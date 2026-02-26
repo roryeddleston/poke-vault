@@ -15,9 +15,22 @@
   --text-muted: #6b7280;
 }
 
+html[data-theme="dark"] {
+  --page: #020617;
+  --card: #020819;
+  --surface: #020617;
+  --surface-soft: #020617;
+  --border-subtle: #1f2937;
+  --accent: #22c55e;
+  --accent-soft: #16a34a;
+  --accent-muted: #064e3b;
+  --danger: #f97373;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark mode */
+  :root:not([data-theme]) {
     --page: #020617;
     --card: #020819;
     --surface: #020617;
