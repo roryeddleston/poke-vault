@@ -31,8 +31,8 @@ export function ThemeToggle() {
   }, []);
 
   const toggle = () => {
-    if (!theme) return;
-    const next: Theme = theme === "light" ? "dark" : "light";
+    const current: Theme = theme ?? getCurrentTheme();
+    const next: Theme = current === "light" ? "dark" : "light";
     applyTheme(next);
     window.localStorage.setItem(STORAGE_KEY, next);
     setTheme(next);
@@ -45,7 +45,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={isDark ? "Use light mode" : "Use dark mode"}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-card text-text-muted shadow-sm transition-colors hover:text-text-main"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-card text-text-muted shadow-sm transition-colors hover:border-accent-soft hover:bg-surface-soft hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-page cursor-pointer"
     >
       {isDark ? (
         <SunIcon className="h-4 w-4" aria-hidden="true" />
@@ -60,4 +60,18 @@ function applyTheme(theme: Theme) {
   if (typeof document === "undefined") return;
   document.documentElement.dataset.theme = theme;
 }
+
+function getCurrentTheme(): Theme {
+  if (typeof document === "undefined") {
+    return "light";
+  }
+  const attr = document.documentElement.dataset.theme;
+  if (attr === "light" || attr === "dark") {
+    return attr;
+  }
+  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")
+    .matches;
+  return prefersDark ? "dark" : "light";
+}
+
 

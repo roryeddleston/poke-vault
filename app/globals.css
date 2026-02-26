@@ -15,7 +15,7 @@
   --text-muted: #6b7280;
 }
 
-html[data-theme="dark"] {
+:root[data-theme="dark"] {
   --page: #020617;
   --card: #020819;
   --surface: #020617;

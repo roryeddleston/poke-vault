@@ -14,21 +14,7 @@ export function Topbar() {
           />
         </form>
 
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-
-          <div className="hidden items-center gap-3 rounded-full border border-border-subtle bg-card px-3 py-1.5 text-xs text-text-muted md:flex">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-muted/30 text-[11px] font-semibold text-accent">
-              AK
-            </div>
-            <div className="leading-tight">
-              <p className="text-xs font-medium text-text-main">
-                Ash Ketchum
-              </p>
-              <p className="text-[11px] text-text-muted">Master Collector</p>
-            </div>
-          </div>
-        </div>
+        <ThemeToggle />
       </div>
     </div>
   );
