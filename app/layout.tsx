@@ -29,7 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navigation />
-        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] pb-20 md:pl-60 md:pb-0">
+        <div className="min-h-screen bg-page text-text-main pb-20 md:pl-60 md:pb-0">
           {children}
         </div>
       </body>

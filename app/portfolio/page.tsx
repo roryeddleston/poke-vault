@@ -56,40 +56,40 @@ export default async function PortfolioPage() {
   const data = await getPortfolio();
 
   return (
-    <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] px-4 py-8">
+    <main className="min-h-screen bg-page text-text-main px-4 py-8">
       <div className="mx-auto w-full max-w-5xl space-y-6">
         <header className="flex items-baseline justify-between gap-4">
           <h1 className="text-2xl font-semibold">Portfolio</h1>
-          <p className="text-sm text-[var(--muted)]">
+          <p className="text-sm text-text-muted">
             Demo data • server-rendered
           </p>
         </header>
 
         {/* Summary */}
         <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
-            <p className="text-xs text-[var(--muted)]">Invested</p>
+          <div className="rounded-lg border border-border-subtle bg-card p-4">
+            <p className="text-xs text-text-muted">Invested</p>
             <p className="mt-1 text-lg font-semibold">
               {formatGBP(data.summary.totalInvested)}
             </p>
           </div>
 
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
-            <p className="text-xs text-[var(--muted)]">Value</p>
+          <div className="rounded-lg border border-border-subtle bg-card p-4">
+            <p className="text-xs text-text-muted">Value</p>
             <p className="mt-1 text-lg font-semibold">
               {formatGBP(data.summary.totalValue)}
             </p>
           </div>
 
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
-            <p className="text-xs text-[var(--muted)]">Profit</p>
+          <div className="rounded-lg border border-border-subtle bg-card p-4">
+            <p className="text-xs text-text-muted">Profit</p>
             <p className="mt-1 text-lg font-semibold">
               {formatGBP(data.summary.totalProfit)}
             </p>
           </div>
 
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4">
-            <p className="text-xs text-[var(--muted)]">Profit %</p>
+          <div className="rounded-lg border border-border-subtle bg-card p-4">
+            <p className="text-xs text-text-muted">Profit %</p>
             <p className="mt-1 text-lg font-semibold">
               {formatPct(data.summary.profitPercentage)}%
             </p>
@@ -97,11 +97,11 @@ export default async function PortfolioPage() {
         </section>
 
         {/* Table */}
-        <section className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)]">
+        <section className="overflow-hidden rounded-lg border border-border-subtle bg-card">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-[var(--border)] text-left">
-                <tr className="text-[var(--muted)]">
+              <thead className="border-b border-border-subtle text-left">
+                <tr className="text-text-muted">
                   <th className="px-4 py-3 font-medium">Card</th>
                   <th className="px-4 py-3 font-medium">Set</th>
                   <th className="px-4 py-3 font-medium">Grade</th>
@@ -116,7 +116,7 @@ export default async function PortfolioPage() {
                   return (
                     <tr
                       key={h.id}
-                      className="border-b border-[var(--border)] last:border-b-0"
+                      className="border-b border-border-subtle last:border-b-0"
                     >
                       <td className="px-4 py-3 font-medium">{h.cardName}</td>
                       <td className="px-4 py-3">{h.setName}</td>
@@ -133,7 +133,7 @@ export default async function PortfolioPage() {
                 {data.holdings.length === 0 ? (
                   <tr>
                     <td
-                      className="px-4 py-8 text-center text-[var(--muted)]"
+                      className="px-4 py-8 text-center text-text-muted"
                       colSpan={6}
                     >
                       No holdings yet.
