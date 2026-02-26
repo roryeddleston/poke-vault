@@ -38,6 +38,7 @@ A deterministic seed system is implemented to support:
 - Portfolio holdings CRUD (in progress)
 - Snapshot tracking
 - Deterministic seed system
+- **Reset to template**: `POST /api/portfolio/reset` restores demo data from the template dataset (idempotent, single transaction).
 - Clean separation of API and data layer
 - Owner scoping to prevent IDOR in demo environment
 
