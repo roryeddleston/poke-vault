@@ -144,3 +144,54 @@ export function PlusIcon(props: IconProps) {
   );
 }
 
+export function SearchIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="11" cy="11" r="5.5" stroke="currentColor" />
+      <path d="m15.5 15.5 3 3" stroke="currentColor" />
+    </svg>
+  );
+}
+
+export function SunIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="4" stroke="currentColor" />
+      <path d="M12 3.5v2.5M12 18v2.5M4.75 4.75l1.8 1.8M17.45 17.45l1.8 1.8M3.5 12H6M18 12h2.5M4.75 19.25l1.8-1.8M17.45 6.55l1.8-1.8" stroke="currentColor" />
+    </svg>
+  );
+}
+
+export function MoonIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path
+        d="M19.5 14.5A7 7 0 0 1 10 4.5 7 7 0 1 0 19.5 14.5Z"
+        stroke="currentColor"
+      />
+    </svg>
+  );
+}
+
+
