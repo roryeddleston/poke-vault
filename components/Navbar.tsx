@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 import {
   AnalyticsIcon,
   CollectionIcon,
@@ -16,7 +17,7 @@ import {
 type NavItem = {
   label: string;
   href: string;
-  icon: (props: IconProps) => JSX.Element;
+  icon: (props: IconProps) => ReactNode;
   desktopOnly?: boolean;
   mobileOnly?: boolean;
 };
