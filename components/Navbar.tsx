@@ -5,12 +5,10 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import {
   AnalyticsIcon,
-  CollectionIcon,
   HomeIcon,
   IconProps,
   PlusIcon,
   PortfolioIcon,
-  TransfersIcon,
   UserIcon,
 } from "./icons";
 
@@ -34,20 +32,9 @@ const NAV_ITEMS: NavItem[] = [
     icon: (props) => <PortfolioIcon {...props} />,
   },
   {
-    label: "Collection",
-    href: "/collection",
-    icon: (props) => <CollectionIcon {...props} />,
-  },
-  {
     label: "Analytics",
     href: "/analytics",
     icon: (props) => <AnalyticsIcon {...props} />,
-  },
-  {
-    label: "Transfers",
-    href: "/transfers",
-    icon: (props) => <TransfersIcon {...props} />,
-    desktopOnly: true,
   },
   {
     label: "Profile",
