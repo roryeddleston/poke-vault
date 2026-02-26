@@ -1,9 +1,6 @@
 import { headers } from "next/headers";
 import type { PortfolioResponse } from "./types";
-import { HoldingsTable } from "./_components/holdings-table";
-import { SummaryCards } from "./_components/summary-cards";
-import { PortfolioHeader } from "./_components/header";
-import { PortfolioFilterBar } from "./_components/filter-bar";
+import { PortfolioContent } from "./_components/portfolio-content";
 
 async function getPortfolio(): Promise<PortfolioResponse> {
   // Server-side fetch to your own API route.
@@ -27,13 +24,7 @@ export default async function PortfolioPage() {
   return (
     <main className="min-h-screen bg-page text-text-main px-4 py-8">
       <div className="mx-auto w-full max-w-5xl space-y-6">
-        <PortfolioHeader summary={data.summary} />
-
-        <SummaryCards summary={data.summary} />
-
-        <PortfolioFilterBar />
-
-        <HoldingsTable holdings={data.holdings} />
+        <PortfolioContent data={data} />
       </div>
     </main>
   );
