@@ -9,9 +9,10 @@ type HoldingsTableProps = {
 };
 
 /**
- * 24h change is not in the API yet (only latest snapshot). Pass null to show "—".
+ * Monthly change is not in the API yet (only latest snapshot). Pass null to show "—".
  */
-function get24hChange(_holding: Holding): number | null {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- holding used when monthly snapshots exist
+function getMonthlyChange(holding: Holding): number | null {
   return null;
 }
 
@@ -46,7 +47,7 @@ export function HoldingsTable({ holdings }: HoldingsTableProps) {
                 Market price
               </th>
               <th scope="col" className="px-4 py-3 font-medium text-right">
-                24h change
+                Monthly change
               </th>
               <th scope="col" className="px-4 py-3 font-medium text-right">
                 Total value
@@ -57,7 +58,7 @@ export function HoldingsTable({ holdings }: HoldingsTableProps) {
             {holdings.map((h) => {
               const latest = h.snapshots[0]?.value ?? h.purchasePrice;
               const totalValue = latest * h.quantity;
-              const change24h = get24hChange(h);
+              const changeMonthly = getMonthlyChange(h);
 
               return (
                 <tr
@@ -84,7 +85,7 @@ export function HoldingsTable({ holdings }: HoldingsTableProps) {
                     {formatGBP(latest)}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <ChangePill value={change24h} />
+                    <ChangePill value={changeMonthly} periodLabel="this month" />
                   </td>
                   <td className="px-4 py-3 text-right font-medium tabular-nums text-text-main">
                     {formatGBP(totalValue)}

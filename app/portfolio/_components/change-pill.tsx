@@ -3,10 +3,16 @@ import { formatPct } from "../utils";
 type ChangePillProps = {
   /** Percentage change; null shows "—" when no data. */
   value: number | null;
+  /** Optional period for aria-label, e.g. "this month". */
+  periodLabel?: string;
   className?: string;
 };
 
-export function ChangePill({ value, className = "" }: ChangePillProps) {
+export function ChangePill({
+  value,
+  periodLabel,
+  className = "",
+}: ChangePillProps) {
   if (value === null) {
     return (
       <span className={`text-xs text-text-muted ${className}`} aria-hidden="true">
@@ -24,11 +30,12 @@ export function ChangePill({ value, className = "" }: ChangePillProps) {
       : "text-text-muted";
 
   const arrow = isPositive ? "▲" : isNegative ? "▼" : "−";
-  const label = isPositive
+  const baseLabel = isPositive
     ? `Up ${formatPct(value)}%`
     : isNegative
       ? `Down ${formatPct(-value)}%`
       : "No change";
+  const label = periodLabel ? `${baseLabel} ${periodLabel}` : baseLabel;
 
   return (
     <span
