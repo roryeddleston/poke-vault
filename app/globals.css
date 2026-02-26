@@ -1,18 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  /* Dark-first palette inspired by the mocks */
-  --page: #020617; /* overall app background */
-  --card: #020819; /* main card / panels */
-  --surface: #020617; /* secondary surfaces */
-  --surface-soft: #020617;
-  --border-subtle: #1f2937;
-  --accent: #22c55e;
-  --accent-soft: #16a34a;
-  --accent-muted: #064e3b;
-  --danger: #f97373;
-  --text-main: #e5e7eb;
-  --text-muted: #9ca3af;
+  /* Light mode (default) */
+  --page: #f3f4f6; /* overall app background */
+  --card: #ffffff; /* main card / panels */
+  --surface: #f9fafb; /* secondary surfaces */
+  --surface-soft: #f3f4f6;
+  --border-subtle: #e5e7eb;
+  --accent: #16a34a;
+  --accent-soft: #22c55e;
+  --accent-muted: #bbf7d0;
+  --danger: #ef4444;
+  --text-main: #0f172a;
+  --text-muted: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode */
+    --page: #020617;
+    --card: #020819;
+    --surface: #020617;
+    --surface-soft: #020617;
+    --border-subtle: #1f2937;
+    --accent: #22c55e;
+    --accent-soft: #16a34a;
+    --accent-muted: #064e3b;
+    --danger: #f97373;
+    --text-main: #e5e7eb;
+    --text-muted: #9ca3af;
+  }
 }
 
 @theme inline {
