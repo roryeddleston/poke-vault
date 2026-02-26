@@ -1,40 +1,7 @@
 import { headers } from "next/headers";
-
-type Holding = {
-  id: string;
-  cardId: string;
-  cardName: string;
-  setName: string;
-  grade: string;
-  purchasePrice: number;
-  quantity: number;
-  snapshots: Array<{ value: number; capturedAt: string }>;
-};
-
-type PortfolioResponse = {
-  holdings: Holding[];
-  summary: {
-    totalInvested: number;
-    totalValue: number;
-    totalProfit: number;
-    profitPercentage: number;
-  };
-};
-
-function formatGBP(value: number) {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function formatPct(value: number) {
-  return new Intl.NumberFormat("en-GB", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
+import type { PortfolioResponse } from "./types";
+import { HoldingsTable } from "./_components/holdings-table";
+import { SummaryCards } from "./_components/summary-cards";
 
 async function getPortfolio(): Promise<PortfolioResponse> {
   // Server-side fetch to your own API route.
@@ -65,85 +32,9 @@ export default async function PortfolioPage() {
           </p>
         </header>
 
-        {/* Summary */}
-        <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <div className="rounded-lg border border-border-subtle bg-card p-4">
-            <p className="text-xs text-text-muted">Invested</p>
-            <p className="mt-1 text-lg font-semibold">
-              {formatGBP(data.summary.totalInvested)}
-            </p>
-          </div>
+        <SummaryCards summary={data.summary} />
 
-          <div className="rounded-lg border border-border-subtle bg-card p-4">
-            <p className="text-xs text-text-muted">Value</p>
-            <p className="mt-1 text-lg font-semibold">
-              {formatGBP(data.summary.totalValue)}
-            </p>
-          </div>
-
-          <div className="rounded-lg border border-border-subtle bg-card p-4">
-            <p className="text-xs text-text-muted">Profit</p>
-            <p className="mt-1 text-lg font-semibold">
-              {formatGBP(data.summary.totalProfit)}
-            </p>
-          </div>
-
-          <div className="rounded-lg border border-border-subtle bg-card p-4">
-            <p className="text-xs text-text-muted">Profit %</p>
-            <p className="mt-1 text-lg font-semibold">
-              {formatPct(data.summary.profitPercentage)}%
-            </p>
-          </div>
-        </section>
-
-        {/* Table */}
-        <section className="overflow-hidden rounded-lg border border-border-subtle bg-card">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b border-border-subtle text-left">
-                <tr className="text-text-muted">
-                  <th className="px-4 py-3 font-medium">Card</th>
-                  <th className="px-4 py-3 font-medium">Set</th>
-                  <th className="px-4 py-3 font-medium">Grade</th>
-                  <th className="px-4 py-3 font-medium">Qty</th>
-                  <th className="px-4 py-3 font-medium">Buy</th>
-                  <th className="px-4 py-3 font-medium">Latest</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.holdings.map((h) => {
-                  const latest = h.snapshots[0]?.value ?? h.purchasePrice;
-                  return (
-                    <tr
-                      key={h.id}
-                      className="border-b border-border-subtle last:border-b-0"
-                    >
-                      <td className="px-4 py-3 font-medium">{h.cardName}</td>
-                      <td className="px-4 py-3">{h.setName}</td>
-                      <td className="px-4 py-3">{h.grade}</td>
-                      <td className="px-4 py-3">{h.quantity}</td>
-                      <td className="px-4 py-3">
-                        {formatGBP(h.purchasePrice)}
-                      </td>
-                      <td className="px-4 py-3">{formatGBP(latest)}</td>
-                    </tr>
-                  );
-                })}
-
-                {data.holdings.length === 0 ? (
-                  <tr>
-                    <td
-                      className="px-4 py-8 text-center text-text-muted"
-                      colSpan={6}
-                    >
-                      No holdings yet.
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <HoldingsTable holdings={data.holdings} />
       </div>
     </main>
   );
