@@ -3,6 +3,7 @@ import type { PortfolioResponse } from "./types";
 import { HoldingsTable } from "./_components/holdings-table";
 import { SummaryCards } from "./_components/summary-cards";
 import { PortfolioHeader } from "./_components/header";
+import { PortfolioFilterBar } from "./_components/filter-bar";
 
 async function getPortfolio(): Promise<PortfolioResponse> {
   // Server-side fetch to your own API route.
@@ -29,6 +30,8 @@ export default async function PortfolioPage() {
         <PortfolioHeader summary={data.summary} />
 
         <SummaryCards summary={data.summary} />
+
+        <PortfolioFilterBar />
 
         <HoldingsTable holdings={data.holdings} />
       </div>
