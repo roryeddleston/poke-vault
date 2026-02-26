@@ -1,39 +1,94 @@
 import type { Holding } from "../types";
 import { formatGBP } from "../utils";
+import { CardImagePlaceholder } from "./card-image-placeholder";
+import { ChangePill } from "./change-pill";
+import { GradePill } from "./grade-pill";
 
 type HoldingsTableProps = {
   holdings: Holding[];
 };
 
+/**
+ * 24h change is not in the API yet (only latest snapshot). Pass null to show "—".
+ */
+function get24hChange(_holding: Holding): number | null {
+  return null;
+}
+
 export function HoldingsTable({ holdings }: HoldingsTableProps) {
   return (
-    <section className="overflow-hidden rounded-lg border border-border-subtle bg-card">
+    <section aria-labelledby="holdings-heading">
+      <h2
+        id="holdings-heading"
+        className="mb-2 text-xs font-medium uppercase tracking-wider text-text-muted"
+      >
+        Holdings ({holdings.length})
+      </h2>
+      <div
+        className="overflow-hidden rounded-lg border border-border-subtle bg-card"
+        role="region"
+        aria-label="Holdings table"
+      >
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-border-subtle text-left">
             <tr className="text-text-muted">
-              <th className="px-4 py-3 font-medium">Card</th>
-              <th className="px-4 py-3 font-medium">Set</th>
-              <th className="px-4 py-3 font-medium">Grade</th>
-              <th className="px-4 py-3 font-medium">Qty</th>
-              <th className="px-4 py-3 font-medium">Buy</th>
-              <th className="px-4 py-3 font-medium">Latest</th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                Card
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                Set
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                Grade
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium text-right">
+                Market price
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium text-right">
+                24h change
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium text-right">
+                Total value
+              </th>
             </tr>
           </thead>
           <tbody>
             {holdings.map((h) => {
               const latest = h.snapshots[0]?.value ?? h.purchasePrice;
+              const totalValue = latest * h.quantity;
+              const change24h = get24hChange(h);
+
               return (
                 <tr
                   key={h.id}
                   className="border-b border-border-subtle last:border-b-0"
                 >
-                  <td className="px-4 py-3 font-medium">{h.cardName}</td>
-                  <td className="px-4 py-3">{h.setName}</td>
-                  <td className="px-4 py-3">{h.grade}</td>
-                  <td className="px-4 py-3">{h.quantity}</td>
-                  <td className="px-4 py-3">{formatGBP(h.purchasePrice)}</td>
-                  <td className="px-4 py-3">{formatGBP(latest)}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <CardImagePlaceholder name={h.cardName} />
+                      <span className="font-medium text-text-main">
+                        {h.cardName}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex rounded-full bg-surface-soft px-2 py-0.5 text-xs text-text-muted">
+                      {h.setName}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <GradePill grade={h.grade} />
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {formatGBP(latest)}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <ChangePill value={change24h} />
+                  </td>
+                  <td className="px-4 py-3 text-right font-medium tabular-nums text-text-main">
+                    {formatGBP(totalValue)}
+                  </td>
                 </tr>
               );
             })}
@@ -51,7 +106,7 @@ export function HoldingsTable({ holdings }: HoldingsTableProps) {
           </tbody>
         </table>
       </div>
+      </div>
     </section>
   );
 }
-
