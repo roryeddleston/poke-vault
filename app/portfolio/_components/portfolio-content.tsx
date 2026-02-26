@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import type { Holding, PortfolioResponse } from "../types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { PortfolioResponse } from "../types";
 import {
   filterHoldings,
   getUniqueGrades,
@@ -10,8 +10,11 @@ import {
 } from "../utils";
 import { PortfolioFilterBar } from "./filter-bar";
 import { HoldingsTable } from "./holdings-table";
+import { Pagination } from "./pagination";
 import { PortfolioHeader } from "./header";
 import { SummaryCards } from "./summary-cards";
+
+const PAGE_SIZE = 10;
 
 type PortfolioContentProps = {
   data: PortfolioResponse;
@@ -20,6 +23,7 @@ type PortfolioContentProps = {
 export function PortfolioContent({ data }: PortfolioContentProps) {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<FilterEntry[]>([]);
+  const [page, setPage] = useState(1);
 
   const availableGrades = useMemo(
     () => getUniqueGrades(data.holdings),
@@ -34,6 +38,15 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
     () => filterHoldings(data.holdings, search, filters),
     [data.holdings, search, filters],
   );
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, filters]);
+
+  const paginatedHoldings = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return filteredHoldings.slice(start, start + PAGE_SIZE);
+  }, [filteredHoldings, page]);
 
   const onRemoveFilter = useCallback((key: FilterEntry["key"], value: string) => {
     setFilters((prev) => prev.filter((f) => !(f.key === key && f.value === value)));
@@ -66,7 +79,16 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
         availableSets={availableSets}
         onAddFilter={onAddFilter}
       />
-      <HoldingsTable holdings={filteredHoldings} />
+      <HoldingsTable
+        holdings={paginatedHoldings}
+        totalCount={filteredHoldings.length}
+      />
+      <Pagination
+        totalItems={filteredHoldings.length}
+        pageSize={PAGE_SIZE}
+        currentPage={page}
+        onPageChange={setPage}
+      />
     </>
   );
 }

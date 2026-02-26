@@ -6,6 +6,8 @@ import { GradePill } from "./grade-pill";
 
 type HoldingsTableProps = {
   holdings: Holding[];
+  /** Total count when paginated; used for heading. */
+  totalCount?: number;
 };
 
 /**
@@ -16,14 +18,19 @@ function getMonthlyChange(holding: Holding): number | null {
   return null;
 }
 
-export function HoldingsTable({ holdings }: HoldingsTableProps) {
+export function HoldingsTable({
+  holdings,
+  totalCount,
+}: HoldingsTableProps) {
+  const count = totalCount ?? holdings.length;
+
   return (
     <section aria-labelledby="holdings-heading">
       <h2
         id="holdings-heading"
         className="mb-2 text-xs font-medium uppercase tracking-wider text-text-muted"
       >
-        Holdings ({holdings.length})
+        Holdings ({count})
       </h2>
       <div
         className="overflow-hidden rounded-lg border border-border-subtle bg-card"
