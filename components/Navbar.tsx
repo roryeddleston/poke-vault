@@ -69,17 +69,17 @@ export default function Navbar() {
       {/* Desktop sidebar */}
       <nav
         aria-label="Main navigation"
-        className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-zinc-800 bg-zinc-950/95 px-4 py-6 text-sm text-zinc-300 backdrop-blur md:flex"
+        className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-border-subtle bg-surface px-4 py-6 text-sm text-text-muted backdrop-blur md:flex"
       >
         <div className="flex items-center gap-3 px-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-400/40">
             <span className="text-lg font-semibold text-emerald-300">PV</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-zinc-50">
+            <span className="text-sm font-semibold text-text-main">
               PokeVault Pro
             </span>
-            <span className="text-xs text-zinc-500">Elite Collector</span>
+            <span className="text-xs text-text-muted">Elite Collector</span>
           </div>
         </div>
 
@@ -92,13 +92,13 @@ export default function Navbar() {
                   href={item.href}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                     active
-                      ? "bg-emerald-500/10 text-emerald-300"
-                      : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+                      ? "bg-accent-muted/20 text-accent"
+                      : "text-text-muted hover:bg-surface-soft hover:text-text-main"
                   }`}
                 >
                   <item.icon
                     className={`h-5 w-5 ${
-                      active ? "text-emerald-300" : "text-zinc-500"
+                      active ? "text-accent" : "text-text-muted"
                     }`}
                     aria-hidden="true"
                   />
@@ -113,7 +113,7 @@ export default function Navbar() {
       {/* Mobile bottom bar */}
       <nav
         aria-label="Bottom navigation"
-        className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between border-t border-zinc-800 bg-zinc-950/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 text-xs text-zinc-300 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between border-t border-border-subtle bg-surface px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 text-xs text-text-muted backdrop-blur md:hidden"
       >
         {NAV_ITEMS.filter((item) => !item.desktopOnly).map((item) => {
           const active = isActive(item.href);
@@ -125,13 +125,13 @@ export default function Navbar() {
             >
               <item.icon
                 className={`h-5 w-5 ${
-                  active ? "text-emerald-300" : "text-zinc-500"
+                  active ? "text-accent" : "text-text-muted"
                 }`}
                 aria-hidden="true"
               />
               <span
                 className={`text-[11px] ${
-                  active ? "text-emerald-300" : "text-zinc-400"
+                  active ? "text-accent" : "text-text-muted"
                 }`}
               >
                 {item.label}
