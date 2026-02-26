@@ -49,15 +49,11 @@ export function HoldingsTable({ holdings }: HoldingsTableProps) {
               <th scope="col" className="px-4 py-3 font-medium text-right">
                 Monthly change
               </th>
-              <th scope="col" className="px-4 py-3 font-medium text-right">
-                Total value
-              </th>
             </tr>
           </thead>
           <tbody>
             {holdings.map((h) => {
               const latest = h.snapshots[0]?.value ?? h.purchasePrice;
-              const totalValue = latest * h.quantity;
               const changeMonthly = getMonthlyChange(h);
 
               return (
@@ -87,9 +83,6 @@ export function HoldingsTable({ holdings }: HoldingsTableProps) {
                   <td className="px-4 py-3 text-right">
                     <ChangePill value={changeMonthly} periodLabel="this month" />
                   </td>
-                  <td className="px-4 py-3 text-right font-medium tabular-nums text-text-main">
-                    {formatGBP(totalValue)}
-                  </td>
                 </tr>
               );
             })}
@@ -98,7 +91,7 @@ export function HoldingsTable({ holdings }: HoldingsTableProps) {
               <tr>
                 <td
                   className="px-4 py-8 text-center text-text-muted"
-                  colSpan={6}
+                  colSpan={5}
                 >
                   No holdings yet.
                 </td>
