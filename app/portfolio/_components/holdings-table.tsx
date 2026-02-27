@@ -18,10 +18,7 @@ function getMonthlyChange(holding: Holding): number | null {
   return null;
 }
 
-export function HoldingsTable({
-  holdings,
-  totalCount,
-}: HoldingsTableProps) {
+export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
   const count = totalCount ?? holdings.length;
 
   return (

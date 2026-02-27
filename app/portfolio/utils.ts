@@ -59,4 +59,3 @@ export function hasAnyValue(summary: PortfolioSummary) {
     summary.profitPercentage !== 0
   );
 }
-

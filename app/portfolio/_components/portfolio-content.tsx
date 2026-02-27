@@ -48,9 +48,14 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
     return filteredHoldings.slice(start, start + PAGE_SIZE);
   }, [filteredHoldings, page]);
 
-  const onRemoveFilter = useCallback((key: FilterEntry["key"], value: string) => {
-    setFilters((prev) => prev.filter((f) => !(f.key === key && f.value === value)));
-  }, []);
+  const onRemoveFilter = useCallback(
+    (key: FilterEntry["key"], value: string) => {
+      setFilters((prev) =>
+        prev.filter((f) => !(f.key === key && f.value === value)),
+      );
+    },
+    [],
+  );
 
   const onClearAll = useCallback(() => {
     setFilters([]);

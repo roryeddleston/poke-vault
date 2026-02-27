@@ -49,7 +49,7 @@ export async function GET() {
 
     return NextResponse.json(
       { error: "Failed to fetch portfolio" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

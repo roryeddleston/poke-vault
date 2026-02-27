@@ -25,4 +25,3 @@ export type PortfolioResponse = {
   holdings: Holding[];
   summary: PortfolioSummary;
 };
-
