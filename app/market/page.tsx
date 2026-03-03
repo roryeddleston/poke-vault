@@ -2,11 +2,13 @@ import { searchPokemonCards } from "@/lib/pokemon-tcg";
 import { AddFromMarketButton } from "./_components/add-from-market-button";
 
 type MarketPageProps = {
-  searchParams?: { q?: string };
+  // In the latest App Router, searchParams is a Promise
+  searchParams: Promise<{ q?: string }>;
 };
 
-export default async function MarketPage({ searchParams }: MarketPageProps) {
-  const query = searchParams?.q?.toString() ?? "";
+export default async function MarketPage(props: MarketPageProps) {
+  const { q } = await props.searchParams;
+  const query = q?.toString() ?? "";
 
   const cards = query ? await searchPokemonCards(query, 20) : [];
 
