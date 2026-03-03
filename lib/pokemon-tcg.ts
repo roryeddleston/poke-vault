@@ -1,12 +1,5 @@
 import "server-only";
-
-type PokemonTcgCard = {
-  id: string;
-  name: string;
-  images?: { small?: string; large?: string };
-  set?: { name?: string };
-  rarity?: string;
-};
+import TCGdex, { Query } from "@tcgdex/sdk";
 
 export type PokemonCardSummary = {
   id: string;
@@ -16,12 +9,27 @@ export type PokemonCardSummary = {
   rarity?: string;
 };
 
-const API_BASE = "https://api.pokemontcg.io/v2/cards";
+let tcgdexClient: TCGdex | null = null;
 
-function buildHeaders(): Record<string, string> {
-  const apiKey = process.env.POKEMON_TCG_API_KEY;
-  return apiKey ? { "X-Api-Key": apiKey } : {};
+function getTcgDex(): TCGdex {
+  if (!tcgdexClient) {
+    tcgdexClient = new TCGdex("en");
+    // Cache responses inside the SDK for an hour.
+    tcgdexClient.setCacheTTL(60 * 60);
+  }
+  return tcgdexClient;
 }
+
+type TcgDexCard = {
+  id: string;
+  name: string;
+  rarity?: string;
+  set?: {
+    id: string;
+    name?: string;
+  };
+  getImageURL?: (quality: "high" | "low", ext: "png" | "webp") => string;
+};
 
 export async function searchPokemonCards(
   query: string,
@@ -30,39 +38,34 @@ export async function searchPokemonCards(
   const q = query.trim();
   if (!q) return [];
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 1500);
-
   try {
-    const url = new URL(API_BASE);
-    // Simple name-based search; this can be refined later.
-    url.searchParams.set("q", `name:${q}*`);
-    url.searchParams.set("pageSize", String(pageSize));
+    const tcgdex = getTcgDex();
 
-    const res = await fetch(url.toString(), {
-      headers: buildHeaders(),
-      next: { revalidate: 60 * 60 }, // cache for an hour
-      signal: controller.signal,
+    const cards = (await tcgdex.card.list(
+      Query.create()
+        .contains("name", q)
+        .sort("localId", "ASC")
+        .paginate(1, pageSize),
+    )) as unknown as TcgDexCard[];
+
+    return cards.map((card) => {
+      const imageUrl =
+        typeof card.getImageURL === "function"
+          ? card.getImageURL("high", "png")
+          : undefined;
+
+      const setName = card.set?.name ?? card.set?.id;
+
+      return {
+        id: card.id,
+        name: card.name,
+        imageUrl,
+        setName,
+        rarity: card.rarity,
+      };
     });
-
-    clearTimeout(timeoutId);
-
-    if (!res.ok) return [];
-
-    const json = (await res.json()) as { data?: PokemonTcgCard[] };
-    const cards = json.data ?? [];
-
-    return cards.map((card) => ({
-      id: card.id,
-      name: card.name,
-      imageUrl: card.images?.small ?? card.images?.large,
-      setName: card.set?.name,
-      rarity: card.rarity,
-    }));
   } catch (error) {
-    clearTimeout(timeoutId);
-    console.error("searchPokemonCards failed:", error);
+    console.error("[TCGdex] searchPokemonCards failed:", error);
     return [];
   }
 }
-
