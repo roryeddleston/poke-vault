@@ -1,0 +1,124 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { SearchIcon } from "./icons";
+import type { PokemonCardSummary } from "@/lib/pokemon-tcg";
+
+type Suggestion = PokemonCardSummary;
+
+export function SearchBox() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!query || query.trim().length < 2) {
+      setSuggestions([]);
+      setOpen(false);
+      return;
+    }
+
+    let cancelled = false;
+    const timeoutId = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `/api/cards/search?q=${encodeURIComponent(query.trim())}`,
+        );
+        if (!res.ok) {
+          if (!cancelled) {
+            setSuggestions([]);
+            setOpen(false);
+          }
+          return;
+        }
+        const data = (await res.json()) as Suggestion[];
+        if (!cancelled) {
+          setSuggestions(data);
+          setOpen(data.length > 0);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [query]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    router.push(`/market?q=${encodeURIComponent(q)}`);
+    setOpen(false);
+  };
+
+  const handleSuggestionClick = (s: Suggestion) => {
+    router.push(`/market?q=${encodeURIComponent(s.name)}`);
+    setOpen(false);
+  };
+
+  return (
+    <div className="relative flex-1">
+      <form
+        onSubmit={handleSubmit}
+        className="flex h-10 items-center gap-2 rounded-full border border-border-subtle bg-card px-3 text-sm text-text-muted shadow-sm"
+      >
+        <SearchIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search collection or market…"
+          className="w-full bg-transparent text-sm text-text-main placeholder:text-text-muted focus:outline-none"
+        />
+        {loading ? (
+          <span className="text-[10px] text-text-muted">…</span>
+        ) : null}
+      </form>
+
+      {open && suggestions.length > 0 && (
+        <ul className="absolute z-40 mt-1 w-full overflow-hidden rounded-xl border border-border-subtle bg-card text-sm shadow-lg">
+          {suggestions.map((s) => (
+            <li key={s.id}>
+              <button
+                type="button"
+                onClick={() => handleSuggestionClick(s)}
+                className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left hover:bg-surface-soft"
+              >
+                {s.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={s.imageUrl}
+                    alt={s.name}
+                    className="h-8 w-auto rounded bg-surface-soft object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-8 w-6 items-center justify-center rounded bg-surface-soft text-[10px] text-text-muted">
+                    ?
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-medium text-text-main">
+                    {s.name}
+                  </p>
+                  <p className="truncate text-[11px] text-text-muted">
+                    {s.setName ?? "Unknown set"}
+                  </p>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
