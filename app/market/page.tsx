@@ -1,4 +1,5 @@
 import { searchPokemonCards } from "@/lib/pokemon-tcg";
+import { AddFromMarketButton } from "./_components/add-from-market-button";
 
 type MarketPageProps = {
   searchParams?: { q?: string };
@@ -76,12 +77,7 @@ export default async function MarketPage({ searchParams }: MarketPageProps) {
                   </div>
 
                   <div className="flex shrink-0 items-center gap-2">
-                    <button
-                      type="button"
-                      className="inline-flex cursor-pointer items-center justify-center rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:bg-surface-soft"
-                    >
-                      Add to portfolio
-                    </button>
+                    <AddFromMarketButton card={card} />
                   </div>
                 </li>
               ))}
