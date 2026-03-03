@@ -13,6 +13,7 @@ import { HoldingsTable } from "./holdings-table";
 import { Pagination } from "./pagination";
 import { PortfolioHeader } from "./header";
 import { SummaryCards } from "./summary-cards";
+import { AddHoldingDialog } from "./add-holding-dialog";
 
 const PAGE_SIZE = 10;
 
@@ -24,6 +25,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<FilterEntry[]>([]);
   const [page, setPage] = useState(1);
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
   const availableGrades = useMemo(
     () => getUniqueGrades(data.holdings),
@@ -72,7 +74,10 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
 
   return (
     <>
-      <PortfolioHeader summary={data.summary} />
+      <PortfolioHeader
+        summary={data.summary}
+        onAddCard={() => setShowAddDialog(true)}
+      />
       <SummaryCards summary={data.summary} />
       <PortfolioFilterBar
         search={search}
@@ -93,6 +98,10 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
         pageSize={PAGE_SIZE}
         currentPage={page}
         onPageChange={setPage}
+      />
+      <AddHoldingDialog
+        open={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
       />
     </>
   );
