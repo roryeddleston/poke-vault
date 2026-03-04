@@ -20,11 +20,18 @@ function getTcgDex(): TCGdex {
   return tcgdexClient;
 }
 
-type TcgDexCard = {
+type TcgDexCardResume = {
   id: string;
   name: string;
   rarity?: string;
-  set?: {
+  getCard?: () => Promise<TcgDexCardFull>;
+};
+
+type TcgDexCardFull = {
+  id: string;
+  name: string;
+  rarity?: string;
+  set: {
     id: string;
     name?: string;
   };
@@ -41,29 +48,50 @@ export async function searchPokemonCards(
   try {
     const tcgdex = getTcgDex();
 
-    const cards = (await tcgdex.card.list(
+    const resumes = (await tcgdex.card.list(
       Query.create()
         .contains("name", q)
         .sort("localId", "ASC")
         .paginate(1, pageSize),
-    )) as unknown as TcgDexCard[];
+    )) as unknown as TcgDexCardResume[];
 
-    return cards.map((card) => {
-      const imageUrl =
-        typeof card.getImageURL === "function"
-          ? card.getImageURL("high", "png")
-          : undefined;
+    const fullCards = await Promise.all(
+      resumes.map(async (resume) => {
+        try {
+          if (typeof resume.getCard === "function") {
+            return (await resume.getCard()) as TcgDexCardFull;
+          }
+          // Fallback: fetch full card by id if getCard is not available.
+          return (await tcgdex.card.get(resume.id)) as TcgDexCardFull;
+        } catch (err) {
+          console.error(
+            "[TCGdex] Failed to load full card for",
+            resume.id,
+            err,
+          );
+          return null;
+        }
+      }),
+    );
 
-      const setName = card.set?.name ?? card.set?.id;
+    return fullCards
+      .filter((c): c is TcgDexCardFull => c !== null)
+      .map((card) => {
+        const imageUrl =
+          typeof card.getImageURL === "function"
+            ? card.getImageURL("high", "png")
+            : undefined;
 
-      return {
-        id: card.id,
-        name: card.name,
-        imageUrl,
-        setName,
-        rarity: card.rarity,
-      };
-    });
+        const setName = card.set?.name ?? card.set?.id;
+
+        return {
+          id: card.id,
+          name: card.name,
+          imageUrl,
+          setName,
+          rarity: card.rarity,
+        };
+      });
   } catch (error) {
     console.error("[TCGdex] searchPokemonCards failed:", error);
     return [];
