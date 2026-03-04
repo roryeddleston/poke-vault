@@ -46,7 +46,7 @@ export default async function MarketPage(props: MarketPageProps) {
               {cards.map((card) => (
                 <li
                   key={card.id}
-                  className="flex items-center gap-6 px-5 py-5 text-lg md:gap-8 md:px-6 md:py-6"
+                  className="flex items-center gap-7 px-5 py-6 text-lg md:gap-9 md:px-7 md:py-7"
                 >
                   <div className="flex h-24 w-16 items-center justify-center overflow-hidden rounded-sm bg-surface-soft md:h-28 md:w-20">
                     {card.imageUrl ? (
