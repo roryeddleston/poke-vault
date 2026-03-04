@@ -75,6 +75,17 @@ export default async function MarketPage(props: MarketPageProps) {
                     </div>
                     <p className="truncate text-xs text-text-muted">
                       {card.setName ?? "Unknown set"}
+                      {card.cardNumber != null && card.setTotal != null ? (
+                        <>
+                          {" "}
+                          · {card.cardNumber}/{card.setTotal}
+                        </>
+                      ) : card.cardNumber != null ? (
+                        <>
+                          {" "}
+                          · {card.cardNumber}
+                        </>
+                      ) : null}
                     </p>
                   </div>
 
