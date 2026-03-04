@@ -46,21 +46,23 @@ export default async function MarketPage(props: MarketPageProps) {
               {cards.map((card) => (
                 <li
                   key={card.id}
-                  className="flex items-center gap-4 px-4 py-3 text-sm"
+                  className="flex items-center gap-6 px-5 py-5 text-lg md:gap-8 md:px-6 md:py-6"
                 >
-                  {card.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={card.imageUrl}
-                      alt={card.name}
-                      className="h-14 w-auto rounded-md bg-surface-soft object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="flex h-14 w-10 items-center justify-center rounded-md bg-surface-soft text-xs text-text-muted">
-                      ?
-                    </div>
-                  )}
+                  <div className="flex h-24 w-16 items-center justify-center overflow-hidden rounded-sm bg-surface-soft md:h-28 md:w-20">
+                    {card.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={card.imageUrl}
+                        alt={card.name}
+                        className="max-h-full max-w-full object-contain"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-sm text-text-muted">
+                        ?
+                      </div>
+                    )}
+                  </div>
 
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <div className="flex items-baseline justify-between gap-3">
@@ -81,10 +83,7 @@ export default async function MarketPage(props: MarketPageProps) {
                           · {card.cardNumber}/{card.setTotal}
                         </>
                       ) : card.cardNumber != null ? (
-                        <>
-                          {" "}
-                          · {card.cardNumber}
-                        </>
+                        <> · {card.cardNumber}</>
                       ) : null}
                     </p>
                   </div>
@@ -101,4 +100,3 @@ export default async function MarketPage(props: MarketPageProps) {
     </main>
   );
 }
-
