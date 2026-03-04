@@ -7,6 +7,10 @@ export type PokemonCardSummary = {
   imageUrl?: string;
   setName?: string;
   rarity?: string;
+  /** Card number within the set (e.g. 2 in 2/102). */
+  cardNumber?: number;
+  /** Total number of cards in the set (e.g. 102 in 2/102). */
+  setTotal?: number;
 };
 
 let tcgdexClient: TCGdex | null = null;
@@ -34,7 +38,12 @@ type TcgDexCardFull = {
   set: {
     id: string;
     name?: string;
+    cardCount?: {
+      official?: number;
+      total?: number;
+    };
   };
+  localId?: string | number;
   getImageURL?: (quality: "high" | "low", ext: "png" | "webp") => string;
 };
 
@@ -84,12 +93,29 @@ export async function searchPokemonCards(
 
         const setName = card.set?.name ?? card.set?.id;
 
+        // Prefer the "official" card count if present, otherwise fall back to total,
+        // but treat 0 or negative values as "no total".
+        const rawTotal =
+          card.set?.cardCount?.official ?? card.set?.cardCount?.total;
+        const setTotal =
+          typeof rawTotal === "number" && rawTotal > 0 ? rawTotal : undefined;
+
+        let cardNumber: number | undefined;
+        if (typeof card.localId === "string") {
+          const parsed = Number.parseInt(card.localId, 10);
+          cardNumber = Number.isNaN(parsed) ? undefined : parsed;
+        } else if (typeof card.localId === "number") {
+          cardNumber = card.localId;
+        }
+
         return {
           id: card.id,
           name: card.name,
           imageUrl,
           setName,
           rarity: card.rarity,
+          cardNumber,
+          setTotal,
         };
       });
   } catch (error) {
