@@ -12,6 +12,7 @@ export const createHoldingSchema = z.object({
     .min(1)
     .max(20)
     .optional()
+    .or(z.literal(""))
     .transform((v) => (v && v.length > 0 ? v : "RAW")),
 
   purchasePrice: z.number().finite().min(0).max(1_000_000),
