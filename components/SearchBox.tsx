@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "./icons";
 import type { PokemonCardSummary } from "@/lib/pokemon-tcg";
@@ -13,6 +13,7 @@ export function SearchBox() {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!query || query.trim().length < 2) {
@@ -57,11 +58,15 @@ export function SearchBox() {
     if (!q) return;
     router.push(`/market?q=${encodeURIComponent(q)}`);
     setOpen(false);
+    setQuery("");
+    inputRef.current?.blur();
   };
 
   const handleSuggestionClick = (s: Suggestion) => {
     router.push(`/market?q=${encodeURIComponent(s.name)}`);
     setOpen(false);
+    setQuery("");
+    inputRef.current?.blur();
   };
 
   return (
@@ -73,6 +78,7 @@ export function SearchBox() {
         <SearchIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
         <input
           type="search"
+          ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search collection or market…"
@@ -99,6 +105,9 @@ export function SearchBox() {
                     alt={s.name}
                     className="h-8 w-auto rounded bg-surface-soft object-cover"
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
                   />
                 ) : (
                   <div className="flex h-8 w-6 items-center justify-center rounded bg-surface-soft text-[10px] text-text-muted">
