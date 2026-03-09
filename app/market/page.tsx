@@ -1,5 +1,6 @@
 import { searchPokemonCardsAll } from "@/lib/pokemon-tcg";
 import { CardImage } from "@/components/CardImage";
+import Link from "next/link";
 import { AddFromMarketButton } from "./_components/add-from-market-button";
 
 type MarketPageProps = {
@@ -16,6 +17,7 @@ export default async function MarketPage(props: MarketPageProps) {
 
   const allCards = query ? await searchPokemonCardsAll(query, 50, 10) : [];
   const total = allCards.length;
+  const totalPages = total === 0 ? 1 : Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const startIndex = (page - 1) * PAGE_SIZE;
   const pageCards = allCards.slice(startIndex, startIndex + PAGE_SIZE);
@@ -49,7 +51,8 @@ export default async function MarketPage(props: MarketPageProps) {
             <p className="text-xs text-text-muted">
               Showing {pageCards.length} of {total} result
               {total === 1 ? "" : "s"} for{" "}
-              <span className="font-medium">{query}</span>
+              <span className="font-medium">{query}</span> (page {page} of{" "}
+              {totalPages})
             </p>
             <ul className="divide-y divide-border-subtle rounded-xl border border-border-subtle bg-card">
               {pageCards.map((card) => (
@@ -92,39 +95,37 @@ export default async function MarketPage(props: MarketPageProps) {
             </ul>
             <div className="flex items-center justify-between pt-3 text-xs text-text-muted">
               <div>
-                Page {page}
+                Page {page} of {totalPages}
               </div>
               <div className="flex items-center gap-2">
-                <a
-                  href={
-                    page > 1
-                      ? `/market?q=${encodeURIComponent(query)}&page=${page - 1}`
-                      : "#"
-                  }
-                  aria-disabled={page <= 1}
-                  className={`rounded-full px-3 py-1 font-medium ${
-                    page <= 1
-                      ? "cursor-not-allowed opacity-40"
-                      : "cursor-pointer hover:bg-surface-soft"
-                  }`}
-                >
-                  Previous
-                </a>
-                <a
-                  href={
-                    startIndex + PAGE_SIZE < total
-                      ? `/market?q=${encodeURIComponent(query)}&page=${page + 1}`
-                      : "#"
-                  }
-                  aria-disabled={startIndex + PAGE_SIZE >= total}
-                  className={`rounded-full px-3 py-1 font-medium ${
-                    startIndex + PAGE_SIZE >= total
-                      ? "cursor-not-allowed opacity-40"
-                      : "cursor-pointer hover:bg-surface-soft"
-                  }`}
-                >
-                  Next
-                </a>
+                {page > 1 ? (
+                  <Link
+                    href={`/market?q=${encodeURIComponent(
+                      query,
+                    )}&page=${page - 1}`}
+                    className="rounded-full px-3 py-1 font-medium cursor-pointer hover:bg-surface-soft"
+                  >
+                    Previous
+                  </Link>
+                ) : (
+                  <span className="rounded-full px-3 py-1 font-medium cursor-not-allowed opacity-40">
+                    Previous
+                  </span>
+                )}
+                {startIndex + PAGE_SIZE < total ? (
+                  <Link
+                    href={`/market?q=${encodeURIComponent(
+                      query,
+                    )}&page=${page + 1}`}
+                    className="rounded-full px-3 py-1 font-medium cursor-pointer hover:bg-surface-soft"
+                  >
+                    Next
+                  </Link>
+                ) : (
+                  <span className="rounded-full px-3 py-1 font-medium cursor-not-allowed opacity-40">
+                    Next
+                  </span>
+                )}
               </div>
             </div>
           </section>
