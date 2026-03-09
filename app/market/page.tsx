@@ -1,16 +1,23 @@
-import { searchPokemonCards } from "@/lib/pokemon-tcg";
+import { searchPokemonCardsAll } from "@/lib/pokemon-tcg";
 import { AddFromMarketButton } from "./_components/add-from-market-button";
 
 type MarketPageProps = {
   // In the latest App Router, searchParams is a Promise
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 };
 
-export default async function MarketPage(props: MarketPageProps) {
-  const { q } = await props.searchParams;
-  const query = q?.toString() ?? "";
+const PAGE_SIZE = 20;
 
-  const cards = query ? await searchPokemonCards(query, 20) : [];
+export default async function MarketPage(props: MarketPageProps) {
+  const { q, page: rawPage } = await props.searchParams;
+  const query = q?.toString() ?? "";
+  const page = Math.max(1, Number.parseInt(rawPage ?? "1", 10) || 1);
+
+  const allCards = query ? await searchPokemonCardsAll(query, 50, 10) : [];
+  const total = allCards.length;
+
+  const startIndex = (page - 1) * PAGE_SIZE;
+  const pageCards = allCards.slice(startIndex, startIndex + PAGE_SIZE);
 
   return (
     <main className="min-h-screen bg-page text-text-main px-4 py-8">
@@ -32,18 +39,19 @@ export default async function MarketPage(props: MarketPageProps) {
           <section className="rounded-xl border border-border-subtle bg-card px-4 py-10 text-center text-sm text-text-muted">
             Start by typing a card name in the search bar.
           </section>
-        ) : cards.length === 0 ? (
+        ) : total === 0 ? (
           <section className="rounded-xl border border-border-subtle bg-card px-4 py-10 text-center text-sm text-text-muted">
             No cards found for <span className="font-medium">{query}</span>.
           </section>
         ) : (
-          <section className="space-y-3">
+              <section className="space-y-3">
             <p className="text-xs text-text-muted">
-              Showing {cards.length} result{cards.length === 1 ? "" : "s"} for{" "}
+              Showing {pageCards.length} of {total} result
+              {total === 1 ? "" : "s"} for{" "}
               <span className="font-medium">{query}</span>
             </p>
             <ul className="divide-y divide-border-subtle rounded-xl border border-border-subtle bg-card">
-              {cards.map((card) => (
+              {pageCards.map((card) => (
                 <li
                   key={card.id}
                   className="flex items-center gap-7 px-5 py-6 text-lg md:gap-9 md:px-7 md:py-7"
@@ -91,6 +99,43 @@ export default async function MarketPage(props: MarketPageProps) {
                 </li>
               ))}
             </ul>
+            <div className="flex items-center justify-between pt-3 text-xs text-text-muted">
+              <div>
+                Page {page}
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={
+                    page > 1
+                      ? `/market?q=${encodeURIComponent(query)}&page=${page - 1}`
+                      : "#"
+                  }
+                  aria-disabled={page <= 1}
+                  className={`rounded-full px-3 py-1 font-medium ${
+                    page <= 1
+                      ? "cursor-not-allowed opacity-40"
+                      : "cursor-pointer hover:bg-surface-soft"
+                  }`}
+                >
+                  Previous
+                </a>
+                <a
+                  href={
+                    startIndex + PAGE_SIZE < total
+                      ? `/market?q=${encodeURIComponent(query)}&page=${page + 1}`
+                      : "#"
+                  }
+                  aria-disabled={startIndex + PAGE_SIZE >= total}
+                  className={`rounded-full px-3 py-1 font-medium ${
+                    startIndex + PAGE_SIZE >= total
+                      ? "cursor-not-allowed opacity-40"
+                      : "cursor-pointer hover:bg-surface-soft"
+                  }`}
+                >
+                  Next
+                </a>
+              </div>
+            </div>
           </section>
         )}
       </div>

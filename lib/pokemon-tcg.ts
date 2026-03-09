@@ -49,6 +49,7 @@ type TcgDexCardFull = {
 
 export async function searchPokemonCards(
   query: string,
+  page = 1,
   pageSize = 10,
 ): Promise<PokemonCardSummary[]> {
   const q = query.trim();
@@ -84,7 +85,7 @@ export async function searchPokemonCards(
       queries.push(
         Query.create()
           .equal("id", q)
-          .paginate(1, pageSize),
+          .paginate(page, pageSize),
       );
     }
 
@@ -95,7 +96,7 @@ export async function searchPokemonCards(
         Query.create()
           .contains("name", namePart)
           .equal("localId", nameNumberPart)
-          .paginate(1, pageSize),
+          .paginate(page, pageSize),
       );
     }
 
@@ -105,7 +106,7 @@ export async function searchPokemonCards(
         Query.create()
           .equal("localId", pureNumberPart)
           .sort("localId", "ASC")
-          .paginate(1, pageSize),
+          .paginate(page, pageSize),
       );
     }
 
@@ -115,7 +116,7 @@ export async function searchPokemonCards(
         Query.create()
           .contains("name", effectiveName)
           .sort("localId", "ASC")
-          .paginate(1, pageSize),
+          .paginate(page, pageSize),
       );
     }
 
@@ -217,4 +218,33 @@ export async function searchPokemonCards(
     console.error("[TCGdex] searchPokemonCards failed:", error);
     return [];
   }
+}
+
+/**
+ * Fetch multiple pages of search results from TCGdex and merge them client-side.
+ * This is more expensive, so only use it where you truly need the global set
+ * of matches (e.g. for paginating in the UI with an accurate total count).
+ */
+export async function searchPokemonCardsAll(
+  query: string,
+  perPage = 50,
+  maxPages = 10,
+): Promise<PokemonCardSummary[]> {
+  const all: PokemonCardSummary[] = [];
+  const seen = new Set<string>();
+
+  for (let page = 1; page <= maxPages; page++) {
+    const pageResults = await searchPokemonCards(query, page, perPage);
+    const newOnThisPage = pageResults.filter((c) => !seen.has(c.id));
+    for (const card of newOnThisPage) {
+      seen.add(card.id);
+      all.push(card);
+    }
+    // If we received fewer than perPage results, we've likely exhausted matches.
+    if (pageResults.length < perPage) {
+      break;
+    }
+  }
+
+  return all;
 }
