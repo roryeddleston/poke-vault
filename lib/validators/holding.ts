@@ -4,6 +4,9 @@ export const createHoldingSchema = z.object({
   cardId: z.string().min(1).max(100),
   cardName: z.string().min(1).max(120),
   setName: z.string().min(1).max(120),
+  imageUrl: z.string().url().max(500).optional(),
+  cardNumber: z.number().int().min(1).max(9999).optional(),
+  setTotal: z.number().int().min(1).max(9999).optional(),
 
   // Optional from the client, but ALWAYS becomes a string in parsed.data
   grade: z

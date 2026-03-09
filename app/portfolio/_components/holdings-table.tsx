@@ -68,9 +68,24 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <CardImagePlaceholder name={h.cardName} />
+                        {h.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={h.imageUrl}
+                            alt={h.cardName}
+                            className="h-12 w-auto rounded-md bg-surface-soft object-contain sm:h-14"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <CardImagePlaceholder name={h.cardName} />
+                        )}
                         <span className="font-medium text-text-main">
                           {h.cardName}
+                          {h.cardNumber != null && h.setTotal != null ? (
+                            <> {h.cardNumber}/{h.setTotal}</>
+                          ) : h.cardNumber != null ? (
+                            <> {h.cardNumber}</>
+                          ) : null}
                         </span>
                       </div>
                     </td>
@@ -126,11 +141,26 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                 key={h.id}
                 className="flex items-center gap-3 rounded-lg border border-border-subtle bg-card px-3 py-2"
               >
-                <CardImagePlaceholder name={h.cardName} className="w-12" />
+                {h.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={h.imageUrl}
+                    alt={h.cardName}
+                    className="h-14 w-auto rounded-md bg-surface-soft object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <CardImagePlaceholder name={h.cardName} className="w-12" />
+                )}
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <div className="flex items-baseline justify-between gap-2">
                     <h3 className="truncate text-sm font-medium text-text-main">
                       {h.cardName}
+                      {h.cardNumber != null && h.setTotal != null ? (
+                        <> {h.cardNumber}/{h.setTotal}</>
+                      ) : h.cardNumber != null ? (
+                        <> {h.cardNumber}</>
+                      ) : null}
                     </h3>
                     <span className="shrink-0 text-xs font-medium tabular-nums">
                       {formatGBP(latest)}
