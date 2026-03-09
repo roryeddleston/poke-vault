@@ -126,18 +126,19 @@ export async function searchPokemonCards(
       ),
     );
 
-    // Merge and de-duplicate by id, then enforce pageSize limit.
+    // Merge and de-duplicate by id, keeping a reasonable pool for scoring.
     const seen = new Set<string>();
     const merged: TcgDexCardResume[] = [];
+    const maxMerged = pageSize * 5;
     for (const list of resumeArrays) {
       for (const r of list) {
         if (!seen.has(r.id)) {
           seen.add(r.id);
           merged.push(r);
-          if (merged.length >= pageSize) break;
+          if (merged.length >= maxMerged) break;
         }
       }
-      if (merged.length >= pageSize) break;
+      if (merged.length >= maxMerged) break;
     }
 
     const resumes = merged;
@@ -166,19 +167,19 @@ export async function searchPokemonCards(
     );
 
     const summaries = nonNullCards.map((card) => {
-        const imageUrl =
-          typeof card.getImageURL === "function"
-            ? card.getImageURL("high", "png")
-            : undefined;
+      const imageUrl =
+        typeof card.getImageURL === "function"
+          ? card.getImageURL("high", "png")
+          : undefined;
 
-        const setName = card.set?.name ?? card.set?.id;
+      const setName = card.set?.name ?? card.set?.id;
 
-        // Prefer the "official" card count if present, otherwise fall back to total,
-        // but treat 0 or negative values as "no total".
-        const rawTotal =
-          card.set?.cardCount?.official ?? card.set?.cardCount?.total;
-        const setTotal =
-          typeof rawTotal === "number" && rawTotal > 0 ? rawTotal : undefined;
+      // Prefer the "official" card count if present, otherwise fall back to total,
+      // but treat 0 or negative values as "no total".
+      const rawTotal =
+        card.set?.cardCount?.official ?? card.set?.cardCount?.total;
+      const setTotal =
+        typeof rawTotal === "number" && rawTotal > 0 ? rawTotal : undefined;
 
       let cardNumber: number | undefined;
       if (typeof card.localId === "string") {
@@ -199,21 +200,52 @@ export async function searchPokemonCards(
       };
     });
 
-    // If the user specified a total in the query (e.g. "3/111"),
-    // prefer results whose setTotal matches that total.
+    // Scoring: favour matches on name, card number, and set total.
+    const nameHint = namePart.toLowerCase();
+    const numberHint =
+      nameNumberPart ?? pureNumberPart ?? undefined;
+    const numberHintValue = numberHint
+      ? Number.parseInt(numberHint, 10)
+      : undefined;
+    const desiredTotalRaw = nameTotalPart ?? pureTotalPart;
     const desiredTotal =
-      nameTotalPart ?? pureTotalPart
-        ? Number.parseInt(nameTotalPart ?? pureTotalPart ?? "", 10)
+      desiredTotalRaw !== undefined
+        ? Number.parseInt(desiredTotalRaw, 10)
         : undefined;
 
-    if (desiredTotal && Number.isFinite(desiredTotal)) {
-      const narrowed = summaries.filter((s) => s.setTotal === desiredTotal);
-      if (narrowed.length > 0) {
-        return narrowed;
-      }
-    }
+    const scored = summaries.map((s) => {
+      let score = 0;
 
-    return summaries;
+      if (nameHint && s.name.toLowerCase().includes(nameHint)) {
+        score += 3;
+      }
+      if (
+        numberHintValue !== undefined &&
+        Number.isFinite(numberHintValue) &&
+        s.cardNumber === numberHintValue
+      ) {
+        score += 5;
+      }
+      if (
+        desiredTotal !== undefined &&
+        Number.isFinite(desiredTotal) &&
+        s.setTotal === desiredTotal
+      ) {
+        score += 2;
+      }
+
+      return { summary: s, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+
+    // Return the best-matching slice for this page.
+    const startIndex = (page - 1) * pageSize;
+    const pageSlice = scored
+      .slice(startIndex, startIndex + pageSize)
+      .map((s) => s.summary);
+
+    return pageSlice;
   } catch (error) {
     console.error("[TCGdex] searchPokemonCards failed:", error);
     return [];
