@@ -64,7 +64,7 @@ export function PortfolioFilterBar({
               aria-expanded={filtersOpen}
               aria-haspopup="listbox"
               aria-label="Open filters menu"
-              className="inline-flex items-center gap-1 rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:bg-surface-soft"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:border-accent-soft hover:bg-surface-soft hover:text-text-main"
             >
               Filters
             </button>
@@ -89,7 +89,7 @@ export function PortfolioFilterBar({
                           onAddFilter("grade", g);
                           setFiltersOpen(false);
                         }}
-                        className="block w-full rounded px-2 py-1.5 text-left text-sm text-text-main hover:bg-surface-soft"
+                        className="block w-full cursor-pointer rounded px-2 py-1.5 text-left text-sm text-text-main transition-colors hover:bg-surface-soft"
                       >
                         {g}
                       </button>
@@ -111,7 +111,7 @@ export function PortfolioFilterBar({
                           onAddFilter("set", s);
                           setFiltersOpen(false);
                         }}
-                        className="block w-full rounded px-2 py-1.5 text-left text-sm text-text-main hover:bg-surface-soft"
+                        className="block w-full cursor-pointer rounded px-2 py-1.5 text-left text-sm text-text-main transition-colors hover:bg-surface-soft"
                       >
                         {s}
                       </button>
@@ -124,7 +124,7 @@ export function PortfolioFilterBar({
           <button
             type="button"
             aria-label="Export portfolio"
-            className="inline-flex items-center gap-1 rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:bg-surface-soft"
+            className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:border-accent-soft hover:bg-surface-soft hover:text-text-main"
           >
             Export
           </button>
