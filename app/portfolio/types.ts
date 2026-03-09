@@ -8,6 +8,9 @@ export type Holding = {
   cardId: string;
   cardName: string;
   setName: string;
+  imageUrl?: string | null;
+  cardNumber?: number | null;
+  setTotal?: number | null;
   grade: string;
   purchasePrice: number;
   quantity: number;

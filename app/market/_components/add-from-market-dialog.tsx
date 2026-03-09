@@ -59,7 +59,10 @@ export function AddFromMarketDialog({
         body: JSON.stringify({
           cardId: card.id,
           cardName: card.name,
-          setName: card.setName ?? "Unknown set",
+            setName: card.setName ?? "Unknown set",
+            imageUrl: card.imageUrl,
+            cardNumber: card.cardNumber,
+            setTotal: card.setTotal,
           grade: grade.trim(),
           purchasePrice: priceNumber,
           quantity: qtyNumber,

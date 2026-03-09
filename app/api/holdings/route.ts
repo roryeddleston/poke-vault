@@ -15,8 +15,17 @@ export async function POST(req: Request) {
       );
     }
 
-    const { cardId, cardName, setName, grade, purchasePrice, quantity } =
-      parsed.data;
+    const {
+      cardId,
+      cardName,
+      setName,
+      imageUrl,
+      cardNumber,
+      setTotal,
+      grade,
+      purchasePrice,
+      quantity,
+    } = parsed.data;
 
     const holding = await prisma.holding.upsert({
       where: {
@@ -34,10 +43,15 @@ export async function POST(req: Request) {
         cardId,
         cardName,
         setName,
+        // The Prisma client typings can be slightly out of sync in some environments,
+        // so we cast here to avoid over-constraining the shape.
+        ...(imageUrl ? { imageUrl } : {}),
+        ...(cardNumber ? { cardNumber } : {}),
+        ...(setTotal ? { setTotal } : {}),
         grade,
         purchasePrice,
         quantity,
-      },
+      } as any,
     });
 
     return NextResponse.json({ holding }, { status: 201 });
