@@ -66,16 +66,18 @@ export async function searchPokemonCards(
     const queries: Query[] = [];
 
     // Try to extract a trailing number or number/total, e.g.:
-    // "Pikachu 60/64" -> namePart: "Pikachu", numberPart: "60"
-    const nameAndNumberMatch = q.match(/^(.*?)(\d+)(?:\s*\/\s*\d+)?$/);
+    // "Pikachu 60/64" -> namePart: "Pikachu", nameNumberPart: "60", nameTotalPart: "64"
+    const nameAndNumberMatch = q.match(/^(.*?)(\d+)(?:\s*\/\s*(\d+))?$/);
     const namePart = nameAndNumberMatch?.[1]?.trim() || "";
-    const trailingNumber = nameAndNumberMatch?.[2];
+    const nameNumberPart = nameAndNumberMatch?.[2];
+    const nameTotalPart = nameAndNumberMatch?.[3];
 
     // If the query is just a number or "12/72", capture that too.
-    const pureNumberMatch = q.match(/^(\d+)(?:\s*\/\s*\d+)?$/);
-    const pureNumber = pureNumberMatch?.[1];
-
-    const effectiveName = namePart || (!pureNumber ? q : "");
+    // "60/64" -> pureLocalId: "60/64"
+    const pureNumberMatch = q.match(/^(\d+)(?:\s*\/\s*(\d+))?$/);
+    const pureNumberPart = pureNumberMatch?.[1];
+    const pureTotalPart = pureNumberMatch?.[2];
+    const effectiveName = namePart || (!pureNumberPart ? q : "");
 
     // 1) If the query looks like a full card ID (e.g. "swsh3-012"), try exact id first.
     if (q.includes("-")) {
@@ -87,21 +89,21 @@ export async function searchPokemonCards(
     }
 
     // 2) If we have both a name and a trailing number, search for that combo:
-    //    name contains "Pikachu" AND localId == 60.
-    if (namePart && trailingNumber) {
+    //    name contains "Pikachu" AND localId == "60".
+    if (namePart && nameNumberPart) {
       queries.push(
         Query.create()
           .contains("name", namePart)
-          .equal("localId", trailingNumber)
+          .equal("localId", nameNumberPart)
           .paginate(1, pageSize),
       );
     }
 
-    // 3) If the whole query looks like "60" or "60/64", search by exact localId.
-    if (pureNumber) {
+    // 3) If the whole query looks like "60" or "60/64", search by exact card number within the set.
+    if (pureNumberPart) {
       queries.push(
         Query.create()
-          .equal("localId", pureNumber)
+          .equal("localId", pureNumberPart)
           .sort("localId", "ASC")
           .paginate(1, pageSize),
       );
@@ -158,9 +160,11 @@ export async function searchPokemonCards(
       }),
     );
 
-    return fullCards
-      .filter((c): c is TcgDexCardFull => c !== null)
-      .map((card) => {
+    const nonNullCards = fullCards.filter(
+      (c): c is TcgDexCardFull => c !== null,
+    );
+
+    const summaries = nonNullCards.map((card) => {
         const imageUrl =
           typeof card.getImageURL === "function"
             ? card.getImageURL("high", "png")
@@ -175,24 +179,40 @@ export async function searchPokemonCards(
         const setTotal =
           typeof rawTotal === "number" && rawTotal > 0 ? rawTotal : undefined;
 
-        let cardNumber: number | undefined;
-        if (typeof card.localId === "string") {
-          const parsed = Number.parseInt(card.localId, 10);
-          cardNumber = Number.isNaN(parsed) ? undefined : parsed;
-        } else if (typeof card.localId === "number") {
-          cardNumber = card.localId;
-        }
+      let cardNumber: number | undefined;
+      if (typeof card.localId === "string") {
+        const parsed = Number.parseInt(card.localId, 10);
+        cardNumber = Number.isNaN(parsed) ? undefined : parsed;
+      } else if (typeof card.localId === "number") {
+        cardNumber = card.localId;
+      }
 
-        return {
-          id: card.id,
-          name: card.name,
-          imageUrl,
-          setName,
-          rarity: card.rarity,
-          cardNumber,
-          setTotal,
-        };
-      });
+      return {
+        id: card.id,
+        name: card.name,
+        imageUrl,
+        setName,
+        rarity: card.rarity,
+        cardNumber,
+        setTotal,
+      };
+    });
+
+    // If the user specified a total in the query (e.g. "3/111"),
+    // prefer results whose setTotal matches that total.
+    const desiredTotal =
+      nameTotalPart ?? pureTotalPart
+        ? Number.parseInt(nameTotalPart ?? pureTotalPart ?? "", 10)
+        : undefined;
+
+    if (desiredTotal && Number.isFinite(desiredTotal)) {
+      const narrowed = summaries.filter((s) => s.setTotal === desiredTotal);
+      if (narrowed.length > 0) {
+        return narrowed;
+      }
+    }
+
+    return summaries;
   } catch (error) {
     console.error("[TCGdex] searchPokemonCards failed:", error);
     return [];
