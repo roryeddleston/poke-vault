@@ -1,4 +1,5 @@
 import { searchPokemonCardsAll } from "@/lib/pokemon-tcg";
+import { CardImage } from "@/components/CardImage";
 import { AddFromMarketButton } from "./_components/add-from-market-button";
 
 type MarketPageProps = {
@@ -56,21 +57,11 @@ export default async function MarketPage(props: MarketPageProps) {
                   key={card.id}
                   className="flex items-center gap-7 px-5 py-6 text-lg md:gap-9 md:px-7 md:py-7"
                 >
-                  <div className="flex h-24 w-16 items-center justify-center overflow-hidden rounded-sm bg-surface-soft md:h-28 md:w-20">
-                    {card.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={card.imageUrl}
-                        alt={card.name}
-                        className="max-h-full max-w-full object-contain"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-sm text-text-muted">
-                        ?
-                      </div>
-                    )}
-                  </div>
+                  <CardImage
+                    src={card.imageUrl}
+                    alt={card.name}
+                    className="h-24 w-16 md:h-28 md:w-20"
+                  />
 
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <div className="flex items-baseline justify-between gap-3">

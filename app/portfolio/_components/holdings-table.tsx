@@ -1,6 +1,7 @@
 import type { Holding } from "../types";
 import { formatGBP } from "../utils";
 import { CardImagePlaceholder } from "./card-image-placeholder";
+import { CardImage } from "@/components/CardImage";
 import { ChangePill } from "./change-pill";
 import { GradePill } from "./grade-pill";
 import { HoldingRowActions } from "./holding-row-actions";
@@ -73,12 +74,10 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         {h.imageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <CardImage
                             src={h.imageUrl}
                             alt={h.cardName}
-                            className="h-20 w-14 rounded-md bg-surface-soft object-contain sm:h-24 sm:w-16"
-                            loading="lazy"
+                            className="h-20 w-14 sm:h-24 sm:w-16"
                           />
                         ) : (
                           <CardImagePlaceholder name={h.cardName} />
@@ -148,22 +147,11 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                 key={h.id}
                 className="flex items-center gap-7 rounded-lg border border-border-subtle bg-card px-5 py-6 text-base md:gap-9 md:px-7 md:py-7 md:text-lg"
               >
-                <div className="flex h-24 w-16 items-center justify-center overflow-hidden rounded-md bg-surface-soft md:h-28 md:w-20">
-                  {h.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={h.imageUrl}
-                      alt={h.cardName}
-                      className="max-h-full max-w-full object-contain"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <CardImagePlaceholder
-                      name={h.cardName}
-                      className="h-full w-full"
-                    />
-                  )}
-                </div>
+                <CardImage
+                  src={h.imageUrl}
+                  alt={h.cardName}
+                  className="h-24 w-16 md:h-28 md:w-20"
+                />
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <div className="flex items-baseline justify-between gap-3">
                     <h3 className="truncate text-sm font-medium text-text-main">
