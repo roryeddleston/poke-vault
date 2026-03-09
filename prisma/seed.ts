@@ -71,22 +71,45 @@ async function main() {
       orderBy: { createdAt: "asc" },
     });
 
-    // Create template snapshots
-    for (const h of templateHoldings) {
-      const baseValue = h.purchasePrice * 1.2;
+    // Create template snapshots with varied increases.
+    // Roughly half the holdings get a positive increase between 5–36%,
+    // the rest stay flat or only slightly up to keep things realistic.
+    for (let index = 0; index < templateHoldings.length; index++) {
+      const h = templateHoldings[index];
+      const base = h.purchasePrice;
+
+      const hasIncrease = index % 2 === 0; // about half of holdings
+
+      let firstValue: number;
+      let middleValue: number;
+      let latestValue: number;
+
+      if (hasIncrease) {
+        // Deterministic "random" percentage between 5% and 36% based on index.
+        const t = (index % 10) / 9; // 0..1
+        const pct = 0.05 + t * (0.36 - 0.05); // 5%..36%
+        latestValue = base * (1 + pct);
+        firstValue = base * 0.8;
+        middleValue = base * 0.9;
+      } else {
+        // Keep roughly flat with a small change.
+        latestValue = base * 1.02;
+        firstValue = base * 0.95;
+        middleValue = base;
+      }
 
       await tx.priceSnapshot.createMany({
         data: [
           {
             ownerId: TEMPLATE_OWNER_ID,
             holdingId: h.id,
-            value: baseValue * 0.9,
+            value: firstValue,
           },
-          { ownerId: TEMPLATE_OWNER_ID, holdingId: h.id, value: baseValue },
+          { ownerId: TEMPLATE_OWNER_ID, holdingId: h.id, value: middleValue },
           {
             ownerId: TEMPLATE_OWNER_ID,
             holdingId: h.id,
-            value: baseValue * 1.05,
+            value: latestValue,
           },
         ],
       });
