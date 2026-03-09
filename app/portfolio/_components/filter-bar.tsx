@@ -49,7 +49,7 @@ export function PortfolioFilterBar({
           <input
             type="search"
             aria-label="Search portfolio cards"
-            placeholder="Search by name, set, or ID…"
+            placeholder="Search by name, number or set..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full min-w-0 bg-transparent text-sm text-text-main placeholder:text-text-muted focus:outline-none"
