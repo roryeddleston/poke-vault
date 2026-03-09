@@ -37,25 +37,25 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
         aria-label="Holdings table"
       >
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-base">
             <thead className="border-b border-border-subtle text-left">
               <tr className="text-text-muted">
-                <th scope="col" className="px-4 py-3 font-medium">
+                <th scope="col" className="px-5 py-4 font-medium">
                   Card
                 </th>
-                <th scope="col" className="px-4 py-3 font-medium">
+                <th scope="col" className="px-5 py-4 font-medium">
                   Set
                 </th>
-                <th scope="col" className="px-4 py-3 font-medium">
+                <th scope="col" className="px-5 py-4 font-medium">
                   Grade
                 </th>
-                <th scope="col" className="px-4 py-3 font-medium text-right">
+                <th scope="col" className="px-5 py-4 font-medium text-right">
                   Market price
                 </th>
-                <th scope="col" className="px-4 py-3 font-medium text-right">
+                <th scope="col" className="px-5 py-4 font-medium text-right">
                   Monthly change
                 </th>
-                <th scope="col" className="px-4 py-3 font-medium text-right">
+                <th scope="col" className="px-5 py-4 font-medium text-right">
                   Actions
                 </th>
               </tr>
@@ -70,14 +70,14 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                     key={h.id}
                     className="border-b border-border-subtle last:border-b-0"
                   >
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         {h.imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={h.imageUrl}
                             alt={h.cardName}
-                            className="h-12 w-auto rounded-md bg-surface-soft object-contain sm:h-14"
+                            className="h-20 w-14 rounded-md bg-surface-soft object-contain sm:h-24 sm:w-16"
                             loading="lazy"
                           />
                         ) : (
@@ -93,24 +93,24 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-4">
                       <span className="inline-flex rounded-full bg-surface-soft px-2 py-0.5 text-xs text-text-muted">
                         {h.setName}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-4">
                       <GradePill grade={h.grade} />
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums">
+                    <td className="px-5 py-4 text-right tabular-nums">
                       {formatGBP(latest)}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-5 py-4 text-right">
                       <ChangePill
                         value={changeMonthly}
                         periodLabel="this month"
                       />
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-5 py-4 text-right">
                       <HoldingRowActions holdingId={h.id} />
                     </td>
                   </tr>
@@ -146,21 +146,26 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
             return (
               <article
                 key={h.id}
-                className="flex items-center gap-3 rounded-lg border border-border-subtle bg-card px-3 py-2"
+                className="flex items-center gap-7 rounded-lg border border-border-subtle bg-card px-5 py-6 text-base md:gap-9 md:px-7 md:py-7 md:text-lg"
               >
-                {h.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={h.imageUrl}
-                    alt={h.cardName}
-                    className="h-14 w-auto rounded-md bg-surface-soft object-contain"
-                    loading="lazy"
-                  />
-                ) : (
-                  <CardImagePlaceholder name={h.cardName} className="w-12" />
-                )}
+                <div className="flex h-24 w-16 items-center justify-center overflow-hidden rounded-md bg-surface-soft md:h-28 md:w-20">
+                  {h.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={h.imageUrl}
+                      alt={h.cardName}
+                      className="max-h-full max-w-full object-contain"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <CardImagePlaceholder
+                      name={h.cardName}
+                      className="h-full w-full"
+                    />
+                  )}
+                </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <div className="flex items-baseline justify-between gap-2">
+                  <div className="flex items-baseline justify-between gap-3">
                     <h3 className="truncate text-sm font-medium text-text-main">
                       {h.cardName}
                       {h.cardNumber != null && h.setTotal != null ? (

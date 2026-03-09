@@ -64,10 +64,15 @@ export default async function MarketPage(props: MarketPageProps) {
                     )}
                   </div>
 
-                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <div className="flex items-baseline justify-between gap-3">
                       <p className="truncate font-medium text-text-main">
                         {card.name}
+                        {card.cardNumber != null && card.setTotal != null ? (
+                          <> {card.cardNumber}/{card.setTotal}</>
+                        ) : card.cardNumber != null ? (
+                          <> {card.cardNumber}</>
+                        ) : null}
                       </p>
                       {card.rarity ? (
                         <span className="shrink-0 rounded-full bg-surface-soft px-2 py-0.5 text-[11px] text-text-muted">
@@ -77,14 +82,6 @@ export default async function MarketPage(props: MarketPageProps) {
                     </div>
                     <p className="truncate text-xs text-text-muted">
                       {card.setName ?? "Unknown set"}
-                      {card.cardNumber != null && card.setTotal != null ? (
-                        <>
-                          {" "}
-                          · {card.cardNumber}/{card.setTotal}
-                        </>
-                      ) : card.cardNumber != null ? (
-                        <> · {card.cardNumber}</>
-                      ) : null}
                     </p>
                   </div>
 

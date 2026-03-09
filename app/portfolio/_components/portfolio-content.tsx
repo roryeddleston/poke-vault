@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { PortfolioResponse } from "../types";
 import {
   filterHoldings,
@@ -41,17 +41,19 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
     [data.holdings, search, filters],
   );
 
-  useEffect(() => {
-    setPage(1);
-  }, [search, filters]);
-
   const paginatedHoldings = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
     return filteredHoldings.slice(start, start + PAGE_SIZE);
   }, [filteredHoldings, page]);
 
+  const handleSearchChange = useCallback((value: string) => {
+    setPage(1);
+    setSearch(value);
+  }, []);
+
   const onRemoveFilter = useCallback(
     (key: FilterEntry["key"], value: string) => {
+      setPage(1);
       setFilters((prev) =>
         prev.filter((f) => !(f.key === key && f.value === value)),
       );
@@ -60,11 +62,13 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
   );
 
   const onClearAll = useCallback(() => {
+    setPage(1);
     setFilters([]);
     setSearch("");
   }, []);
 
   const onAddFilter = useCallback((key: FilterEntry["key"], value: string) => {
+    setPage(1);
     setFilters((prev) =>
       prev.some((f) => f.key === key && f.value === value)
         ? prev
@@ -81,7 +85,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
       <SummaryCards summary={data.summary} />
       <PortfolioFilterBar
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={handleSearchChange}
         filters={filters}
         onRemoveFilter={onRemoveFilter}
         onClearAll={onClearAll}
