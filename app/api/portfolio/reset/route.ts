@@ -31,18 +31,35 @@ export async function POST() {
       }
 
       await tx.holding.createMany({
-        data: templateHoldings.map((h) => ({
-          ownerId: DEMO_OWNER_ID,
-          cardId: h.cardId,
-          cardName: h.cardName,
-          setName: h.setName,
-          imageUrl: h.imageUrl,
-          cardNumber: h.cardNumber,
-          setTotal: h.setTotal,
-          grade: h.grade,
-          purchasePrice: h.purchasePrice,
-          quantity: h.quantity,
-        })),
+        data: templateHoldings.map((h) => {
+          const base = {
+            ownerId: DEMO_OWNER_ID,
+            cardId: h.cardId,
+            cardName: h.cardName,
+            setName: h.setName,
+            grade: h.grade,
+            purchasePrice: h.purchasePrice,
+            quantity: h.quantity,
+          };
+
+          return {
+            ...base,
+            // Optional display fields; if your generated types don't include
+            // them yet they'll simply be omitted at runtime.
+            ...(Object.prototype.hasOwnProperty.call(h, "imageUrl") && {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              imageUrl: (h as any).imageUrl,
+            }),
+            ...(Object.prototype.hasOwnProperty.call(h, "cardNumber") && {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              cardNumber: (h as any).cardNumber,
+            }),
+            ...(Object.prototype.hasOwnProperty.call(h, "setTotal") && {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              setTotal: (h as any).setTotal,
+            }),
+          };
+        }),
       });
 
       const demoHoldings = await tx.holding.findMany({
