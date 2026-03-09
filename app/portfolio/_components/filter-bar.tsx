@@ -13,6 +13,7 @@ type PortfolioFilterBarProps = {
   availableGrades: string[];
   availableSets: string[];
   onAddFilter: (key: FilterEntry["key"], value: string) => void;
+  onExport: () => void;
 };
 
 export function PortfolioFilterBar({
@@ -24,6 +25,7 @@ export function PortfolioFilterBar({
   availableGrades,
   availableSets,
   onAddFilter,
+  onExport,
 }: PortfolioFilterBarProps) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -124,6 +126,7 @@ export function PortfolioFilterBar({
           <button
             type="button"
             aria-label="Export portfolio"
+            onClick={onExport}
             className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:border-accent-soft hover:bg-surface-soft hover:text-text-main"
           >
             Export

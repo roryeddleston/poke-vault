@@ -76,6 +76,50 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
     );
   }, []);
 
+  const handleExport = useCallback(() => {
+    if (filteredHoldings.length === 0) return;
+
+    const header = [
+      "Card ID",
+      "Name",
+      "Set",
+      "Grade",
+      "Quantity",
+      "Purchase price",
+    ];
+
+    const rows = filteredHoldings.map((h) => [
+      h.cardId,
+      h.cardName,
+      h.setName,
+      h.grade,
+      String(h.quantity),
+      String(h.purchasePrice),
+    ]);
+
+    const csv = [header, ...rows]
+      .map((cols) =>
+        cols
+          .map((c) => {
+            const value = c.replace(/"/g, '""');
+            return `"${value}"`;
+          })
+          .join(","),
+      )
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    link.download = `portfolio-export-${timestamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [filteredHoldings]);
+
   return (
     <>
       <PortfolioHeader
@@ -92,6 +136,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
         availableGrades={availableGrades}
         availableSets={availableSets}
         onAddFilter={onAddFilter}
+        onExport={handleExport}
       />
       <HoldingsTable
         holdings={paginatedHoldings}
