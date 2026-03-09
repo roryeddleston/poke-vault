@@ -48,9 +48,9 @@ export function ThemeToggle() {
       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-card text-text-muted shadow-sm transition-colors hover:border-accent-soft hover:bg-surface-soft hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-page cursor-pointer"
     >
       {isDark ? (
-        <SunIcon className="h-4 w-4" aria-hidden="true" />
+        <SunIcon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
       ) : (
-        <MoonIcon className="h-4 w-4" aria-hidden="true" />
+        <MoonIcon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
       )}
     </button>
   );
