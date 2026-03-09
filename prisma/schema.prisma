@@ -12,16 +12,19 @@ model Holding {
   cardId        String
   cardName      String
   setName       String
+  imageUrl      String?
+  cardNumber    Int?
+  setTotal      Int?
   grade         String   @default("RAW")
   purchasePrice Float
   quantity      Int      @default(1)
   createdAt     DateTime @default(now())
 
-  snapshots     PriceSnapshot[]
+  snapshots PriceSnapshot[]
 
+  @@unique([ownerId, cardId, grade])
   @@index([ownerId])
   @@index([ownerId, createdAt])
-  @@unique([ownerId, cardId, grade])
 }
 
 model PriceSnapshot {
