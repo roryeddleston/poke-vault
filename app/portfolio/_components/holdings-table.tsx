@@ -3,6 +3,7 @@ import { formatGBP } from "../utils";
 import { CardImagePlaceholder } from "./card-image-placeholder";
 import { ChangePill } from "./change-pill";
 import { GradePill } from "./grade-pill";
+import { HoldingRowActions } from "./holding-row-actions";
 
 type HoldingsTableProps = {
   holdings: Holding[];
@@ -53,6 +54,9 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                 </th>
                 <th scope="col" className="px-4 py-3 font-medium text-right">
                   Monthly change
+                </th>
+                <th scope="col" className="px-4 py-3 font-medium text-right">
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -106,6 +110,9 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                         periodLabel="this month"
                       />
                     </td>
+                    <td className="px-4 py-3 text-right">
+                      <HoldingRowActions holdingId={h.id} />
+                    </td>
                   </tr>
                 );
               })}
@@ -114,7 +121,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                 <tr>
                   <td
                     className="px-4 py-8 text-center text-text-muted"
-                    colSpan={5}
+                    colSpan={6}
                   >
                     No holdings yet.
                   </td>
@@ -166,7 +173,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                       {formatGBP(latest)}
                     </span>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <div className="flex items-center gap-2 text-xs">
                     <span className="rounded-full bg-surface-soft px-2 py-0.5 text-[11px] text-text-muted">
                       {h.setName}
                     </span>
@@ -178,6 +185,9 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                       />
                     </span>
                   </div>
+                </div>
+                <div className="self-start">
+                  <HoldingRowActions holdingId={h.id} />
                 </div>
               </article>
             );

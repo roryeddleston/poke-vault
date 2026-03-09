@@ -194,4 +194,31 @@ export function MoonIcon(props: IconProps) {
   );
 }
 
+export function TrashIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M5.5 7h13" stroke="currentColor" />
+      <path
+        d="M10 5.5h4a1 1 0 0 1 1 1V7H9v-.5a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+      />
+      <path
+        d="M9 10v6.5M12 10v6.5M15 10v6.5"
+        stroke="currentColor"
+      />
+      <path
+        d="M7.5 7H17l-.7 10.1A1.5 1.5 0 0 1 14.8 18.5H9.2A1.5 1.5 0 0 1 7.7 17.1L7.5 7Z"
+        stroke="currentColor"
+      />
+    </svg>
+  );
+}
+
 
