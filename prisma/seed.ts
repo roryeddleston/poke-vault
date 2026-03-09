@@ -75,6 +75,10 @@ async function main() {
     // Applied deterministically so "most" cards have value > invested.
     const GAIN_MULTIPLIERS = [1.07, 1.12, 1.18, 1.24, 1.56, 2.32, 1] as const;
 
+    const now = new Date();
+    const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const twoMonthsAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
     for (let index = 0; index < templateHoldings.length; index++) {
       const h = templateHoldings[index];
       const base = h.purchasePrice;
@@ -89,12 +93,19 @@ async function main() {
             ownerId: TEMPLATE_OWNER_ID,
             holdingId: h.id,
             value: firstValue,
+            capturedAt: twoMonthsAgo,
           },
-          { ownerId: TEMPLATE_OWNER_ID, holdingId: h.id, value: middleValue },
+          {
+            ownerId: TEMPLATE_OWNER_ID,
+            holdingId: h.id,
+            value: middleValue,
+            capturedAt: oneMonthAgo,
+          },
           {
             ownerId: TEMPLATE_OWNER_ID,
             holdingId: h.id,
             value: latestValue,
+            capturedAt: now,
           },
         ],
       });
