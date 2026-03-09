@@ -42,9 +42,9 @@ export function HoldingRowActions({ holdingId }: HoldingRowActionsProps) {
         type="button"
         onClick={() => setConfirmOpen(true)}
         disabled={removing}
-        className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-danger hover:bg-danger/5 disabled:cursor-not-allowed disabled:opacity-70"
+        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-danger hover:bg-danger/5 disabled:cursor-not-allowed disabled:opacity-70 sm:h-10 sm:w-10"
       >
-        <TrashIcon className="h-4 w-4" aria-hidden="true" />
+        <TrashIcon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
         <span className="sr-only">Remove card</span>
       </button>
 

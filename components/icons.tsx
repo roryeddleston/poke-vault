@@ -199,24 +199,26 @@ export function TrashIcon(props: IconProps) {
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      strokeWidth={1.8}
+      strokeWidth={1.6}
       strokeLinecap="round"
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M5.5 7h13" stroke="currentColor" />
-      <path
-        d="M10 5.5h4a1 1 0 0 1 1 1V7H9v-.5a1 1 0 0 1 1-1Z"
+      {/* lid */}
+      <path d="M9.5 6h5" stroke="currentColor" />
+      {/* top bar */}
+      <path d="M5.5 7.5h13" stroke="currentColor" />
+      {/* can */}
+      <rect
+        x="7"
+        y="7.5"
+        width="10"
+        height="11"
+        rx="1.5"
         stroke="currentColor"
       />
-      <path
-        d="M9 10v6.5M12 10v6.5M15 10v6.5"
-        stroke="currentColor"
-      />
-      <path
-        d="M7.5 7H17l-.7 10.1A1.5 1.5 0 0 1 14.8 18.5H9.2A1.5 1.5 0 0 1 7.7 17.1L7.5 7Z"
-        stroke="currentColor"
-      />
+      {/* inner lines */}
+      <path d="M10 10v6M14 10v6" stroke="currentColor" />
     </svg>
   );
 }
