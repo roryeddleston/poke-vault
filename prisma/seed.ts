@@ -71,32 +71,17 @@ async function main() {
       orderBy: { createdAt: "asc" },
     });
 
-    // Create template snapshots with varied increases.
-    // Roughly half the holdings get a positive increase between 5–36%,
-    // the rest stay flat or only slightly up to keep things realistic.
+    // Gain multipliers: 7%, 12%, 18%, 24%, 56%, 132%. One slot is "no gain" (1).
+    // Applied deterministically so "most" cards have value > invested.
+    const GAIN_MULTIPLIERS = [1.07, 1.12, 1.18, 1.24, 1.56, 2.32, 1] as const;
+
     for (let index = 0; index < templateHoldings.length; index++) {
       const h = templateHoldings[index];
       const base = h.purchasePrice;
-
-      const hasIncrease = index % 2 === 0; // about half of holdings
-
-      let firstValue: number;
-      let middleValue: number;
-      let latestValue: number;
-
-      if (hasIncrease) {
-        // Deterministic "random" percentage between 5% and 36% based on index.
-        const t = (index % 10) / 9; // 0..1
-        const pct = 0.05 + t * (0.36 - 0.05); // 5%..36%
-        latestValue = base * (1 + pct);
-        firstValue = base * 0.8;
-        middleValue = base * 0.9;
-      } else {
-        // Keep roughly flat with a small change.
-        latestValue = base * 1.02;
-        firstValue = base * 0.95;
-        middleValue = base;
-      }
+      const multiplier = GAIN_MULTIPLIERS[index % GAIN_MULTIPLIERS.length];
+      const latestValue = base * multiplier;
+      const firstValue = base * 0.9;
+      const middleValue = base * 0.95;
 
       await tx.priceSnapshot.createMany({
         data: [
