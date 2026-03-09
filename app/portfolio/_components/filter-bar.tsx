@@ -84,6 +84,7 @@ export function PortfolioFilterBar({
                         key={g}
                         type="button"
                         role="option"
+                        aria-selected="false"
                         onClick={() => {
                           onAddFilter("grade", g);
                           setFiltersOpen(false);
@@ -105,6 +106,7 @@ export function PortfolioFilterBar({
                         key={s}
                         type="button"
                         role="option"
+                        aria-selected="false"
                         onClick={() => {
                           onAddFilter("set", s);
                           setFiltersOpen(false);
