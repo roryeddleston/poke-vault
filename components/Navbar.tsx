@@ -57,7 +57,7 @@ export default function Navbar() {
       {/* Desktop sidebar */}
       <nav
         aria-label="Main navigation"
-        className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-border-subtle bg-surface px-4 py-6 text-sm text-text-muted backdrop-blur md:flex"
+        className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-border-subtle/70 bg-surface/90 px-4 py-6 text-sm text-text-muted shadow-[0_0_40px_rgba(15,23,42,0.25)] backdrop-blur-md md:flex"
       >
         <div className="flex items-center gap-3 px-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-400/40">
@@ -65,9 +65,11 @@ export default function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-text-main">
-              PokeVault Pro
+              PokeVault
             </span>
-            <span className="text-xs text-text-muted">Elite Collector</span>
+            <span className="text-[11px] uppercase tracking-[0.16em] text-text-muted">
+              Pokémon investing
+            </span>
           </div>
         </div>
 
@@ -78,15 +80,17 @@ export default function Navbar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                  className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                     active
-                      ? "bg-accent-muted/20 text-accent"
+                      ? "bg-accent-muted/20 text-text-main"
                       : "text-text-muted hover:bg-surface-soft hover:text-text-main"
                   }`}
                 >
                   <item.icon
                     className={`h-5 w-5 ${
-                      active ? "text-accent" : "text-text-muted"
+                      active
+                        ? "text-accent"
+                        : "text-text-muted group-hover:text-text-main"
                     }`}
                     aria-hidden="true"
                   />
@@ -101,7 +105,7 @@ export default function Navbar() {
       {/* Mobile bottom bar */}
       <nav
         aria-label="Bottom navigation"
-        className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between border-t border-border-subtle bg-surface px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 text-xs text-text-muted backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between border-t border-border-subtle/70 bg-surface/90 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 text-xs text-text-muted shadow-[0_-10px_30px_rgba(15,23,42,0.25)] backdrop-blur-md md:hidden"
       >
         {NAV_ITEMS.filter((item) => !item.desktopOnly).map((item) => {
           const active = isActive(item.href);
