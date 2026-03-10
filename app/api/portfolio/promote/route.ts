@@ -6,14 +6,15 @@ import { DEMO_OWNER_ID, TEMPLATE_OWNER_ID } from "@/lib/constants";
 const holdingKey = (h: Pick<Holding, "cardId" | "grade">) =>
   `${h.cardId}::${h.grade ?? ""}`;
 
+// Applied so ~6/7 holdings show value > invested (one slot is 1 = no gain).
+const GAIN_MULTIPLIERS = [1.07, 1.12, 1.18, 1.24, 1.56, 2.32, 1] as const;
+
 /**
  * POST /api/portfolio/promote
  *
- * One-off helper to promote the current demo portfolio (ownerId=DEMO_OWNER_ID)
- * to become the template dataset (ownerId=TEMPLATE_OWNER_ID).
- *
- * After running this once, POST /api/portfolio/reset will restore to the
- * current demo portfolio snapshot.
+ * Promotes the current demo portfolio to the template (default for reset/seed).
+ * Also adds a new "current" snapshot per holding so that for most holdings
+ * the displayed value is above invested (profit).
  */
 export async function POST() {
   try {
@@ -105,6 +106,24 @@ export async function POST() {
             },
           ];
         }),
+      });
+
+      // Add a new "current" snapshot per holding so latest value shows profit for most
+      const now = new Date();
+      const demoGainSnapshots = demoHoldings.map((h, i) => ({
+        ownerId: DEMO_OWNER_ID,
+        holdingId: h.id,
+        value: h.purchasePrice * GAIN_MULTIPLIERS[i % GAIN_MULTIPLIERS.length],
+        capturedAt: now,
+      }));
+      const templateGainSnapshots = templateHoldings.map((h, i) => ({
+        ownerId: TEMPLATE_OWNER_ID,
+        holdingId: h.id,
+        value: h.purchasePrice * GAIN_MULTIPLIERS[i % GAIN_MULTIPLIERS.length],
+        capturedAt: now,
+      }));
+      await tx.priceSnapshot.createMany({
+        data: [...demoGainSnapshots, ...templateGainSnapshots],
       });
     });
 

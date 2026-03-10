@@ -4,9 +4,16 @@ import { formatGBP, formatPct } from "../utils";
 type PortfolioHeaderProps = {
   summary: PortfolioSummary;
   onAddCard?: () => void;
+  onSetAsDefault?: () => void;
+  setAsDefaultLoading?: boolean;
 };
 
-export function PortfolioHeader({ summary, onAddCard }: PortfolioHeaderProps) {
+export function PortfolioHeader({
+  summary,
+  onAddCard,
+  onSetAsDefault,
+  setAsDefaultLoading,
+}: PortfolioHeaderProps) {
   const hasValue = summary.totalValue > 0;
 
   return (
@@ -40,15 +47,27 @@ export function PortfolioHeader({ summary, onAddCard }: PortfolioHeaderProps) {
           </div>
         </div>
 
-        {onAddCard ? (
-          <button
-            type="button"
-            onClick={onAddCard}
-            className="inline-flex items-center justify-center rounded-full bg-accent px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft cursor-pointer"
-          >
-            + Add Card
-          </button>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {onSetAsDefault ? (
+            <button
+              type="button"
+              onClick={onSetAsDefault}
+              disabled={setAsDefaultLoading}
+              className="inline-flex items-center justify-center rounded-full border border-border-subtle bg-surface px-4 py-2 text-xs font-medium text-text-main shadow-sm transition-colors hover:border-accent-soft hover:bg-surface-soft cursor-pointer disabled:opacity-60"
+            >
+              {setAsDefaultLoading ? "Saving…" : "Set as default"}
+            </button>
+          ) : null}
+          {onAddCard ? (
+            <button
+              type="button"
+              onClick={onAddCard}
+              className="inline-flex items-center justify-center rounded-full bg-accent px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft cursor-pointer"
+            >
+              + Add Card
+            </button>
+          ) : null}
+        </div>
       </div>
     </header>
   );

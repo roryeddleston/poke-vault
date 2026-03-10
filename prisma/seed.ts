@@ -23,15 +23,31 @@ const holdingKey = (h: Pick<Holding, "cardId" | "grade">) =>
   `${h.cardId}::${h.grade ?? ""}`;
 
 async function main() {
+  const resetDemo = process.env.RESET_DEMO === "1";
+  let skippedDemoClone = false;
+
   await prisma.$transaction(async (tx) => {
-    // Clean existing template + demo data (idempotent)
+    // Always reset template so it has correct snapshot dates
     await tx.priceSnapshot.deleteMany({
-      where: { ownerId: { in: [DEMO_OWNER_ID, TEMPLATE_OWNER_ID] } },
+      where: { ownerId: TEMPLATE_OWNER_ID },
+    });
+    await tx.holding.deleteMany({
+      where: { ownerId: TEMPLATE_OWNER_ID },
     });
 
-    await tx.holding.deleteMany({
-      where: { ownerId: { in: [DEMO_OWNER_ID, TEMPLATE_OWNER_ID] } },
+    const existingDemoCount = await tx.holding.count({
+      where: { ownerId: DEMO_OWNER_ID },
     });
+    const skipDemoClone = !resetDemo && existingDemoCount > 0;
+
+    if (resetDemo) {
+      await tx.priceSnapshot.deleteMany({
+        where: { ownerId: DEMO_OWNER_ID },
+      });
+      await tx.holding.deleteMany({
+        where: { ownerId: DEMO_OWNER_ID },
+      });
+    }
 
     // Create template holdings
     await tx.holding.createMany({
@@ -111,6 +127,11 @@ async function main() {
       });
     }
 
+    if (skipDemoClone) {
+      skippedDemoClone = true;
+      return;
+    }
+
     // Clone template → demo holdings
     await tx.holding.createMany({
       data: templateHoldings.map((h) => ({
@@ -163,7 +184,18 @@ async function main() {
     });
   });
 
-  console.log("✅ Seeded template + demo data");
+  if (skippedDemoClone) {
+    console.log(
+      "✅ Template updated. Your demo portfolio was left unchanged.",
+    );
+    console.log(
+      "   To replace it with template (Charizard/Blastoise/Venusaur), run: RESET_DEMO=1 npx prisma db seed",
+    );
+  } else if (resetDemo) {
+    console.log("✅ Seeded template + demo data (demo reset to template)");
+  } else {
+    console.log("✅ Seeded template + demo data");
+  }
 }
 
 main()

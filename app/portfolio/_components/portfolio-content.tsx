@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { PortfolioResponse } from "../types";
 import {
   filterHoldings,
@@ -22,10 +23,12 @@ type PortfolioContentProps = {
 };
 
 export function PortfolioContent({ data }: PortfolioContentProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<FilterEntry[]>([]);
   const [page, setPage] = useState(1);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [setAsDefaultLoading, setSetAsDefaultLoading] = useState(false);
 
   const availableGrades = useMemo(
     () => getUniqueGrades(data.holdings),
@@ -76,6 +79,17 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
     );
   }, []);
 
+  const handleSetAsDefault = useCallback(async () => {
+    setSetAsDefaultLoading(true);
+    try {
+      const res = await fetch("/api/portfolio/promote", { method: "POST" });
+      if (!res.ok) throw new Error("Promote failed");
+      router.refresh();
+    } finally {
+      setSetAsDefaultLoading(false);
+    }
+  }, [router]);
+
   const handleExport = useCallback(() => {
     if (filteredHoldings.length === 0) return;
 
@@ -125,6 +139,8 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
       <PortfolioHeader
         summary={data.summary}
         onAddCard={() => setShowAddDialog(true)}
+        onSetAsDefault={handleSetAsDefault}
+        setAsDefaultLoading={setAsDefaultLoading}
       />
       <SummaryCards summary={data.summary} />
       <PortfolioFilterBar
