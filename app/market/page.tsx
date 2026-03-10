@@ -21,6 +21,8 @@ export default async function MarketPage(props: MarketPageProps) {
 
   const startIndex = (page - 1) * PAGE_SIZE;
   const pageCards = allCards.slice(startIndex, startIndex + PAGE_SIZE);
+  const startDisplay = total === 0 ? 0 : startIndex + 1;
+  const endDisplay = startIndex + pageCards.length;
 
   return (
     <main className="min-h-screen bg-page text-text-main px-4 py-8">
@@ -49,7 +51,7 @@ export default async function MarketPage(props: MarketPageProps) {
         ) : (
               <section className="space-y-3">
             <p className="text-xs text-text-muted">
-              Showing {pageCards.length} of {total} result
+              Showing {startDisplay}–{endDisplay} of {total} result
               {total === 1 ? "" : "s"} for{" "}
               <span className="font-medium">{query}</span> (page {page} of{" "}
               {totalPages})
