@@ -93,20 +93,20 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
       onClick={resetStateAndClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-border-subtle bg-card p-5 shadow-xl"
+        className="w-full max-w-md rounded-2xl border border-border-subtle bg-card p-5 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2
             id="add-holding-title"
-            className="text-base font-semibold text-text-main"
+            className="text-xl font-semibold text-text-main"
           >
             Add card to portfolio
           </h2>
           <button
             type="button"
             onClick={resetStateAndClose}
-            className="text-sm text-text-muted hover:text-text-main cursor-pointer"
+            className="cursor-pointer px-2 py-0.5 text-3xl leading-none text-text-muted transition-colors hover:text-text-main"
             aria-label="Close"
           >
             ✕
@@ -122,7 +122,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
               required
               value={cardId}
               onChange={(e) => setCardId(e.target.value)}
-              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none focus:border-accent"
+              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
               placeholder="e.g. base1-4"
             />
           </div>
@@ -135,7 +135,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
               required
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
-              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none focus:border-accent"
+              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
               placeholder="Charizard Holo"
             />
           </div>
@@ -148,7 +148,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
               required
               value={setName}
               onChange={(e) => setSetName(e.target.value)}
-              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none focus:border-accent"
+              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
               placeholder="Base Set"
             />
           </div>
@@ -161,7 +161,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
               <input
                 value={grade}
                 onChange={(e) => setGrade(e.target.value)}
-                className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none focus:border-accent"
+                className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
                 placeholder="e.g. PSA 10 (leave blank for RAW)"
               />
             </div>
@@ -177,7 +177,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
                 inputMode="decimal"
                 value={purchasePrice}
                 onChange={(e) => setPurchasePrice(e.target.value)}
-                className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none focus:border-accent"
+                className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
                 placeholder="0"
               />
             </div>
@@ -190,7 +190,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
                 inputMode="numeric"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none focus:border-accent"
+                className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
                 placeholder="1"
               />
             </div>
@@ -206,14 +206,14 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
             <button
               type="button"
               onClick={resetStateAndClose}
-              className="rounded-full px-3 py-1.5 text-xs font-medium text-text-muted hover:text-text-main"
+              className="cursor-pointer rounded-full border border-transparent px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:border-border-subtle hover:bg-surface-soft hover:text-text-main"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center justify-center rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
+              className="inline-flex cursor-pointer items-center justify-center rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-70"
             >
               {submitting ? "Adding…" : "Add card"}
             </button>
