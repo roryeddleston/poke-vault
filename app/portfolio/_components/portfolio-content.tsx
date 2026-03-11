@@ -8,6 +8,7 @@ import {
   getUniqueGrades,
   getUniqueSets,
   type FilterEntry,
+  type QuickPreset,
 } from "../utils";
 import { PortfolioFilterBar } from "./filter-bar";
 import { HoldingsTable } from "./holdings-table";
@@ -26,6 +27,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<FilterEntry[]>([]);
+  const [quickPreset, setQuickPreset] = useState<QuickPreset>("all");
   const [page, setPage] = useState(1);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [setAsDefaultLoading, setSetAsDefaultLoading] = useState(false);
@@ -40,8 +42,8 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
   );
 
   const filteredHoldings = useMemo(
-    () => filterHoldings(data.holdings, search, filters),
-    [data.holdings, search, filters],
+    () => filterHoldings(data.holdings, search, filters, quickPreset),
+    [data.holdings, search, filters, quickPreset],
   );
 
   const paginatedHoldings = useMemo(() => {
@@ -68,6 +70,12 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
     setPage(1);
     setFilters([]);
     setSearch("");
+    setQuickPreset("all");
+  }, []);
+
+  const onQuickPresetChange = useCallback((preset: QuickPreset) => {
+    setPage(1);
+    setQuickPreset(preset);
   }, []);
 
   const onAddFilter = useCallback((key: FilterEntry["key"], value: string) => {
@@ -142,11 +150,13 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
         onSetAsDefault={handleSetAsDefault}
         setAsDefaultLoading={setAsDefaultLoading}
       />
-      <SummaryCards summary={data.summary} />
+      <SummaryCards summary={data.summary} totalCards={data.holdings.length} />
       <PortfolioFilterBar
         search={search}
         onSearchChange={handleSearchChange}
         filters={filters}
+        quickPreset={quickPreset}
+        onQuickPresetChange={onQuickPresetChange}
         onRemoveFilter={onRemoveFilter}
         onClearAll={onClearAll}
         availableGrades={availableGrades}
