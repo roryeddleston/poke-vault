@@ -34,18 +34,18 @@ export function Pagination({
   return (
     <nav
       aria-label="Holdings pagination"
-      className="flex flex-col items-center justify-between gap-2 border-t border-border-subtle pt-4 sm:flex-row"
+      className="flex flex-col items-center justify-between gap-2 rounded-2xl border border-border-subtle bg-card px-4 py-3 shadow-sm sm:flex-row"
     >
       <p className="text-xs text-text-muted">
         Showing {start} to {end} of {totalItems} items
       </p>
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center justify-center gap-1">
         <button
           type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={!canPrev}
           aria-label="Previous page"
-          className="rounded border border-border-subtle bg-card px-2.5 py-1 text-xs font-medium text-text-main transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full border border-border-subtle bg-card px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-50"
         >
           Previous
         </button>
@@ -56,9 +56,9 @@ export function Pagination({
             onClick={() => onPageChange(n)}
             aria-label={`Page ${n}`}
             aria-current={n === currentPage ? "page" : undefined}
-            className={`min-w-8 rounded px-2 py-1 text-xs font-medium transition-colors ${
+            className={`min-w-8 rounded-full px-2.5 py-1.5 text-xs font-medium transition-colors ${
               n === currentPage
-                ? "bg-accent text-white"
+                ? "bg-accent text-slate-950"
                 : "border border-border-subtle bg-card text-text-main hover:bg-surface-soft"
             }`}
           >
@@ -70,7 +70,7 @@ export function Pagination({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={!canNext}
           aria-label="Next page"
-          className="rounded border border-border-subtle bg-card px-2.5 py-1 text-xs font-medium text-text-main transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full border border-border-subtle bg-card px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next
         </button>

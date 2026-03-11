@@ -39,7 +39,7 @@ export function ChangePill({
 
   return (
     <span
-      className={`inline-flex items-center gap-0.5 text-xs font-medium ${color} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-1 text-xs font-semibold ${color} ${className}`}
       aria-label={label}
     >
       <span aria-hidden="true">{arrow}</span>
