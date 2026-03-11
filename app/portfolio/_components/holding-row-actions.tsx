@@ -42,7 +42,7 @@ export function HoldingRowActions({ holdingId }: HoldingRowActionsProps) {
         type="button"
         onClick={() => setConfirmOpen(true)}
         disabled={removing}
-        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-danger hover:bg-danger/5 disabled:cursor-not-allowed disabled:opacity-70 sm:h-10 sm:w-10"
+        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-transparent text-danger transition-colors hover:border-danger/20 hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-70 sm:h-10 sm:w-10"
       >
         <TrashIcon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
         <span className="sr-only">Remove card</span>
@@ -57,7 +57,7 @@ export function HoldingRowActions({ holdingId }: HoldingRowActionsProps) {
           onClick={() => !removing && setConfirmOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl border border-border-subtle bg-card p-5 shadow-xl"
+          className="w-full max-w-sm rounded-2xl border border-border-subtle bg-card p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between gap-3">
@@ -70,7 +70,7 @@ export function HoldingRowActions({ holdingId }: HoldingRowActionsProps) {
               <button
                 type="button"
                 onClick={() => setConfirmOpen(false)}
-                className="cursor-pointer text-xs text-text-muted hover:text-text-main"
+                className="cursor-pointer rounded-full px-2 py-1 text-xs text-text-muted transition-colors hover:bg-surface-soft hover:text-text-main"
                 aria-label="Close"
                 disabled={removing}
               >
@@ -85,7 +85,7 @@ export function HoldingRowActions({ holdingId }: HoldingRowActionsProps) {
               <button
                 type="button"
                 onClick={() => setConfirmOpen(false)}
-                className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium text-text-muted hover:text-text-main"
+                className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium text-text-muted transition-colors hover:bg-surface-soft hover:text-text-main"
                 disabled={removing}
               >
                 Cancel
