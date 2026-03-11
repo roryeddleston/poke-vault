@@ -30,6 +30,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
   const [quickPreset, setQuickPreset] = useState<QuickPreset>("all");
   const [page, setPage] = useState(1);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showSetDefaultConfirm, setShowSetDefaultConfirm] = useState(false);
   const [setAsDefaultLoading, setSetAsDefaultLoading] = useState(false);
 
   const availableGrades = useMemo(
@@ -95,6 +96,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
       router.refresh();
     } finally {
       setSetAsDefaultLoading(false);
+      setShowSetDefaultConfirm(false);
     }
   }, [router]);
 
@@ -147,7 +149,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
       <PortfolioHeader
         summary={data.summary}
         onAddCard={() => setShowAddDialog(true)}
-        onSetAsDefault={handleSetAsDefault}
+        onSetAsDefault={() => setShowSetDefaultConfirm(true)}
         setAsDefaultLoading={setAsDefaultLoading}
       />
       <SummaryCards summary={data.summary} totalCards={data.holdings.length} />
@@ -178,6 +180,63 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
       />
+      {showSetDefaultConfirm ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="set-default-title"
+          onClick={() => !setAsDefaultLoading && setShowSetDefaultConfirm(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-border-subtle bg-card p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <h2 id="set-default-title" className="text-lg font-semibold text-text-main">
+                Set as default portfolio?
+              </h2>
+              <button
+                type="button"
+                onClick={() => setShowSetDefaultConfirm(false)}
+                className="cursor-pointer px-2 py-0.5 text-2xl leading-none text-text-muted transition-colors hover:text-text-main"
+                aria-label="Close"
+                disabled={setAsDefaultLoading}
+              >
+                ×
+              </button>
+            </div>
+
+            <p className="rounded-lg border border-amber-300/40 bg-amber-100/40 px-3 py-2 text-xs text-amber-700">
+              Warning: developer use only. This action updates the template
+              baseline used by reset/seed flows.
+            </p>
+            <p className="mt-3 text-sm text-text-muted">
+              Continue only if you intend to replace the default demo/template
+              portfolio with your current portfolio.
+            </p>
+
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowSetDefaultConfirm(false)}
+                className="cursor-pointer rounded-full border border-transparent px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:border-border-subtle hover:bg-surface-soft hover:text-text-main"
+                disabled={setAsDefaultLoading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSetAsDefault}
+                disabled={setAsDefaultLoading}
+                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {setAsDefaultLoading ? "Saving…" : "Yes, set as default"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
