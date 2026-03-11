@@ -5,6 +5,7 @@ export type HoldingSnapshot = {
 
 export type Holding = {
   id: string;
+  createdAt?: string;
   cardId: string;
   cardName: string;
   setName: string;
