@@ -1,15 +1,26 @@
 import type { Holding, PortfolioSummary } from "./types";
 
 export type FilterEntry = { key: "grade" | "set"; value: string };
+export type QuickPreset = "all" | "graded" | "raw" | "recent";
 
 export function filterHoldings(
   holdings: Holding[],
   search: string,
   filters: FilterEntry[],
+  quickPreset: QuickPreset = "all",
 ): Holding[] {
   const q = search.trim().toLowerCase();
 
-  return holdings.filter((h) => {
+  let result = holdings.filter((h) => {
+    const normalizedGrade = (h.grade ?? "").trim().toUpperCase();
+
+    if (quickPreset === "graded" && (!normalizedGrade || normalizedGrade === "RAW")) {
+      return false;
+    }
+    if (quickPreset === "raw" && normalizedGrade !== "RAW") {
+      return false;
+    }
+
     if (q) {
       const matchesSearch =
         h.cardName.toLowerCase().includes(q) ||
@@ -24,6 +35,16 @@ export function filterHoldings(
     }
     return true;
   });
+
+  if (quickPreset === "recent") {
+    result = [...result].sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    });
+  }
+
+  return result;
 }
 
 export function getUniqueGrades(holdings: Holding[]): string[] {
