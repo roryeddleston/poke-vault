@@ -27,36 +27,36 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
     <section aria-labelledby="holdings-heading">
       <h2
         id="holdings-heading"
-        className="mb-2 text-xs font-medium uppercase tracking-wider text-text-muted"
+        className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted"
       >
         Holdings ({count})
       </h2>
       {/* Desktop / tablet table */}
       <div
-        className="hidden overflow-hidden rounded-lg border border-border-subtle bg-card md:block"
+        className="hidden overflow-hidden rounded-2xl border border-border-subtle bg-card shadow-sm md:block"
         role="region"
         aria-label="Holdings table"
       >
         <div className="overflow-x-auto">
-          <table className="w-full text-base">
-            <thead className="border-b border-border-subtle text-left">
+          <table className="w-full min-w-[960px] text-base">
+            <thead className="border-b border-border-subtle/80 bg-surface-soft/60 text-left">
               <tr className="text-text-muted">
-                <th scope="col" className="px-5 py-4 font-medium">
+                <th scope="col" className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">
                   Card
                 </th>
-                <th scope="col" className="px-5 py-4 font-medium">
+                <th scope="col" className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">
                   Set
                 </th>
-                <th scope="col" className="px-5 py-4 font-medium">
-                  Grade
+                <th scope="col" className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">
+                  Condition
                 </th>
-                <th scope="col" className="px-5 py-4 font-medium text-right">
+                <th scope="col" className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide">
                   Market price
                 </th>
-                <th scope="col" className="px-5 py-4 font-medium text-right">
+                <th scope="col" className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide">
                   Monthly change
                 </th>
-                <th scope="col" className="px-5 py-4 font-medium text-right">
+                <th scope="col" className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide">
                   Actions
                 </th>
               </tr>
@@ -69,20 +69,20 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                 return (
                   <tr
                     key={h.id}
-                    className="border-b border-border-subtle last:border-b-0"
+                    className="border-b border-border-subtle/70 transition-colors hover:bg-surface-soft/50 last:border-b-0"
                   >
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-5">
                       <div className="flex items-center gap-3">
                         {h.imageUrl ? (
                           <CardImage
                             src={h.imageUrl}
                             alt={h.cardName}
-                            className="h-20 w-14 sm:h-24 sm:w-16"
+                            className="h-16 w-12 rounded-lg ring-1 ring-border-subtle"
                           />
                         ) : (
                           <CardImagePlaceholder name={h.cardName} />
                         )}
-                        <span className="font-medium text-text-main">
+                        <span className="font-semibold text-text-main">
                           {h.cardName}
                           {h.cardNumber != null && h.setTotal != null ? (
                             <> {h.cardNumber}/{h.setTotal}</>
@@ -92,24 +92,24 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                         </span>
                       </div>
                     </td>
-                    <td className="px-5 py-4">
-                      <span className="inline-flex rounded-full bg-surface-soft px-2 py-0.5 text-xs text-text-muted">
+                    <td className="px-5 py-5">
+                      <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 text-xs text-text-muted">
                         {h.setName}
                       </span>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-5">
                       <GradePill grade={h.grade} />
                     </td>
-                    <td className="px-5 py-4 text-right tabular-nums">
+                    <td className="px-5 py-5 text-right font-medium tabular-nums">
                       {formatGBP(latest)}
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="px-5 py-5 text-right">
                       <ChangePill
                         value={changeMonthly}
                         periodLabel="this month"
                       />
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="px-5 py-5 text-right">
                       <HoldingRowActions holdingId={h.id} />
                     </td>
                   </tr>
@@ -145,12 +145,12 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
             return (
               <article
                 key={h.id}
-                className="flex items-center gap-7 rounded-lg border border-border-subtle bg-card px-5 py-6 text-base md:gap-9 md:px-7 md:py-7 md:text-lg"
+                className="flex items-start gap-4 rounded-2xl border border-border-subtle bg-card px-4 py-5 text-base shadow-sm"
               >
                 <CardImage
                   src={h.imageUrl}
                   alt={h.cardName}
-                  className="h-24 w-16 md:h-28 md:w-20"
+                  className="h-20 w-14 rounded-lg ring-1 ring-border-subtle"
                 />
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <div className="flex items-baseline justify-between gap-3">
@@ -162,12 +162,12 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                         <> {h.cardNumber}</>
                       ) : null}
                     </h3>
-                    <span className="shrink-0 text-xs font-medium tabular-nums">
+                    <span className="shrink-0 text-xs font-semibold tabular-nums">
                       {formatGBP(latest)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="rounded-full bg-surface-soft px-2 py-0.5 text-[11px] text-text-muted">
+                    <span className="rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-[11px] text-text-muted">
                       {h.setName}
                     </span>
                     <GradePill grade={h.grade} />
@@ -179,7 +179,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                     </span>
                   </div>
                 </div>
-                <div className="self-start">
+                <div className="self-start pt-0.5">
                   <HoldingRowActions holdingId={h.id} />
                 </div>
               </article>
