@@ -28,7 +28,11 @@ export function SummaryCards({ summary, totalCards }: SummaryCardsProps) {
         <p className={`mt-3 text-3xl font-semibold tracking-tight ${profitPositive ? "text-emerald-600" : "text-danger"}`}>
           {showData ? formatGBP(summary.totalProfit) : "—"}
         </p>
-        <p className={`mt-1 text-xs font-medium ${profitPositive ? "text-emerald-600" : "text-danger"}`}>
+        <p
+          className={`mt-1 text-sm font-semibold ${
+            profitPositive ? "text-emerald-600" : "text-danger"
+          }`}
+        >
           {showData ? `${profitPositive ? "+" : ""}${formatPct(summary.profitPercentage)}%` : "—"}
         </p>
       </div>
