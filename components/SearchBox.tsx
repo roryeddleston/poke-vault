@@ -14,6 +14,7 @@ export function SearchBox() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!query || query.trim().length < 2) {
@@ -52,6 +53,16 @@ export function SearchBox() {
     };
   }, [query]);
 
+  useEffect(() => {
+    const onMouseDown = (event: MouseEvent) => {
+      if (!containerRef.current) return;
+      if (containerRef.current.contains(event.target as Node)) return;
+      setOpen(false);
+    };
+    document.addEventListener("mousedown", onMouseDown);
+    return () => document.removeEventListener("mousedown", onMouseDown);
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const q = query.trim();
@@ -70,7 +81,7 @@ export function SearchBox() {
   };
 
   return (
-    <div className="relative flex-1">
+    <div ref={containerRef} className="relative flex-1">
       <form
         onSubmit={handleSubmit}
         className="flex h-10 items-center gap-2 rounded-full border border-border-subtle bg-card px-3 text-sm text-text-muted shadow-sm"
@@ -79,8 +90,15 @@ export function SearchBox() {
         <input
           type="search"
           ref={inputRef}
+          role="combobox"
+          aria-expanded={open}
+          aria-controls="global-search-suggestions"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setOpen(suggestions.length > 0)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setOpen(false);
+          }}
           placeholder="Search collection or market…"
           className="w-full bg-transparent text-sm text-text-main placeholder:text-text-muted focus:outline-none"
         />
@@ -90,7 +108,10 @@ export function SearchBox() {
       </form>
 
       {open && suggestions.length > 0 && (
-        <ul className="absolute z-40 mt-1 w-full overflow-hidden rounded-xl border border-border-subtle bg-card text-sm shadow-lg">
+        <ul
+          id="global-search-suggestions"
+          className="absolute z-40 mt-1 max-h-80 w-full overflow-auto rounded-xl border border-border-subtle bg-card text-sm shadow-lg"
+        >
           {suggestions.map((s) => (
             <li key={s.id}>
               <button
