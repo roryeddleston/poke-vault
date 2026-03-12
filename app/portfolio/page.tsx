@@ -22,7 +22,7 @@ export default async function PortfolioPage() {
   const data = await getPortfolio();
 
   return (
-    <main className="min-h-screen bg-page text-text-main px-4 py-8">
+    <main className="min-h-screen bg-page text-text-main px-4 md:px-20 py-8">
       <div className="mx-auto w-full max-w-6xl space-y-5">
         <PortfolioContent data={data} />
       </div>
