@@ -41,22 +41,40 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
           <table className="w-full min-w-[1040px] text-base">
             <thead className="border-b border-border-subtle/80 bg-surface-soft/80 text-left">
               <tr className="text-text-muted">
-                <th scope="col" className="px-6 py-3 text-xs font-semibold uppercase tracking-wide">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-xs font-semibold uppercase tracking-wide"
+                >
                   Card
                 </th>
-                <th scope="col" className="px-6 py-3 text-xs font-semibold uppercase tracking-wide">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-xs font-semibold uppercase tracking-wide"
+                >
                   Set
                 </th>
-                <th scope="col" className="px-6 py-3 text-xs font-semibold uppercase tracking-wide">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-xs font-semibold uppercase tracking-wide"
+                >
                   Condition
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide"
+                >
                   Market price
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide"
+                >
                   Monthly change
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide"
+                >
                   Actions
                 </th>
               </tr>
@@ -69,10 +87,10 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                 return (
                   <tr
                     key={h.id}
-                    className="border-b border-border-subtle/70 transition-colors hover:bg-surface-soft/60 last:border-b-0"
+                    className="border-b border-border-subtle/70 last:border-b-0"
                   >
                     <td className="px-6 py-5">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-8">
                         {h.imageUrl ? (
                           <CardImage
                             src={h.imageUrl}
@@ -88,7 +106,10 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                         <span className="font-semibold text-text-main">
                           {h.cardName}
                           {h.cardNumber != null && h.setTotal != null ? (
-                            <> {h.cardNumber}/{h.setTotal}</>
+                            <>
+                              {" "}
+                              {h.cardNumber}/{h.setTotal}
+                            </>
                           ) : h.cardNumber != null ? (
                             <> {h.cardNumber}</>
                           ) : null}
@@ -148,7 +169,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
             return (
               <article
                 key={h.id}
-                className="shadow-elevation-1 flex items-center gap-7 rounded-2xl border border-border-subtle bg-card px-5 py-6 text-lg"
+                className="shadow-elevation-1 flex items-center gap-8 rounded-2xl border border-border-subtle bg-card px-5 py-6 text-lg"
               >
                 <CardImage
                   src={h.imageUrl}
@@ -160,7 +181,10 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                     <h3 className="truncate text-sm font-medium text-text-main">
                       {h.cardName}
                       {h.cardNumber != null && h.setTotal != null ? (
-                        <> {h.cardNumber}/{h.setTotal}</>
+                        <>
+                          {" "}
+                          {h.cardNumber}/{h.setTotal}
+                        </>
                       ) : h.cardNumber != null ? (
                         <> {h.cardNumber}</>
                       ) : null}
