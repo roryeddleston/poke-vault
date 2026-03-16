@@ -2,17 +2,17 @@
 
 :root {
   /* Light mode (default) */
-  --page: #f3f4f6; /* overall app background */
-  --card: #ffffff; /* main card / panels */
-  --surface: #f9fafb; /* secondary surfaces */
-  --surface-soft: #f3f4f6;
-  --border-subtle: #e5e7eb;
-  --accent: #14b8a6;
-  --accent-soft: #22c5a8;
-  --accent-muted: #a5f3fc;
+  --page: #f5f7fa;
+  --card: #ffffff;
+  --surface: #f7f9fc;
+  --surface-soft: #eef2f6;
+  --border-subtle: #e4e9ef;
+  --accent: #34c9a6;
+  --accent-soft: #45d6b4;
+  --accent-muted: #d8f7ef;
   --danger: #ef4444;
   --text-main: #0f172a;
-  --text-muted: #6b7280;
+  --text-muted: #657286;
 }
 
 :root[data-theme="dark"] {
@@ -76,6 +76,7 @@
 
 body {
   background-color: var(--page);
+  background-image: linear-gradient(180deg, #f9fbfd 0%, var(--page) 35%);
   color: var(--text-main);
   font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont,
     "SF Pro Text", sans-serif;
