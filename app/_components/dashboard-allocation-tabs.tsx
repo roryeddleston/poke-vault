@@ -52,27 +52,29 @@ export function DashboardAllocationTabs({
         <p className="text-xs text-text-muted">No allocation data yet.</p>
       ) : (
         <ul className="space-y-3">
-          {rows.map((row) => (
-            <li
-              key={row.label}
-              className="space-y-2 rounded-lg border border-border-subtle bg-surface-soft/40 px-3 py-3"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <p className="truncate text-xs font-medium text-text-main">
-                  {row.label}
-                </p>
-                <p className="text-[11px] text-text-muted">
-                  {formatGBP(row.value)} • {row.pct.toFixed(1)}%
-                </p>
-              </div>
-              <div className="h-2.5 overflow-hidden rounded-full bg-surface-soft">
-                <div
-                  className="h-full rounded-full bg-accent-soft"
-                  style={{ width: `${Math.min(100, row.pct)}%` }}
-                />
-              </div>
-            </li>
-          ))}
+          {rows.map((row) => {
+            return (
+              <li
+                key={row.label}
+                className="space-y-2 rounded-lg border border-border-subtle bg-surface-soft/40 px-3 py-3"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-xs font-medium text-text-main">
+                    {row.label}
+                  </p>
+                  <p className="text-[11px] text-text-muted">
+                    {formatGBP(row.value)} • {row.pct.toFixed(1)}%
+                  </p>
+                </div>
+                <div className="h-2.5 overflow-hidden rounded-full bg-surface-soft">
+                  <div
+                    className="h-full rounded-full bg-accent-soft"
+                    style={{ width: `${Math.min(100, row.pct)}%` }}
+                  />
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
