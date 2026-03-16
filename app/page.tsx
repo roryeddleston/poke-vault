@@ -1,5 +1,6 @@
 import { DEMO_OWNER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { CardImage } from "@/components/CardImage";
 import { formatGBP, formatPct } from "./portfolio/utils";
 import { DashboardAllocationTabs } from "./_components/dashboard-allocation-tabs";
 
@@ -8,6 +9,7 @@ type HoldingWithSnapshots = {
   cardName: string;
   setName: string;
   grade: string;
+  imageUrl?: string | null;
   purchasePrice: number;
   quantity: number;
   snapshots: { value: number; capturedAt: Date }[];
@@ -185,8 +187,8 @@ export default async function DashboardPage() {
   const data = await getDashboardData();
 
   return (
-    <main className="min-h-screen bg-page text-text-main px-4 py-8">
-      <div className="mx-auto w-full max-w-5xl space-y-6">
+    <main className="min-h-screen bg-page px-4 py-7 text-text-main md:px-8 lg:px-10">
+      <div className="mx-auto w-full max-w-6xl space-y-6">
         <header className="space-y-1">
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-text-muted">
             Dashboard
@@ -200,7 +202,7 @@ export default async function DashboardPage() {
         </header>
 
         {data.holdingsCount === 0 ? (
-          <section className="rounded-xl border border-border-subtle bg-card px-6 py-12 text-center">
+          <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card px-6 py-12 text-center">
             <p className="text-sm font-medium text-text-main">No holdings yet</p>
             <p className="mt-2 text-sm text-text-muted">
               Add cards from Market to populate your dashboard widgets.
@@ -208,20 +210,20 @@ export default async function DashboardPage() {
           </section>
         ) : (
           <>
-            <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-              <article className="rounded-xl border border-border-subtle bg-card p-4">
+            <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
                 <p className="text-xs text-text-muted">Total portfolio value</p>
                 <p className="mt-1 text-xl font-semibold">
                   {formatGBP(data.summary.totalValue)}
                 </p>
               </article>
-              <article className="rounded-xl border border-border-subtle bg-card p-4">
+              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
                 <p className="text-xs text-text-muted">Total cost basis</p>
                 <p className="mt-1 text-xl font-semibold">
                   {formatGBP(data.summary.totalInvested)}
                 </p>
               </article>
-              <article className="rounded-xl border border-border-subtle bg-card p-4">
+              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
                 <p className="text-xs text-text-muted">Profit / loss</p>
                 <p
                   className={`mt-1 text-xl font-semibold ${
@@ -231,7 +233,7 @@ export default async function DashboardPage() {
                   {formatGBP(data.summary.totalProfit)}
                 </p>
               </article>
-              <article className="rounded-xl border border-border-subtle bg-card p-4">
+              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
                 <p className="text-xs text-text-muted">Return</p>
                 <p className="mt-1 text-xl font-semibold text-emerald-600">
                   {formatPct(data.summary.profitPercentage)}%
@@ -240,39 +242,69 @@ export default async function DashboardPage() {
             </section>
 
             <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              <article className="rounded-xl border border-border-subtle bg-card p-4">
-                <p className="text-xs text-text-muted">Best performer</p>
+              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
+                  Best performer
+                </p>
                 {data.bestPerformer ? (
-                  <div className="mt-2">
-                    <p className="text-sm font-medium text-text-main">
-                      {data.bestPerformer.cardName}
-                    </p>
-                    <p className="text-xs text-text-muted">
-                      {data.bestPerformer.setName} • {data.bestPerformer.grade}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-emerald-600">
-                      {formatGBP(data.bestPerformer.profit)} (
-                      {formatPct(data.bestPerformer.profitPct)}%)
-                    </p>
+                  <div className="mt-3 flex items-start gap-4">
+                    <CardImage
+                      src={data.bestPerformer.imageUrl}
+                      alt={data.bestPerformer.cardName}
+                      className="h-24 w-16 shrink-0 ring-1 ring-border-subtle"
+                      sizes="64px"
+                    />
+                    <div className="min-w-0 space-y-3">
+                      <p className="truncate text-base font-semibold text-text-main">
+                        {data.bestPerformer.cardName}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 text-xs">
+                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 font-medium text-text-main">
+                          {data.bestPerformer.setName}
+                        </span>
+                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 text-text-muted">
+                          {data.bestPerformer.grade}
+                        </span>
+                      </div>
+                      <p className="text-sm font-semibold text-text-main">
+                        {formatGBP(data.bestPerformer.profit)} (
+                        {formatPct(data.bestPerformer.profitPct)}%)
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <p className="mt-2 text-xs text-text-muted">No data.</p>
                 )}
               </article>
-              <article className="rounded-xl border border-border-subtle bg-card p-4">
-                <p className="text-xs text-text-muted">Worst performer</p>
+              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
+                  Worst performer
+                </p>
                 {data.worstPerformer ? (
-                  <div className="mt-2">
-                    <p className="text-sm font-medium text-text-main">
-                      {data.worstPerformer.cardName}
-                    </p>
-                    <p className="text-xs text-text-muted">
-                      {data.worstPerformer.setName} • {data.worstPerformer.grade}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-red-600">
-                      {formatGBP(data.worstPerformer.profit)} (
-                      {formatPct(data.worstPerformer.profitPct)}%)
-                    </p>
+                  <div className="mt-3 flex items-start gap-4">
+                    <CardImage
+                      src={data.worstPerformer.imageUrl}
+                      alt={data.worstPerformer.cardName}
+                      className="h-24 w-16 shrink-0 ring-1 ring-border-subtle"
+                      sizes="64px"
+                    />
+                    <div className="min-w-0 space-y-3">
+                      <p className="truncate text-base font-semibold text-text-main">
+                        {data.worstPerformer.cardName}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 text-xs">
+                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 font-medium text-text-main">
+                          {data.worstPerformer.setName}
+                        </span>
+                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 text-text-muted">
+                          {data.worstPerformer.grade}
+                        </span>
+                      </div>
+                      <p className="text-sm font-semibold text-text-main">
+                        {formatGBP(data.worstPerformer.profit)} (
+                        {formatPct(data.worstPerformer.profitPct)}%)
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <p className="mt-2 text-xs text-text-muted">No data.</p>
@@ -280,7 +312,7 @@ export default async function DashboardPage() {
               </article>
             </section>
 
-            <section className="rounded-xl border border-border-subtle bg-card p-4">
+            <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
               <p className="text-xs text-text-muted">
                 Portfolio allocation by set / grade
               </p>
@@ -293,7 +325,7 @@ export default async function DashboardPage() {
             </section>
 
             <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              <article className="rounded-xl border border-border-subtle bg-card p-4">
+              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
                 <p className="text-xs text-text-muted">Recent price changes</p>
                 <ul className="mt-3 space-y-2">
                   {data.recentPriceChanges.map((h) => (
@@ -302,9 +334,14 @@ export default async function DashboardPage() {
                         <p className="truncate text-sm font-medium text-text-main">
                           {h.cardName}
                         </p>
-                        <p className="truncate text-xs text-text-muted">
-                          {h.setName} • {h.grade}
-                        </p>
+                        <div className="mt-1 flex items-center gap-1.5 overflow-hidden text-xs">
+                          <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
+                            {h.setName}
+                          </span>
+                          <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-text-muted">
+                            {h.grade}
+                          </span>
+                        </div>
                       </div>
                       <p
                         className={`text-xs font-semibold ${
@@ -319,7 +356,7 @@ export default async function DashboardPage() {
                 </ul>
               </article>
 
-              <article className="rounded-xl border border-border-subtle bg-card p-4">
+              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
                 <p className="text-xs text-text-muted">Top movers</p>
                 <ul className="mt-3 space-y-2">
                   {data.topMovers.map((h) => (
@@ -328,9 +365,14 @@ export default async function DashboardPage() {
                         <p className="truncate text-sm font-medium text-text-main">
                           {h.cardName}
                         </p>
-                        <p className="truncate text-xs text-text-muted">
-                          {h.setName} • {h.grade}
-                        </p>
+                        <div className="mt-1 flex items-center gap-1.5 overflow-hidden text-xs">
+                          <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
+                            {h.setName}
+                          </span>
+                          <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-text-muted">
+                            {h.grade}
+                          </span>
+                        </div>
                       </div>
                       <p
                         className={`text-xs font-semibold ${
@@ -346,7 +388,7 @@ export default async function DashboardPage() {
               </article>
             </section>
 
-            <section className="rounded-xl border border-border-subtle bg-card p-4">
+            <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
               <p className="text-xs text-text-muted">
                 Mini chart of portfolio value over time
               </p>
