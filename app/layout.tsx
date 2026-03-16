@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navbar";
 import { Topbar } from "@/components/Topbar";
+import { RouteScrollManager } from "@/components/RouteScrollManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <RouteScrollManager />
         <Navigation />
         <div className="min-h-screen bg-page text-text-main pb-20 md:pl-60 md:pb-0">
           <Topbar />
