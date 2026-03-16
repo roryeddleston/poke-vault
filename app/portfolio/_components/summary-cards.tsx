@@ -1,5 +1,6 @@
 import type { PortfolioSummary } from "../types";
 import { formatGBP, formatPct, hasAnyValue } from "../utils";
+import { FiDollarSign, FiGrid, FiTrendingUp } from "react-icons/fi";
 
 type SummaryCardsProps = {
   summary: PortfolioSummary;
@@ -12,7 +13,10 @@ export function SummaryCards({ summary, totalCards }: SummaryCardsProps) {
 
   return (
     <section className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-      <div className="rounded-2xl border border-border-subtle bg-card p-5 shadow-sm">
+      <div className="shadow-elevation-1 relative min-h-36 rounded-2xl border border-border-subtle bg-card p-5">
+        <span className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border-subtle bg-surface text-emerald-600 dark:text-emerald-300">
+          <FiDollarSign size={16} aria-hidden="true" />
+        </span>
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
           Total net value
         </p>
@@ -21,7 +25,10 @@ export function SummaryCards({ summary, totalCards }: SummaryCardsProps) {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border-subtle bg-card p-5 shadow-sm">
+      <div className="shadow-elevation-1 relative min-h-36 rounded-2xl border border-border-subtle bg-card p-5">
+        <span className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border-subtle bg-surface text-sky-600 dark:text-sky-300">
+          <FiTrendingUp size={16} aria-hidden="true" />
+        </span>
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
           Overall gain / loss
         </p>
@@ -37,7 +44,10 @@ export function SummaryCards({ summary, totalCards }: SummaryCardsProps) {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border-subtle bg-card p-5 shadow-sm">
+      <div className="shadow-elevation-1 relative min-h-36 rounded-2xl border border-border-subtle bg-card p-5">
+        <span className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border-subtle bg-surface text-orange-600 dark:text-orange-300">
+          <FiGrid size={16} aria-hidden="true" />
+        </span>
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
           Cards in portfolio
         </p>

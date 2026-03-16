@@ -13,6 +13,9 @@
   --danger: #ef4444;
   --text-main: #0f172a;
   --text-muted: #657286;
+  --shadow-elevation-1: 0 8px 20px rgba(15, 23, 42, 0.05);
+  --shadow-elevation-2: 0 10px 24px rgba(15, 23, 42, 0.06);
+  --shadow-elevation-3: 0 12px 26px rgba(15, 23, 42, 0.07);
 }
 
 :root[data-theme="dark"] {
@@ -27,6 +30,9 @@
   --danger: #f97373;
   --text-main: #e5e7eb;
   --text-muted: #9ca3af;
+  --shadow-elevation-1: 0 8px 20px rgba(2, 6, 23, 0.45);
+  --shadow-elevation-2: 0 10px 24px rgba(2, 6, 23, 0.5);
+  --shadow-elevation-3: 0 12px 26px rgba(2, 6, 23, 0.55);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,6 +48,9 @@
     --danger: #f97373;
     --text-main: #e5e7eb;
     --text-muted: #9ca3af;
+    --shadow-elevation-1: 0 8px 20px rgba(2, 6, 23, 0.45);
+    --shadow-elevation-2: 0 10px 24px rgba(2, 6, 23, 0.5);
+    --shadow-elevation-3: 0 12px 26px rgba(2, 6, 23, 0.55);
   }
 }
 
@@ -84,4 +93,18 @@ body {
 
 button:not(:disabled) {
   cursor: pointer;
+}
+
+@layer utilities {
+  .shadow-elevation-1 {
+    box-shadow: var(--shadow-elevation-1);
+  }
+
+  .shadow-elevation-2 {
+    box-shadow: var(--shadow-elevation-2);
+  }
+
+  .shadow-elevation-3 {
+    box-shadow: var(--shadow-elevation-3);
+  }
 }

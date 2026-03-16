@@ -33,13 +33,13 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
       </h2>
       {/* Desktop / tablet table */}
       <div
-        className="hidden overflow-hidden rounded-2xl border border-border-subtle bg-card shadow-sm md:block"
+        className="shadow-elevation-3 hidden overflow-hidden rounded-2xl border border-border-subtle bg-card md:block"
         role="region"
         aria-label="Holdings table"
       >
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1040px] text-base">
-            <thead className="border-b border-border-subtle/80 bg-surface-soft/60 text-left">
+            <thead className="border-b border-border-subtle/80 bg-surface-soft/80 text-left">
               <tr className="text-text-muted">
                 <th scope="col" className="px-6 py-3 text-xs font-semibold uppercase tracking-wide">
                   Card
@@ -69,9 +69,9 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                 return (
                   <tr
                     key={h.id}
-                    className="border-b border-border-subtle/70 transition-colors hover:bg-surface-soft/50 last:border-b-0"
+                    className="border-b border-border-subtle/70 transition-colors hover:bg-surface-soft/60 last:border-b-0"
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         {h.imageUrl ? (
                           <CardImage
@@ -95,24 +95,24 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-5">
                       <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 text-xs text-text-muted">
                         {h.setName}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-5">
                       <GradePill grade={h.grade} />
                     </td>
-                    <td className="px-6 py-4 text-right font-medium tabular-nums">
+                    <td className="px-6 py-5 text-right font-medium tabular-nums">
                       {formatGBP(latest)}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-5 text-right">
                       <ChangePill
                         value={changeMonthly}
                         periodLabel="this month"
                       />
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-5 text-right">
                       <HoldingRowActions holdingId={h.id} />
                     </td>
                   </tr>
@@ -148,7 +148,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
             return (
               <article
                 key={h.id}
-                className="flex items-center gap-7 rounded-2xl border border-border-subtle bg-card px-5 py-6 text-lg shadow-sm"
+                className="shadow-elevation-1 flex items-center gap-7 rounded-2xl border border-border-subtle bg-card px-5 py-6 text-lg"
               >
                 <CardImage
                   src={h.imageUrl}

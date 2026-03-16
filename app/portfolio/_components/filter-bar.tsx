@@ -47,9 +47,9 @@ export function PortfolioFilterBar({
   return (
     <section
       aria-label="Portfolio filters"
-      className="space-y-3 rounded-2xl border border-border-subtle bg-card px-3 py-3 shadow-sm sm:px-4 sm:py-4"
+      className="shadow-elevation-2 space-y-3 rounded-2xl border border-border-subtle bg-card px-3 py-3 sm:px-4 sm:py-4"
     >
-      <div className="flex items-center gap-5 overflow-x-auto border-b border-border-subtle/70 pb-2 text-sm">
+      <div className="flex items-center gap-5 overflow-x-auto border-b border-border-subtle/70 pb-2.5 text-sm">
         <QuickPresetButton
           active={quickPreset === "all"}
           label="All Collections"
@@ -72,7 +72,7 @@ export function PortfolioFilterBar({
         />
       </div>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="flex flex-1 items-center gap-2 rounded-full border border-border-subtle bg-surface px-3 py-2 text-sm text-text-muted">
+        <div className="flex flex-1 items-center gap-2 rounded-full border border-border-subtle bg-card px-3 py-2 text-sm text-text-muted ring-1 ring-surface-soft/70">
           <SearchIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
           <input
             type="search"
@@ -197,8 +197,8 @@ function QuickPresetButton({ active, label, onClick }: QuickPresetButtonProps) {
       onClick={onClick}
       className={`shrink-0 cursor-pointer rounded-t-md border-b-2 px-1 pb-2 text-sm font-semibold leading-5 transition-colors ${
         active
-          ? "border-accent text-accent hover:text-accent-soft"
-          : "border-transparent text-text-muted hover:text-text-main"
+          ? "border-accent text-accent"
+          : "border-transparent text-text-muted hover:border-border-subtle hover:text-text-main"
       }`}
     >
       {label}
