@@ -241,32 +241,32 @@ export default async function DashboardPage() {
               </article>
             </section>
 
-            <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+            <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <article className="shadow-elevation-1 min-h-56 rounded-2xl border border-border-subtle bg-card p-6">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
                   Best performer
                 </p>
                 {data.bestPerformer ? (
-                  <div className="mt-3 flex items-start gap-4">
+                  <div className="mt-4 flex items-start gap-4">
                     <CardImage
                       src={data.bestPerformer.imageUrl}
                       alt={data.bestPerformer.cardName}
-                      className="h-24 w-16 shrink-0 ring-1 ring-border-subtle"
-                      sizes="64px"
+                      className="h-28 w-20 shrink-0 ring-1 ring-border-subtle"
+                      sizes="80px"
                     />
-                    <div className="min-w-0 space-y-3">
-                      <p className="truncate text-base font-semibold text-text-main">
+                    <div className="min-w-0 space-y-3.5">
+                      <p className="truncate text-lg font-semibold text-text-main">
                         {data.bestPerformer.cardName}
                       </p>
-                      <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 font-medium text-text-main">
+                      <div className="flex flex-wrap items-center gap-2 text-sm">
+                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 font-medium text-text-main">
                           {data.bestPerformer.setName}
                         </span>
-                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 text-text-muted">
+                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-text-muted">
                           {data.bestPerformer.grade}
                         </span>
                       </div>
-                      <p className="text-sm font-semibold text-text-main">
+                      <p className="text-base font-semibold text-text-main">
                         {formatGBP(data.bestPerformer.profit)} (
                         {formatPct(data.bestPerformer.profitPct)}%)
                       </p>
@@ -276,31 +276,31 @@ export default async function DashboardPage() {
                   <p className="mt-2 text-xs text-text-muted">No data.</p>
                 )}
               </article>
-              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+              <article className="shadow-elevation-1 min-h-56 rounded-2xl border border-border-subtle bg-card p-6">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
                   Worst performer
                 </p>
                 {data.worstPerformer ? (
-                  <div className="mt-3 flex items-start gap-4">
+                  <div className="mt-4 flex items-start gap-4">
                     <CardImage
                       src={data.worstPerformer.imageUrl}
                       alt={data.worstPerformer.cardName}
-                      className="h-24 w-16 shrink-0 ring-1 ring-border-subtle"
-                      sizes="64px"
+                      className="h-28 w-20 shrink-0 ring-1 ring-border-subtle"
+                      sizes="80px"
                     />
-                    <div className="min-w-0 space-y-3">
-                      <p className="truncate text-base font-semibold text-text-main">
+                    <div className="min-w-0 space-y-3.5">
+                      <p className="truncate text-lg font-semibold text-text-main">
                         {data.worstPerformer.cardName}
                       </p>
-                      <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 font-medium text-text-main">
+                      <div className="flex flex-wrap items-center gap-2 text-sm">
+                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 font-medium text-text-main">
                           {data.worstPerformer.setName}
                         </span>
-                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 text-text-muted">
+                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-text-muted">
                           {data.worstPerformer.grade}
                         </span>
                       </div>
-                      <p className="text-sm font-semibold text-text-main">
+                      <p className="text-base font-semibold text-text-main">
                         {formatGBP(data.worstPerformer.profit)} (
                         {formatPct(data.worstPerformer.profitPct)}%)
                       </p>
