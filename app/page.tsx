@@ -21,6 +21,29 @@ type AllocationRow = {
   pct: number;
 };
 
+type PerformerVariant = "best" | "worst";
+
+const PERFORMER_LABEL_STYLES: Record<PerformerVariant, string> = {
+  best: "border border-border-subtle bg-surface text-[#065f46] dark:text-[#34d399]",
+  worst:
+    "border border-border-subtle bg-surface text-[#991b1b] dark:text-[#f87171]",
+};
+
+const PERFORMER_LABEL_TEXT: Record<PerformerVariant, string> = {
+  best: "Best performer",
+  worst: "Worst performer",
+};
+
+function PerformerLabel({ variant }: { variant: PerformerVariant }) {
+  return (
+    <p
+      className={`inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] ${PERFORMER_LABEL_STYLES[variant]}`}
+    >
+      {PERFORMER_LABEL_TEXT[variant]}
+    </p>
+  );
+}
+
 function formatDayLabel(isoDay: string) {
   const date = new Date(`${isoDay}T00:00:00.000Z`);
   return new Intl.DateTimeFormat("en-GB", {
@@ -253,9 +276,12 @@ export default async function DashboardPage() {
 
             <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <article className="shadow-elevation-1 min-h-56 rounded-2xl border border-border-subtle bg-card p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
-                  Best performer
-                </p>
+                <div className="flex items-center justify-between gap-3">
+                  <PerformerLabel variant="best" />
+                  <span className="text-lg font-semibold text-slate-400 dark:text-slate-500">
+                    30d Cycle
+                  </span>
+                </div>
                 {data.bestPerformer ? (
                   <div className="mt-4 flex items-start gap-4">
                     <CardImage
@@ -287,9 +313,12 @@ export default async function DashboardPage() {
                 )}
               </article>
               <article className="shadow-elevation-1 min-h-56 rounded-2xl border border-border-subtle bg-card p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
-                  Worst performer
-                </p>
+                <div className="flex items-center justify-between gap-3">
+                  <PerformerLabel variant="worst" />
+                  <span className="text-lg font-semibold text-slate-400 dark:text-slate-500">
+                    Last 30 days
+                  </span>
+                </div>
                 {data.worstPerformer ? (
                   <div className="mt-4 flex items-start gap-4">
                     <CardImage
