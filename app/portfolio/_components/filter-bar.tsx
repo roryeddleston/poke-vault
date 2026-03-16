@@ -170,11 +170,11 @@ export function PortfolioFilterBar({
           />
         ))}
 
-        {(filters.length > 0 || quickPreset !== "all" || search.trim()) && (
+        {quickPreset === "all" && filters.length > 0 && (
           <button
             type="button"
             onClick={onClearAll}
-            className="ml-auto rounded-full px-2 py-1 text-xs font-medium text-text-muted transition-colors hover:bg-surface-soft hover:text-text-main"
+            className="ml-auto cursor-pointer rounded-full border border-transparent px-2 py-1 text-xs font-medium text-text-muted transition-colors hover:border-border-subtle hover:bg-surface-soft hover:text-text-main"
           >
             Clear all
           </button>
@@ -195,10 +195,10 @@ function QuickPresetButton({ active, label, onClick }: QuickPresetButtonProps) {
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 cursor-pointer rounded-t-md px-1 pb-2 font-medium transition-colors ${
+      className={`shrink-0 cursor-pointer rounded-t-md border-b-2 px-1 pb-2 text-sm font-semibold leading-5 transition-colors ${
         active
-          ? "border-b-2 border-accent font-semibold text-accent hover:text-accent-soft"
-          : "text-text-muted hover:text-text-main"
+          ? "border-accent text-accent hover:text-accent-soft"
+          : "border-transparent text-text-muted hover:text-text-main"
       }`}
     >
       {label}
@@ -224,7 +224,10 @@ function FilterChip({ label, value, onRemove }: FilterChipProps) {
       <span className="rounded-full bg-surface-soft px-2 py-0.5 text-[11px] font-medium">
         {value}
       </span>
-      <span aria-hidden="true" className="text-sm leading-none text-text-muted">
+      <span
+        aria-hidden="true"
+        className="inline-flex h-4 w-4 items-center justify-center text-2xl leading-none font-semibold text-text-muted"
+      >
         ×
       </span>
     </button>
