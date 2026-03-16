@@ -57,11 +57,11 @@ export default function Navbar() {
       {/* Desktop sidebar */}
       <nav
         aria-label="Main navigation"
-        className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-border-subtle/70 bg-surface/90 px-4 py-6 text-sm text-text-muted shadow-[0_0_40px_rgba(15,23,42,0.25)] backdrop-blur-md md:flex"
+        className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-border-subtle bg-card px-4 py-6 text-sm text-text-muted md:flex"
       >
         <div className="flex items-center gap-3 px-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-400/40">
-            <span className="text-lg font-semibold text-emerald-300">PV</span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-muted ring-1 ring-accent/25">
+            <span className="text-lg font-semibold text-accent">PV</span>
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-text-main">
@@ -82,7 +82,7 @@ export default function Navbar() {
                   href={item.href}
                   className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                     active
-                      ? "bg-accent-muted/20 text-text-main"
+                      ? "bg-accent-muted text-accent"
                       : "text-text-muted hover:bg-surface-soft hover:text-text-main"
                   }`}
                 >
@@ -105,7 +105,7 @@ export default function Navbar() {
       {/* Mobile bottom bar */}
       <nav
         aria-label="Bottom navigation"
-        className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between border-t border-border-subtle/70 bg-surface/90 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 text-xs text-text-muted shadow-[0_-10px_30px_rgba(15,23,42,0.25)] backdrop-blur-md md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between border-t border-border-subtle bg-card px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 text-xs text-text-muted shadow-[0_-8px_24px_rgba(15,23,42,0.06)] md:hidden"
       >
         {NAV_ITEMS.filter((item) => !item.desktopOnly).map((item) => {
           const active = isActive(item.href);
@@ -136,7 +136,7 @@ export default function Navbar() {
         <button
           type="button"
           aria-label="Add card"
-          className="absolute -top-5 left-1/2 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/40"
+          className="absolute -top-5 left-1/2 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/35"
         >
           <PlusIcon className="h-6 w-6" aria-hidden="true" />
         </button>
