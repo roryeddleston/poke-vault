@@ -226,7 +226,7 @@ export default async function DashboardPage() {
                 </p>
               </article>
               <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-                <p className="text-xs text-text-muted">Total cost basis</p>
+                <p className="text-xs text-text-muted">Total cost</p>
                 <p className="mt-1 text-xl font-semibold">
                   {formatGBP(data.summary.totalInvested)}
                 </p>
