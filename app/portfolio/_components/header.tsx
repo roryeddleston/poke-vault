@@ -17,7 +17,7 @@ export function PortfolioHeader({
       <div className="space-y-1">
         <h1 className="text-3xl font-semibold tracking-tight">My Collection</h1>
         <p className="text-sm text-text-muted">
-          Net value across your Pokémon collection.
+          Add and remove cards from your Pokémon collection
         </p>
       </div>
 

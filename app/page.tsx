@@ -45,8 +45,7 @@ function buildMiniChart(values: number[]) {
   const range = max - min || 1;
 
   const points = values.map((value, index) => {
-    const x =
-      padding + (index / Math.max(1, values.length - 1)) * chartWidth;
+    const x = padding + (index / Math.max(1, values.length - 1)) * chartWidth;
     const normalized = (value - min) / range;
     const y = padding + (1 - normalized) * chartHeight;
     return { x, y };
@@ -58,9 +57,9 @@ function buildMiniChart(values: number[]) {
 
   const first = points[0];
   const last = points[points.length - 1];
-  const areaPath = `${linePath} L ${last.x.toFixed(2)} ${(height - padding).toFixed(
-    2,
-  )} L ${first.x.toFixed(2)} ${(height - padding).toFixed(2)} Z`;
+  const areaPath = `${linePath} L ${last.x.toFixed(2)} ${(
+    height - padding
+  ).toFixed(2)} L ${first.x.toFixed(2)} ${(height - padding).toFixed(2)} Z`;
 
   return { width, height, linePath, areaPath };
 }
@@ -133,8 +132,12 @@ async function getDashboardData() {
   const profitPercentage =
     totalInvested === 0 ? 0 : (totalProfit / totalInvested) * 100;
 
-  const bestPerformer = [...enriched].sort((a, b) => b.profitPct - a.profitPct)[0];
-  const worstPerformer = [...enriched].sort((a, b) => a.profitPct - b.profitPct)[0];
+  const bestPerformer = [...enriched].sort(
+    (a, b) => b.profitPct - a.profitPct,
+  )[0];
+  const worstPerformer = [...enriched].sort(
+    (a, b) => a.profitPct - b.profitPct,
+  )[0];
   const topMovers = [...enriched]
     .sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct))
     .slice(0, 6);
@@ -142,12 +145,16 @@ async function getDashboardData() {
     .filter((h) => h.snapshots[0])
     .sort(
       (a, b) =>
-        b.snapshots[0].capturedAt.getTime() - a.snapshots[0].capturedAt.getTime(),
+        b.snapshots[0].capturedAt.getTime() -
+        a.snapshots[0].capturedAt.getTime(),
     )
     .slice(0, 8);
 
   const allocationBySet = buildAllocation(
-    enriched.map((h) => ({ label: h.setName || "Unknown set", value: h.value })),
+    enriched.map((h) => ({
+      label: h.setName || "Unknown set",
+      value: h.value,
+    })),
     totalValue,
   );
   const allocationByGrade = buildAllocation(
@@ -160,10 +167,12 @@ async function getDashboardData() {
     const qty = s.holding?.quantity ?? 1;
     seriesMap.set(day, (seriesMap.get(day) ?? 0) + s.value * qty);
   }
-  const portfolioSeries = Array.from(seriesMap.entries()).map(([day, value]) => ({
-    day,
-    value,
-  }));
+  const portfolioSeries = Array.from(seriesMap.entries()).map(
+    ([day, value]) => ({
+      day,
+      value,
+    }),
+  );
 
   return {
     holdingsCount: enriched.length,
@@ -190,20 +199,19 @@ export default async function DashboardPage() {
     <main className="min-h-screen bg-page px-4 py-7 text-text-main md:px-8 lg:px-10">
       <div className="mx-auto w-full max-w-6xl space-y-6">
         <header className="space-y-1">
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-text-muted">
-            Dashboard
-          </p>
           <h1 className="text-2xl font-semibold sm:text-3xl">
             Portfolio overview
           </h1>
           <p className="text-sm text-text-muted">
-            Data-heavy summary of valuation, allocation, and price momentum.
+            Summary of valuation, allocation, and price momentum
           </p>
         </header>
 
         {data.holdingsCount === 0 ? (
           <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card px-6 py-12 text-center">
-            <p className="text-sm font-medium text-text-main">No holdings yet</p>
+            <p className="text-sm font-medium text-text-main">
+              No holdings yet
+            </p>
             <p className="mt-2 text-sm text-text-muted">
               Add cards from Market to populate your dashboard widgets.
             </p>
@@ -227,7 +235,9 @@ export default async function DashboardPage() {
                 <p className="text-xs text-text-muted">Profit / loss</p>
                 <p
                   className={`mt-1 text-xl font-semibold ${
-                    data.summary.totalProfit >= 0 ? "text-emerald-600" : "text-red-600"
+                    data.summary.totalProfit >= 0
+                      ? "text-emerald-600"
+                      : "text-red-600"
                   }`}
                 >
                   {formatGBP(data.summary.totalProfit)}
@@ -329,7 +339,10 @@ export default async function DashboardPage() {
                 <p className="text-xs text-text-muted">Recent price changes</p>
                 <ul className="mt-3 space-y-2">
                   {data.recentPriceChanges.map((h) => (
-                    <li key={h.id} className="flex items-start justify-between gap-2">
+                    <li
+                      key={h.id}
+                      className="flex items-start justify-between gap-2"
+                    >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-text-main">
                           {h.cardName}
@@ -345,7 +358,9 @@ export default async function DashboardPage() {
                       </div>
                       <p
                         className={`text-xs font-semibold ${
-                          h.changeAmount >= 0 ? "text-emerald-600" : "text-red-600"
+                          h.changeAmount >= 0
+                            ? "text-emerald-600"
+                            : "text-red-600"
                         }`}
                       >
                         {h.changeAmount >= 0 ? "+" : ""}
@@ -360,7 +375,10 @@ export default async function DashboardPage() {
                 <p className="text-xs text-text-muted">Top movers</p>
                 <ul className="mt-3 space-y-2">
                   {data.topMovers.map((h) => (
-                    <li key={h.id} className="flex items-start justify-between gap-2">
+                    <li
+                      key={h.id}
+                      className="flex items-start justify-between gap-2"
+                    >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-text-main">
                           {h.cardName}
@@ -393,7 +411,9 @@ export default async function DashboardPage() {
                 Mini chart of portfolio value over time
               </p>
               {data.portfolioSeries.length === 0 ? (
-                <p className="mt-3 text-xs text-text-muted">No historical data yet.</p>
+                <p className="mt-3 text-xs text-text-muted">
+                  No historical data yet.
+                </p>
               ) : (
                 <div className="mt-3 space-y-2">
                   {(() => {
@@ -432,10 +452,7 @@ export default async function DashboardPage() {
                                 />
                               </linearGradient>
                             </defs>
-                            <path
-                              d={areaPath}
-                              fill="url(#portfolio-area)"
-                            />
+                            <path d={areaPath} fill="url(#portfolio-area)" />
                             <path
                               d={linePath}
                               fill="none"
@@ -447,8 +464,13 @@ export default async function DashboardPage() {
                           </svg>
                         </div>
                         <div className="flex items-center justify-between text-[11px] text-text-muted">
-                          <span>{formatDayLabel(first.day)} · {formatGBP(first.value)}</span>
-                          <span>{formatDayLabel(last.day)} · {formatGBP(last.value)}</span>
+                          <span>
+                            {formatDayLabel(first.day)} ·{" "}
+                            {formatGBP(first.value)}
+                          </span>
+                          <span>
+                            {formatDayLabel(last.day)} · {formatGBP(last.value)}
+                          </span>
                         </div>
                       </>
                     );
