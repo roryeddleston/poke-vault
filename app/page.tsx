@@ -279,7 +279,7 @@ export default async function DashboardPage() {
                 <div className="flex items-center justify-between gap-3">
                   <PerformerLabel variant="best" />
                   <span className="text-lg font-semibold text-slate-400 dark:text-slate-500">
-                    30d Cycle
+                    Last 30 days
                   </span>
                 </div>
                 {data.bestPerformer ? (
