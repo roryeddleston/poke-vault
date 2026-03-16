@@ -57,7 +57,7 @@ export default async function MarketPage(props: MarketPageProps) {
               {totalPages})
             </p>
             <ul className="divide-y divide-border-subtle rounded-xl border border-border-subtle bg-card">
-              {pageCards.map((card) => (
+              {pageCards.map((card, index) => (
                 <li
                   key={card.id}
                   className="flex items-center gap-7 px-5 py-6 text-lg md:gap-9 md:px-7 md:py-7"
@@ -66,6 +66,8 @@ export default async function MarketPage(props: MarketPageProps) {
                     src={card.imageUrl}
                     alt={card.name}
                     className="h-24 w-16 md:h-28 md:w-20"
+                    sizes="(max-width: 768px) 64px, 80px"
+                    priority={index < 4}
                   />
 
                     <div className="flex min-w-0 flex-1 flex-col gap-1">

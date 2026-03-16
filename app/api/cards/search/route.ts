@@ -11,7 +11,10 @@ export async function GET(request: NextRequest) {
   }
 
   // Autocomplete only needs the first page of a few results.
-  const cards = await searchPokemonCards(q, 1, 5);
+  const cards = await searchPokemonCards(q, 1, 5, {
+    imageQuality: "low",
+    imageExt: "webp",
+  });
 
   return NextResponse.json(cards);
 }

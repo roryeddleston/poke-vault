@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "./icons";
 import type { PokemonCardSummary } from "@/lib/pokemon-tcg";
+import { CardImage } from "./CardImage";
 
 type Suggestion = PokemonCardSummary;
 
@@ -112,7 +113,7 @@ export function SearchBox() {
           id="global-search-suggestions"
           className="absolute z-40 mt-1 max-h-80 w-full overflow-auto rounded-xl border border-border-subtle bg-card text-sm shadow-lg"
         >
-          {suggestions.map((s) => (
+          {suggestions.map((s, index) => (
             <li key={s.id}>
               <button
                 type="button"
@@ -120,15 +121,13 @@ export function SearchBox() {
                 className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left hover:bg-surface-soft"
               >
                 {s.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <CardImage
                     src={s.imageUrl}
                     alt={s.name}
-                    className="h-8 w-auto rounded bg-surface-soft object-cover"
-                    loading="lazy"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
+                    className="h-8 w-6 bg-surface-soft"
+                    sizes="24px"
+                    priority={index < 3}
+                    unoptimized
                   />
                 ) : (
                   <div className="flex h-8 w-6 items-center justify-center rounded bg-surface-soft text-[10px] text-text-muted">

@@ -13,6 +13,11 @@ export type PokemonCardSummary = {
   setTotal?: number;
 };
 
+type SearchImageOptions = {
+  imageQuality?: "high" | "low";
+  imageExt?: "png" | "webp";
+};
+
 let tcgdexClient: TCGdex | null = null;
 
 function getTcgDex(): TCGdex {
@@ -51,6 +56,7 @@ export async function searchPokemonCards(
   query: string,
   page = 1,
   pageSize = 10,
+  imageOptions: SearchImageOptions = {},
 ): Promise<PokemonCardSummary[]> {
   const q = query.trim();
   if (!q) return [];
@@ -166,10 +172,13 @@ export async function searchPokemonCards(
       (c): c is TcgDexCardFull => c !== null,
     );
 
+    const imageQuality = imageOptions.imageQuality ?? "high";
+    const imageExt = imageOptions.imageExt ?? "png";
+
     const summaries = nonNullCards.map((card) => {
       const imageUrl =
         typeof card.getImageURL === "function"
-          ? card.getImageURL("high", "png")
+          ? card.getImageURL(imageQuality, imageExt)
           : undefined;
 
       const setName = card.set?.name ?? card.set?.id;
