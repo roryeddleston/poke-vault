@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MoonIcon, SunIcon } from "./icons";
+import { FiMoon, FiSun } from "react-icons/fi";
 
 type Theme = "light" | "dark";
 
@@ -44,14 +44,23 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label={isDark ? "Use light mode" : "Use dark mode"}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-card text-text-muted shadow-sm transition-colors hover:border-accent-soft hover:bg-surface-soft hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-page cursor-pointer"
+      role="switch"
+      aria-checked={isDark}
+      aria-label="Toggle dark mode"
+      className="relative flex h-8 w-16 cursor-pointer items-center rounded-full border-2 border-accent p-1 transition-all duration-300 hover:border-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-page"
     >
-      {isDark ? (
-        <SunIcon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-      ) : (
-        <MoonIcon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-      )}
+      <span
+        aria-hidden="true"
+        className={`flex h-6 w-5 items-center justify-center rounded-full bg-transparent text-sm transition-transform duration-300 ${
+          isDark ? "translate-x-8" : ""
+        }`}
+      >
+        {isDark ? (
+          <FiSun size={16} className="text-accent" />
+        ) : (
+          <FiMoon size={16} className="text-accent" />
+        )}
+      </span>
     </button>
   );
 }
