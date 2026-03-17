@@ -60,17 +60,17 @@ export function HoldingRowActions({ holdingId }: HoldingRowActionsProps) {
           className="w-full max-w-sm rounded-2xl border border-border-subtle bg-card p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="mb-4 flex items-center justify-between gap-3">
               <h2
                 id="remove-holding-title"
-                className="text-sm font-semibold text-text-main"
+                className="text-xl font-semibold text-text-main"
               >
                 Remove card
               </h2>
               <button
                 type="button"
                 onClick={() => setConfirmOpen(false)}
-                className="cursor-pointer rounded-full px-2 py-1 text-xs text-text-muted transition-colors hover:bg-surface-soft hover:text-text-main"
+                className="cursor-pointer px-2 py-0.5 text-3xl leading-none text-text-muted transition-colors hover:text-text-main"
                 aria-label="Close"
                 disabled={removing}
               >
