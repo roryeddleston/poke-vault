@@ -119,4 +119,71 @@ button:not(:disabled) {
   .shadow-elevation-3 {
     box-shadow: var(--shadow-elevation-3);
   }
+
+  /* High-contrast grading pill variants */
+  .grade-pill-base {
+    @apply inline-flex items-center px-0 py-0 text-xs font-semibold leading-none;
+  }
+
+  .grade-pill-raw {
+    color: #334155;
+  }
+
+  .grade-pill-psa {
+    color: #be123c;
+  }
+
+  .grade-pill-bgs {
+    color: #15803d;
+  }
+
+  .grade-pill-cgc {
+    color: #b45309;
+  }
+
+  .grade-pill-ace {
+    color: #0369a1;
+  }
+
+  :root[data-theme="dark"] .grade-pill-raw {
+    color: #f1f5f9;
+  }
+
+  :root[data-theme="dark"] .grade-pill-psa {
+    color: #fecdd3;
+  }
+
+  :root[data-theme="dark"] .grade-pill-bgs {
+    color: #bbf7d0;
+  }
+
+  :root[data-theme="dark"] .grade-pill-cgc {
+    color: #fde68a;
+  }
+
+  :root[data-theme="dark"] .grade-pill-ace {
+    color: #bae6fd;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .grade-pill-raw {
+    color: #f1f5f9;
+  }
+
+  :root:not([data-theme]) .grade-pill-psa {
+    color: #fecdd3;
+  }
+
+  :root:not([data-theme]) .grade-pill-bgs {
+    color: #bbf7d0;
+  }
+
+  :root:not([data-theme]) .grade-pill-cgc {
+    color: #fde68a;
+  }
+
+  :root:not([data-theme]) .grade-pill-ace {
+    color: #bae6fd;
+  }
 }
