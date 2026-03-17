@@ -8,7 +8,7 @@ type MarketPageProps = {
   searchParams: Promise<{ q?: string; page?: string }>;
 };
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 export default async function MarketPage(props: MarketPageProps) {
   const { q, page: rawPage } = await props.searchParams;
@@ -17,7 +17,8 @@ export default async function MarketPage(props: MarketPageProps) {
 
   const allCards = query ? await searchPokemonCardsAll(query, 50, 10) : [];
   const total = allCards.length;
-  const totalPages = total === 0 ? 1 : Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const totalPages =
+    total === 0 ? 1 : Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const startIndex = (page - 1) * PAGE_SIZE;
   const pageCards = allCards.slice(startIndex, startIndex + PAGE_SIZE);
@@ -28,9 +29,6 @@ export default async function MarketPage(props: MarketPageProps) {
     <main className="min-h-screen bg-page text-text-main px-4 py-8">
       <div className="mx-auto w-full max-w-5xl space-y-6">
         <header className="space-y-1">
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-text-muted">
-            Market
-          </p>
           <h1 className="text-2xl font-semibold sm:text-3xl">
             Search Pokémon cards
           </h1>
@@ -49,7 +47,7 @@ export default async function MarketPage(props: MarketPageProps) {
             No cards found for <span className="font-medium">{query}</span>.
           </section>
         ) : (
-              <section className="space-y-3">
+          <section className="space-y-3">
             <p className="text-xs text-text-muted">
               Showing {startDisplay}–{endDisplay} of {total} result
               {total === 1 ? "" : "s"} for{" "}
@@ -70,21 +68,19 @@ export default async function MarketPage(props: MarketPageProps) {
                     priority={index < 4}
                   />
 
-                    <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <div className="flex items-baseline justify-between gap-3">
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <div className="flex items-baseline gap-3">
                       <p className="truncate font-medium text-text-main">
                         {card.name}
                         {card.cardNumber != null && card.setTotal != null ? (
-                          <> {card.cardNumber}/{card.setTotal}</>
+                          <>
+                            {" "}
+                            {card.cardNumber}/{card.setTotal}
+                          </>
                         ) : card.cardNumber != null ? (
                           <> {card.cardNumber}</>
                         ) : null}
                       </p>
-                      {card.rarity ? (
-                        <span className="shrink-0 rounded-full bg-surface-soft px-2 py-0.5 text-[11px] text-text-muted">
-                          {card.rarity}
-                        </span>
-                      ) : null}
                     </div>
                     <p className="truncate text-xs text-text-muted">
                       {card.setName ?? "Unknown set"}
@@ -92,6 +88,11 @@ export default async function MarketPage(props: MarketPageProps) {
                   </div>
 
                   <div className="flex shrink-0 items-center gap-2">
+                    {card.rarity ? (
+                      <span className="shrink-0 rounded-full bg-surface-soft px-2 py-0.5 text-[11px] text-text-muted">
+                        {card.rarity}
+                      </span>
+                    ) : null}
                     <AddFromMarketButton card={card} />
                   </div>
                 </li>
