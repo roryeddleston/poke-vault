@@ -163,7 +163,7 @@ async function getDashboardData() {
   )[0];
   const topMovers = [...enriched]
     .sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct))
-    .slice(0, 6);
+    .slice(0, 5);
   const recentPriceChanges = [...enriched]
     .filter((h) => h.snapshots[0])
     .sort(
@@ -171,7 +171,7 @@ async function getDashboardData() {
         b.snapshots[0].capturedAt.getTime() -
         a.snapshots[0].capturedAt.getTime(),
     )
-    .slice(0, 8);
+    .slice(0, 5);
 
   const allocationBySet = buildAllocation(
     enriched.map((h) => ({
@@ -352,10 +352,10 @@ export default async function DashboardPage() {
             </section>
 
             <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-              <p className="text-xs text-text-muted">
+              <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
                 Portfolio allocation by set / grade
               </p>
-              <div className="mt-3">
+              <div className="mt-4">
                 <DashboardAllocationTabs
                   bySet={data.allocationBySet}
                   byGrade={data.allocationByGrade}
@@ -365,12 +365,14 @@ export default async function DashboardPage() {
 
             <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-                <p className="text-xs text-text-muted">Recent price changes</p>
-                <ul className="mt-3 space-y-2">
+                <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
+                  Recent price changes
+                </p>
+                <ul className="mt-4 divide-y divide-border-subtle/70">
                   {data.recentPriceChanges.map((h) => (
                     <li
                       key={h.id}
-                      className="flex items-start justify-between gap-2"
+                      className="flex items-start justify-between gap-2 py-2"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-text-main">
@@ -401,12 +403,14 @@ export default async function DashboardPage() {
               </article>
 
               <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-                <p className="text-xs text-text-muted">Top movers</p>
-                <ul className="mt-3 space-y-2">
+                <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
+                  Top movers
+                </p>
+                <ul className="mt-4 divide-y divide-border-subtle/70">
                   {data.topMovers.map((h) => (
                     <li
                       key={h.id}
-                      className="flex items-start justify-between gap-2"
+                      className="flex items-start justify-between gap-2 py-2"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-text-main">
@@ -436,7 +440,7 @@ export default async function DashboardPage() {
             </section>
 
             <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-              <p className="text-xs text-text-muted">
+              <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
                 Mini chart of portfolio value over time
               </p>
               {data.portfolioSeries.length === 0 ? (
