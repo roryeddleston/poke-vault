@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { FiChevronDown } from "react-icons/fi";
 import type { PokemonCardSummary } from "@/lib/pokemon-tcg";
 
 type AddFromMarketDialogProps = {
@@ -10,13 +11,32 @@ type AddFromMarketDialogProps = {
   card: PokemonCardSummary;
 };
 
+const GRADING_COMPANIES = ["RAW", "PSA", "ACE", "BGS", "CGC"] as const;
+const GRADE_OPTIONS = [
+  "10",
+  "9.5",
+  "9",
+  "8.5",
+  "8",
+  "7.5",
+  "7",
+  "6",
+  "5",
+  "4",
+  "3",
+  "2",
+  "1",
+] as const;
+
 export function AddFromMarketDialog({
   open,
   onClose,
   card,
 }: AddFromMarketDialogProps) {
   const router = useRouter();
-  const [grade, setGrade] = useState("");
+  const [gradingCompany, setGradingCompany] =
+    useState<(typeof GRADING_COMPANIES)[number]>("RAW");
+  const [gradeValue, setGradeValue] = useState("");
   const [purchasePrice, setPurchasePrice] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [submitting, setSubmitting] = useState(false);
@@ -25,7 +45,8 @@ export function AddFromMarketDialog({
   if (!open) return null;
 
   const resetAndClose = () => {
-    setGrade("");
+    setGradingCompany("RAW");
+    setGradeValue("");
     setPurchasePrice("");
     setQuantity("1");
     setError(null);
@@ -51,6 +72,14 @@ export function AddFromMarketDialog({
       return;
     }
 
+    if (gradingCompany !== "RAW" && !gradeValue) {
+      setError("Please select a grade.");
+      return;
+    }
+
+    const normalizedGrade =
+      gradingCompany === "RAW" ? "RAW" : `${gradingCompany} ${gradeValue}`;
+
     setSubmitting(true);
     try {
       const res = await fetch("/api/holdings", {
@@ -59,11 +88,11 @@ export function AddFromMarketDialog({
         body: JSON.stringify({
           cardId: card.id,
           cardName: card.name,
-            setName: card.setName ?? "Unknown set",
-            imageUrl: card.imageUrl,
-            cardNumber: card.cardNumber,
-            setTotal: card.setTotal,
-          grade: grade.trim(),
+          setName: card.setName ?? "Unknown set",
+          imageUrl: card.imageUrl,
+          cardNumber: card.cardNumber,
+          setTotal: card.setTotal,
+          grade: normalizedGrade,
           purchasePrice: priceNumber,
           quantity: qtyNumber,
         }),
@@ -109,7 +138,7 @@ export function AddFromMarketDialog({
           <button
             type="button"
             onClick={resetAndClose}
-            className="cursor-pointer text-sm text-text-muted hover:text-text-main"
+            className="cursor-pointer px-2 py-0.5 text-3xl leading-none text-text-muted transition-colors hover:text-text-main"
             aria-label="Close"
           >
             ✕
@@ -127,16 +156,62 @@ export function AddFromMarketDialog({
         </div>
 
         <form className="space-y-3 text-sm" onSubmit={handleSubmit}>
-          <div className="space-y-1">
-            <label className="block text-xs font-medium text-text-muted">
-              Grade
-            </label>
-            <input
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none focus:border-accent"
-              placeholder="e.g. PSA 10 (leave blank for RAW)"
-            />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-text-muted">
+                Grading company
+              </label>
+              <div className="relative">
+                <select
+                  value={gradingCompany}
+                  onChange={(e) =>
+                    setGradingCompany(
+                      e.target.value as (typeof GRADING_COMPANIES)[number],
+                    )
+                  }
+                  className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none focus:border-accent"
+                >
+                  {GRADING_COMPANIES.map((company) => (
+                    <option key={company} value={company}>
+                      {company}
+                    </option>
+                  ))}
+                </select>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted"
+                >
+                  <FiChevronDown className="h-4 w-4" />
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-text-muted">
+                Grade
+              </label>
+              <div className="relative">
+                <select
+                  value={gradeValue}
+                  onChange={(e) => setGradeValue(e.target.value)}
+                  disabled={gradingCompany === "RAW"}
+                  className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none focus:border-accent disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">Select grade</option>
+                  {GRADE_OPTIONS.map((grade) => (
+                    <option key={grade} value={grade}>
+                      {grade}
+                    </option>
+                  ))}
+                </select>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted"
+                >
+                  <FiChevronDown className="h-4 w-4" />
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-3">
