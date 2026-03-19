@@ -6,8 +6,20 @@ datasource db {
   provider = "postgresql"
 }
 
+enum HoldingFinish {
+  NORMAL
+  HOLO
+  REVERSE
+  WPROMO
+}
+
+enum HoldingEdition {
+  UNLIMITED
+  FIRST_EDITION
+}
+
 model Holding {
-  id            String   @id @default(cuid())
+  id            String         @id @default(cuid())
   ownerId       String
   cardId        String
   cardName      String
@@ -15,14 +27,16 @@ model Holding {
   imageUrl      String?
   cardNumber    Int?
   setTotal      Int?
-  grade         String   @default("RAW")
+  grade         String         @default("RAW")
+  finish        HoldingFinish  @default(NORMAL)
+  edition       HoldingEdition @default(UNLIMITED)
   purchasePrice Float
-  quantity      Int      @default(1)
-  createdAt     DateTime @default(now())
+  quantity      Int            @default(1)
+  createdAt     DateTime       @default(now())
 
   snapshots PriceSnapshot[]
 
-  @@unique([ownerId, cardId, grade])
+  @@unique([ownerId, cardId, grade, finish, edition])
   @@index([ownerId])
   @@index([ownerId, createdAt])
 }
