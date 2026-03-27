@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { DEMO_OWNER_ID } from "@/lib/constants";
 import { createHoldingSchema } from "@/lib/validators/holding";
 import { getPokemonCardVariants } from "@/lib/pokemon-tcg";
+import { randomUUID } from "crypto";
 
 export async function POST(req: Request) {
   try {
@@ -50,36 +51,52 @@ export async function POST(req: Request) {
       }
     }
 
-    // Note: Prisma client types can lag behind schema changes in long-lived dev sessions.
-    // Runtime behavior is correct as long as migrations + `prisma generate` are up to date.
-    const holding = await prisma.holding.upsert({
-      where: {
-        ownerId_cardId_grade_finish_edition: {
-          ownerId: DEMO_OWNER_ID,
-          cardId,
-          grade,
-          finish,
-          edition,
-        },
-      },
-      update: {
-        quantity: { increment: quantity },
-      },
-      create: {
-        ownerId: DEMO_OWNER_ID,
-        cardId,
-        cardName,
-        setName,
-        ...(imageUrl ? { imageUrl } : {}),
-        ...(cardNumber ? { cardNumber } : {}),
-        ...(setTotal ? { setTotal } : {}),
-        grade,
-        finish,
-        edition,
-        purchasePrice,
-        quantity,
-      },
-    } as any);
+    // Use SQL upsert to avoid stale Prisma client metadata in long-lived dev sessions.
+    // This relies on the DB unique index: (ownerId, cardId, grade, finish, edition).
+    const rows = await prisma.$queryRaw<
+      Array<{
+        id: string;
+        ownerId: string;
+        cardId: string;
+        cardName: string;
+        setName: string;
+        imageUrl: string | null;
+        cardNumber: number | null;
+        setTotal: number | null;
+        grade: string;
+        finish: string;
+        edition: string;
+        purchasePrice: number;
+        quantity: number;
+        createdAt: Date;
+      }>
+    >`
+      INSERT INTO "Holding" (
+        "id", "ownerId", "cardId", "cardName", "setName",
+        "imageUrl", "cardNumber", "setTotal", "grade", "finish",
+        "edition", "purchasePrice", "quantity"
+      )
+      VALUES (
+        ${randomUUID()}, ${DEMO_OWNER_ID}, ${cardId}, ${cardName}, ${setName},
+        ${imageUrl ?? null}, ${cardNumber ?? null}, ${setTotal ?? null}, ${grade}, ${finish},
+        ${edition}, ${purchasePrice}, ${quantity}
+      )
+      ON CONFLICT ("ownerId", "cardId", "grade", "finish", "edition")
+      DO UPDATE SET
+        "quantity" = "Holding"."quantity" + EXCLUDED."quantity"
+      RETURNING
+        "id", "ownerId", "cardId", "cardName", "setName",
+        "imageUrl", "cardNumber", "setTotal", "grade", "finish",
+        "edition", "purchasePrice", "quantity", "createdAt";
+    `;
+
+    const holding = rows[0];
+    if (!holding) {
+      return NextResponse.json(
+        { error: "Failed to create holding" },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json({ holding }, { status: 201 });
   } catch (error) {
