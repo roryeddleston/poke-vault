@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FiMoon, FiSun } from "react-icons/fi";
 
 type Theme = "light" | "dark";
@@ -8,31 +8,21 @@ type Theme = "light" | "dark";
 const STORAGE_KEY = "pv-theme";
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme | null>(null);
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "light";
+    const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
+    if (stored === "light" || stored === "dark") return stored;
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    return prefersDark ? "dark" : "light";
+  });
 
-  useEffect(() => {
-    const stored =
-      typeof window !== "undefined"
-        ? (window.localStorage.getItem(STORAGE_KEY) as Theme | null)
-        : null;
-
-    if (stored === "light" || stored === "dark") {
-      applyTheme(stored);
-      setTheme(stored);
-      return;
-    }
-
-    const prefersDark = window.matchMedia?.(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-    const initial: Theme = prefersDark ? "dark" : "light";
-    applyTheme(initial);
-    setTheme(initial);
-  }, []);
+  // Keep DOM in sync with state (no state updates here).
+  if (typeof document !== "undefined") {
+    applyTheme(theme);
+  }
 
   const toggle = () => {
-    const current: Theme = theme ?? getCurrentTheme();
-    const next: Theme = current === "light" ? "dark" : "light";
+    const next: Theme = theme === "light" ? "dark" : "light";
     applyTheme(next);
     window.localStorage.setItem(STORAGE_KEY, next);
     setTheme(next);
@@ -69,18 +59,4 @@ function applyTheme(theme: Theme) {
   if (typeof document === "undefined") return;
   document.documentElement.dataset.theme = theme;
 }
-
-function getCurrentTheme(): Theme {
-  if (typeof document === "undefined") {
-    return "light";
-  }
-  const attr = document.documentElement.dataset.theme;
-  if (attr === "light" || attr === "dark") {
-    return attr;
-  }
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")
-    .matches;
-  return prefersDark ? "dark" : "light";
-}
-
 
