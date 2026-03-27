@@ -63,7 +63,7 @@ export function DashboardAllocationTabs({
                     {row.label}
                   </p>
                   <p className="text-[11px] text-text-muted">
-                    {formatGBP(row.value)} • {row.pct.toFixed(1)}%
+                    {formatGBP(row.value)} • {row.pct.toFixed(2)}%
                   </p>
                 </div>
                 <div className="h-2.5 overflow-hidden rounded-full bg-surface-soft">
