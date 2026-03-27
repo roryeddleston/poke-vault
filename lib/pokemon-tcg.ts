@@ -340,80 +340,121 @@ export type PokemonCardMarketValue = {
   currency: string;
 };
 
-const CARDMARKET_PRICE_FIELDS = ["trend", "avg30", "avg7", "avg", "low"] as const;
 const TCGPLAYER_PRICE_FIELDS = ["marketPrice", "midPrice", "lowPrice"] as const;
+type CardmarketMetric = "trend" | "avg30" | "avg7" | "avg" | "low";
 
 export function getMarketValueRequestKey(request: MarketValueRequest) {
   return `${request.cardId}::${request.finish}::${request.edition}`;
 }
 
-export async function getPokemonCardMarketValues(
+export type PokemonCardPricingComparables = {
+  /**
+   * Chosen "current" unit price for display and totals.
+   * Prefer Cardmarket trend, then Cardmarket avg30, then a TCGplayer market price.
+   */
+  current: PokemonCardMarketValue | null;
+  /**
+   * Like-for-like baseline for change calculations.
+   * Only populated when Cardmarket avg30 exists for the same finish/edition.
+   */
+  baseline30: PokemonCardMarketValue | null;
+  /**
+   * Percentage change between current comparable and baseline30 (like-for-like only).
+   * Null when baseline is missing or current is not from Cardmarket.
+   */
+  change30Pct: number | null;
+};
+
+export async function getPokemonCardPricingComparables(
   requests: MarketValueRequest[],
-): Promise<Map<string, PokemonCardMarketValue>> {
+): Promise<Map<string, PokemonCardPricingComparables>> {
   const uniqueRequests = Array.from(
     new Map(requests.map((r) => [getMarketValueRequestKey(r), r])).values(),
   );
 
   const results = await Promise.all(
     uniqueRequests.map(async (request) => {
-      const value = await getPokemonCardMarketValue(request);
+      const value = await getPokemonCardPricingComparable(request);
       return [getMarketValueRequestKey(request), value] as const;
     }),
   );
 
-  const out = new Map<string, PokemonCardMarketValue>();
+  const out = new Map<string, PokemonCardPricingComparables>();
   for (const [key, value] of results) {
     if (value) out.set(key, value);
   }
   return out;
 }
 
-async function getPokemonCardMarketValue(
+async function getPokemonCardPricingComparable(
   request: MarketValueRequest,
-): Promise<PokemonCardMarketValue | null> {
+): Promise<PokemonCardPricingComparables | null> {
   try {
     const tcgdex = getTcgDex();
     const card = (await tcgdex.card.get(request.cardId)) as TcgDexCardFull;
-    return (
-      extractCardmarketValue(card.pricing?.cardmarket, request.finish, request.edition) ??
-      extractTcgplayerValue(card.pricing?.tcgplayer, request.finish, request.edition)
+
+    const cardmarketTrend = extractCardmarketMetric(
+      card.pricing?.cardmarket,
+      request.finish,
+      request.edition,
+      "trend",
     );
+    const cardmarketAvg30 = extractCardmarketMetric(
+      card.pricing?.cardmarket,
+      request.finish,
+      request.edition,
+      "avg30",
+    );
+
+    const current =
+      cardmarketTrend ??
+      cardmarketAvg30 ??
+      extractTcgplayerValue(card.pricing?.tcgplayer, request.finish, request.edition);
+
+    const baseline30 = cardmarketAvg30;
+
+    const change30Pct =
+      current?.source === "cardmarket" &&
+      baseline30?.source === "cardmarket" &&
+      baseline30.value > 0
+        ? ((current.value - baseline30.value) / baseline30.value) * 100
+        : null;
+
+    return { current, baseline30, change30Pct };
   } catch (error) {
-    console.error("[TCGdex] getPokemonCardMarketValue failed:", error);
+    console.error("[TCGdex] getPokemonCardPricingComparable failed:", error);
     return null;
   }
 }
 
-function extractCardmarketValue(
+function extractCardmarketMetric(
   pricing: Record<string, number | string | undefined> | undefined,
   finish: HoldingFinish,
   edition: HoldingEdition,
+  metric: CardmarketMetric,
 ): PokemonCardMarketValue | null {
   if (!pricing) return null;
   const suffixes = getCardmarketSuffixes(finish, edition);
 
-  for (const metric of CARDMARKET_PRICE_FIELDS) {
-    for (const suffix of suffixes) {
-      const key = `${metric}${suffix}`;
-      const value = pricing[key];
-      if (typeof value === "number" && Number.isFinite(value) && value > 0) {
-        return {
-          value,
-          source: "cardmarket",
-          currency: String(pricing.unit ?? "EUR"),
-        };
-      }
-    }
-    const fallback = pricing[metric];
-    if (typeof fallback === "number" && Number.isFinite(fallback) && fallback > 0) {
+  for (const suffix of suffixes) {
+    const key = `${metric}${suffix}`;
+    const value = pricing[key];
+    if (typeof value === "number" && Number.isFinite(value) && value > 0) {
       return {
-        value: fallback,
+        value,
         source: "cardmarket",
         currency: String(pricing.unit ?? "EUR"),
       };
     }
   }
-
+  const fallback = pricing[metric];
+  if (typeof fallback === "number" && Number.isFinite(fallback) && fallback > 0) {
+    return {
+      value: fallback,
+      source: "cardmarket",
+      currency: String(pricing.unit ?? "EUR"),
+    };
+  }
   return null;
 }
 
