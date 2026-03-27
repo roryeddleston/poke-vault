@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import type { PortfolioResponse } from "./types";
 import { PortfolioContent } from "./_components/portfolio-content";
+import { PageShell } from "@/components/PageShell";
 
 async function getPortfolio(): Promise<PortfolioResponse> {
   // Server-side fetch to your own API route.
@@ -21,11 +22,5 @@ async function getPortfolio(): Promise<PortfolioResponse> {
 export default async function PortfolioPage() {
   const data = await getPortfolio();
 
-  return (
-    <main className="min-h-screen bg-page px-4 py-7 text-text-main md:px-8 lg:px-10">
-      <div className="mx-auto w-full max-w-6xl space-y-6">
-        <PortfolioContent data={data} />
-      </div>
-    </main>
-  );
+  return <PageShell><PortfolioContent data={data} /></PageShell>;
 }

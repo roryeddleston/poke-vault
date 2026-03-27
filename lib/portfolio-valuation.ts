@@ -1,4 +1,9 @@
-import type { HoldingEdition, HoldingFinish } from "@/lib/holding-options";
+import {
+  coerceHoldingEdition,
+  coerceHoldingFinish,
+  type HoldingEdition,
+  type HoldingFinish,
+} from "@/lib/holding-options";
 import {
   getMarketValueRequestKey,
   getPokemonCardPricingComparables,
@@ -12,8 +17,8 @@ type SnapshotLike = {
 
 type HoldingValuationInput = {
   cardId: string;
-  finish: HoldingFinish | unknown;
-  edition: HoldingEdition | unknown;
+  finish?: HoldingFinish | unknown;
+  edition?: HoldingEdition | unknown;
   purchasePrice: number;
   quantity: number;
   snapshots: SnapshotLike[];
@@ -35,13 +40,20 @@ export type ValuedHolding<T> = T & {
   profitPct: number;
 };
 
+export type PortfolioValuationSummary = {
+  totalInvested: number;
+  totalValue: number;
+  totalProfit: number;
+  profitPercentage: number;
+};
+
 export async function valuePortfolioHoldings<T extends HoldingValuationInput>(
   holdings: T[],
 ): Promise<ValuedHolding<T>[]> {
   const marketValueRequests = holdings.map((h) => ({
     cardId: h.cardId,
-    finish: h.finish as HoldingFinish,
-    edition: h.edition as HoldingEdition,
+    finish: coerceHoldingFinish(h.finish),
+    edition: coerceHoldingEdition(h.edition),
   }));
   const pricingComparables = await getPokemonCardPricingComparables(
     marketValueRequests,
@@ -50,10 +62,12 @@ export async function valuePortfolioHoldings<T extends HoldingValuationInput>(
   return Promise.all(
     holdings.map(async (holding) => {
       const latestSnapshot = holding.snapshots[0];
+      const finish = coerceHoldingFinish(holding.finish);
+      const edition = coerceHoldingEdition(holding.edition);
       const requestKey = getMarketValueRequestKey({
         cardId: holding.cardId,
-        finish: holding.finish as HoldingFinish,
-        edition: holding.edition as HoldingEdition,
+        finish,
+        edition,
       });
 
       const comparable = pricingComparables.get(requestKey);
@@ -94,5 +108,50 @@ export async function valuePortfolioHoldings<T extends HoldingValuationInput>(
       };
     }),
   );
+}
+
+export function summarizeValuedHoldings<T extends HoldingValuationInput>(
+  holdings: ValuedHolding<T>[],
+): PortfolioValuationSummary {
+  const totals = holdings.reduce(
+    (acc, holding) => {
+      acc.totalInvested += holding.invested;
+      acc.totalValue += holding.currentValue;
+      return acc;
+    },
+    { totalInvested: 0, totalValue: 0 },
+  );
+
+  const totalProfit = totals.totalValue - totals.totalInvested;
+  const profitPercentage =
+    totals.totalInvested === 0 ? 0 : (totalProfit / totals.totalInvested) * 100;
+
+  return {
+    totalInvested: totals.totalInvested,
+    totalValue: totals.totalValue,
+    totalProfit,
+    profitPercentage,
+  };
+}
+
+export function toPortfolioApiHoldings<T extends HoldingValuationInput>(
+  holdings: ValuedHolding<T>[],
+) {
+  return holdings.map((holding) => {
+    const {
+      invested,
+      currentValue,
+      currentUnitValue,
+      profit,
+      profitPct,
+      ...rest
+    } = holding;
+    void invested;
+    void currentValue;
+    void currentUnitValue;
+    void profit;
+    void profitPct;
+    return rest;
+  });
 }
 

@@ -1,23 +1,15 @@
 import { DEMO_OWNER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { valuePortfolioHoldings } from "@/lib/portfolio-valuation";
+import {
+  summarizeValuedHoldings,
+  valuePortfolioHoldings,
+} from "@/lib/portfolio-valuation";
 import { CardImage } from "@/components/CardImage";
+import { PageIntro } from "@/components/PageIntro";
+import { PageShell } from "@/components/PageShell";
+import { SurfaceCard } from "@/components/SurfaceCard";
 import { formatGBP, formatPct } from "./portfolio/utils";
 import { DashboardAllocationTabs } from "./_components/dashboard-allocation-tabs";
-
-type HoldingWithSnapshots = {
-  id: string;
-  cardId: string;
-  cardName: string;
-  setName: string;
-  grade: string;
-  finish: unknown;
-  edition: unknown;
-  imageUrl?: string | null;
-  purchasePrice: number;
-  quantity: number;
-  snapshots: { value: number; capturedAt: Date }[];
-};
 
 type AllocationRow = {
   label: string;
@@ -45,6 +37,68 @@ function PerformerLabel({ variant }: { variant: PerformerVariant }) {
     >
       {PERFORMER_LABEL_TEXT[variant]}
     </p>
+  );
+}
+
+type DashboardHolding = {
+  cardName: string;
+  setName: string;
+  grade: string;
+  imageUrl?: string | null;
+  profit: number;
+  profitPct: number;
+};
+
+function PerformerCard({
+  variant,
+  holding,
+}: {
+  variant: PerformerVariant;
+  holding?: DashboardHolding;
+}) {
+  return (
+    <SurfaceCard as="article" className="min-h-56 p-6">
+      <div className="flex items-center justify-between gap-3">
+        <PerformerLabel variant={variant} />
+        <span className="text-lg font-semibold text-slate-400 dark:text-slate-500">
+          Last 30 days
+        </span>
+      </div>
+      {holding ? (
+        <div className="mt-4 flex items-start gap-4">
+          <CardImage
+            src={holding.imageUrl}
+            alt={holding.cardName}
+            className="h-28 w-20 shrink-0 ring-1 ring-border-subtle"
+            sizes="80px"
+          />
+          <div className="min-w-0 space-y-3.5">
+            <p className="truncate text-lg font-semibold text-text-main">
+              {holding.cardName}
+            </p>
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 font-medium text-text-main">
+                {holding.setName}
+              </span>
+              <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-text-muted">
+                {holding.grade}
+              </span>
+            </div>
+            <p className="text-base font-semibold text-text-main">
+              <span className={holding.profit >= 0 ? "text-emerald-600" : "text-red-600"}>
+                {formatGBP(holding.profit)}
+              </span>{" "}
+              <span className={holding.profitPct >= 0 ? "text-emerald-600" : "text-red-600"}>
+                ({holding.profitPct >= 0 ? "+" : ""}
+                {formatPct(holding.profitPct)}%)
+              </span>
+            </p>
+          </div>
+        </div>
+      ) : (
+        <p className="mt-2 text-xs text-text-muted">No data.</p>
+      )}
+    </SurfaceCard>
   );
 }
 
@@ -132,9 +186,7 @@ async function getDashboardData() {
     }),
   ]);
 
-  const valued = await valuePortfolioHoldings(
-    holdings as unknown as HoldingWithSnapshots[],
-  );
+  const valued = await valuePortfolioHoldings(holdings);
 
   const enriched = valued.map((h) => {
     const previous = h.snapshots[1];
@@ -150,11 +202,7 @@ async function getDashboardData() {
     };
   });
 
-  const totalInvested = enriched.reduce((sum, h) => sum + h.invested, 0);
-  const totalValue = enriched.reduce((sum, h) => sum + h.value, 0);
-  const totalProfit = totalValue - totalInvested;
-  const profitPercentage =
-    totalInvested === 0 ? 0 : (totalProfit / totalInvested) * 100;
+  const summary = summarizeValuedHoldings(valued);
 
   const bestPerformer = [...enriched].sort(
     (a, b) => b.profitPct - a.profitPct,
@@ -179,11 +227,11 @@ async function getDashboardData() {
       label: h.setName || "Unknown set",
       value: h.value,
     })),
-    totalValue,
+    summary.totalValue,
   );
   const allocationByGrade = buildAllocation(
     enriched.map((h) => ({ label: h.grade || "RAW", value: h.value })),
-    totalValue,
+    summary.totalValue,
   );
   const seriesMap = new Map<string, number>();
   for (const s of snapshots) {
@@ -200,12 +248,7 @@ async function getDashboardData() {
 
   return {
     holdingsCount: enriched.length,
-    summary: {
-      totalInvested,
-      totalValue,
-      totalProfit,
-      profitPercentage,
-    },
+    summary,
     bestPerformer,
     worstPerformer,
     recentPriceChanges,
@@ -220,42 +263,37 @@ export default async function DashboardPage() {
   const data = await getDashboardData();
 
   return (
-    <main className="min-h-screen bg-page px-4 py-7 text-text-main md:px-8 lg:px-10">
-      <div className="mx-auto w-full max-w-6xl space-y-6">
-        <header className="space-y-1">
-          <h1 className="text-2xl font-semibold sm:text-3xl">
-            Portfolio overview
-          </h1>
-          <p className="text-sm text-text-muted">
-            Summary of valuation, allocation, and price momentum
-          </p>
-        </header>
+    <PageShell>
+      <PageIntro
+        title="Portfolio overview"
+        subtitle="Summary of valuation, allocation, and price momentum"
+      />
 
-        {data.holdingsCount === 0 ? (
-          <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card px-6 py-12 text-center">
-            <p className="text-sm font-medium text-text-main">
-              No holdings yet
-            </p>
-            <p className="mt-2 text-sm text-text-muted">
-              Add cards from Market to populate your dashboard widgets.
-            </p>
-          </section>
-        ) : (
-          <>
+      {data.holdingsCount === 0 ? (
+        <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card px-6 py-12 text-center">
+          <p className="text-sm font-medium text-text-main">
+            No holdings yet
+          </p>
+          <p className="mt-2 text-sm text-text-muted">
+            Add cards from Market to populate your dashboard widgets.
+          </p>
+        </section>
+      ) : (
+        <>
             <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+              <SurfaceCard as="article" className="p-5">
                 <p className="text-xs text-text-muted">Total portfolio value</p>
                 <p className="mt-1 text-xl font-semibold">
                   {formatGBP(data.summary.totalValue)}
                 </p>
-              </article>
-              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+              </SurfaceCard>
+              <SurfaceCard as="article" className="p-5">
                 <p className="text-xs text-text-muted">Total cost</p>
                 <p className="mt-1 text-xl font-semibold">
                   {formatGBP(data.summary.totalInvested)}
                 </p>
-              </article>
-              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+              </SurfaceCard>
+              <SurfaceCard as="article" className="p-5">
                 <p className="text-xs text-text-muted">Profit / loss</p>
                 <p
                   className={`mt-1 text-xl font-semibold ${
@@ -266,128 +304,18 @@ export default async function DashboardPage() {
                 >
                   {formatGBP(data.summary.totalProfit)}
                 </p>
-              </article>
-              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+              </SurfaceCard>
+              <SurfaceCard as="article" className="p-5">
                 <p className="text-xs text-text-muted">Return</p>
                 <p className="mt-1 text-xl font-semibold text-emerald-600">
                   {formatPct(data.summary.profitPercentage)}%
                 </p>
-              </article>
+              </SurfaceCard>
             </section>
 
             <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <article className="shadow-elevation-1 min-h-56 rounded-2xl border border-border-subtle bg-card p-6">
-                <div className="flex items-center justify-between gap-3">
-                  <PerformerLabel variant="best" />
-                  <span className="text-lg font-semibold text-slate-400 dark:text-slate-500">
-                    Last 30 days
-                  </span>
-                </div>
-                {data.bestPerformer ? (
-                  <div className="mt-4 flex items-start gap-4">
-                    <CardImage
-                      src={data.bestPerformer.imageUrl}
-                      alt={data.bestPerformer.cardName}
-                      className="h-28 w-20 shrink-0 ring-1 ring-border-subtle"
-                      sizes="80px"
-                    />
-                    <div className="min-w-0 space-y-3.5">
-                      <p className="truncate text-lg font-semibold text-text-main">
-                        {data.bestPerformer.cardName}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 text-sm">
-                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 font-medium text-text-main">
-                          {data.bestPerformer.setName}
-                        </span>
-                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-text-muted">
-                          {data.bestPerformer.grade}
-                        </span>
-                      </div>
-                      <p className="text-base font-semibold text-text-main">
-                        <span
-                          className={
-                            data.bestPerformer.profit >= 0
-                              ? "text-emerald-600"
-                              : "text-red-600"
-                          }
-                        >
-                          {formatGBP(data.bestPerformer.profit)}
-                        </span>{" "}
-                        <span
-                          className={
-                            data.bestPerformer.profitPct >= 0
-                              ? "text-emerald-600"
-                              : "text-red-600"
-                          }
-                        >
-                          (
-                          {data.bestPerformer.profitPct >= 0 ? "+" : ""}
-                          {formatPct(data.bestPerformer.profitPct)}%
-                          )
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="mt-2 text-xs text-text-muted">No data.</p>
-                )}
-              </article>
-              <article className="shadow-elevation-1 min-h-56 rounded-2xl border border-border-subtle bg-card p-6">
-                <div className="flex items-center justify-between gap-3">
-                  <PerformerLabel variant="worst" />
-                  <span className="text-lg font-semibold text-slate-400 dark:text-slate-500">
-                    Last 30 days
-                  </span>
-                </div>
-                {data.worstPerformer ? (
-                  <div className="mt-4 flex items-start gap-4">
-                    <CardImage
-                      src={data.worstPerformer.imageUrl}
-                      alt={data.worstPerformer.cardName}
-                      className="h-28 w-20 shrink-0 ring-1 ring-border-subtle"
-                      sizes="80px"
-                    />
-                    <div className="min-w-0 space-y-3.5">
-                      <p className="truncate text-lg font-semibold text-text-main">
-                        {data.worstPerformer.cardName}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 text-sm">
-                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 font-medium text-text-main">
-                          {data.worstPerformer.setName}
-                        </span>
-                        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-text-muted">
-                          {data.worstPerformer.grade}
-                        </span>
-                      </div>
-                      <p className="text-base font-semibold text-text-main">
-                        <span
-                          className={
-                            data.worstPerformer.profit >= 0
-                              ? "text-emerald-600"
-                              : "text-red-600"
-                          }
-                        >
-                          {formatGBP(data.worstPerformer.profit)}
-                        </span>{" "}
-                        <span
-                          className={
-                            data.worstPerformer.profitPct >= 0
-                              ? "text-emerald-600"
-                              : "text-red-600"
-                          }
-                        >
-                          (
-                          {data.worstPerformer.profitPct >= 0 ? "+" : ""}
-                          {formatPct(data.worstPerformer.profitPct)}%
-                          )
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="mt-2 text-xs text-text-muted">No data.</p>
-                )}
-              </article>
+              <PerformerCard variant="best" holding={data.bestPerformer} />
+              <PerformerCard variant="worst" holding={data.worstPerformer} />
             </section>
 
             <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
@@ -550,9 +478,8 @@ export default async function DashboardPage() {
                 </div>
               )}
             </section>
-          </>
-        )}
-      </div>
-    </main>
+        </>
+      )}
+    </PageShell>
   );
 }

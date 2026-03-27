@@ -1,10 +1,10 @@
 import "server-only";
 
-type SupportedCurrency = "GBP" | "EUR" | "USD";
+export type CurrencyCode = "GBP" | "EUR" | "USD";
 
 type FxRates = {
   base: "GBP";
-  gbpPer: Record<SupportedCurrency, number>;
+  gbpPer: Record<CurrencyCode, number>;
   fetchedAt: number;
 };
 
@@ -47,15 +47,23 @@ async function getRates(): Promise<FxRates> {
 
 export async function convertToGbp(
   amount: number,
-  currency: string,
+  currency: string | CurrencyCode,
 ): Promise<number | null> {
   if (!Number.isFinite(amount)) return null;
-  const cur = currency.toUpperCase();
+  const cur = normalizeCurrency(currency);
+  if (!cur) return null;
   if (cur === "GBP") return amount;
-  if (cur !== "EUR" && cur !== "USD") return null;
 
   const rates = await getRates();
   const factor = rates.gbpPer[cur];
   return amount * factor;
+}
+
+export function normalizeCurrency(value: string): CurrencyCode | null {
+  const upper = value.toUpperCase();
+  if (upper === "GBP" || upper === "EUR" || upper === "USD") {
+    return upper;
+  }
+  return null;
 }
 

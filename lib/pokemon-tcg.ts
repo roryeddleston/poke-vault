@@ -1,6 +1,7 @@
 import "server-only";
 import TCGdex, { Query } from "@tcgdex/sdk";
 import type { HoldingEdition, HoldingFinish } from "@/lib/holding-options";
+import type { CurrencyCode } from "@/lib/fx";
 
 export type PokemonCardSummary = {
   id: string;
@@ -151,9 +152,10 @@ export async function searchPokemonCards(
     }
 
     const resumeArrays = await Promise.all(
-      queries.map((qry) =>
-        tcgdex.card.list(qry) as unknown as Promise<TcgDexCardResume[]>,
-      ),
+      queries.map(async (qry) => {
+        const rows = await tcgdex.card.list(qry);
+        return Array.isArray(rows) ? (rows as TcgDexCardResume[]) : [];
+      }),
     );
 
     // Merge and de-duplicate by id, keeping a reasonable pool for scoring.
@@ -337,7 +339,7 @@ export type MarketValueRequest = {
 export type PokemonCardMarketValue = {
   value: number;
   source: "cardmarket" | "tcgplayer";
-  currency: string;
+  currency: CurrencyCode | string;
 };
 
 const TCGPLAYER_PRICE_FIELDS = ["marketPrice", "midPrice", "lowPrice"] as const;

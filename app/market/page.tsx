@@ -1,5 +1,7 @@
 import { searchPokemonCardsAll } from "@/lib/pokemon-tcg";
 import { CardImage } from "@/components/CardImage";
+import { PageIntro } from "@/components/PageIntro";
+import { PageShell } from "@/components/PageShell";
 import Link from "next/link";
 import { AddFromMarketButton } from "./_components/add-from-market-button";
 
@@ -26,28 +28,25 @@ export default async function MarketPage(props: MarketPageProps) {
   const endDisplay = startIndex + pageCards.length;
 
   return (
-    <main className="min-h-screen bg-page text-text-main px-4 py-8">
-      <div className="mx-auto w-full max-w-5xl space-y-6">
-        <header className="space-y-1">
-          <h1 className="text-2xl font-semibold sm:text-3xl">
-            Search Pokémon cards
-          </h1>
-          <p className="text-sm text-text-muted">
-            Use the search bar above to find cards from the Pokémon TCG
-            database, then add them to your portfolio.
-          </p>
-        </header>
+    <PageShell
+      mainClassName="min-h-screen bg-page px-4 py-8 text-text-main"
+      containerClassName="mx-auto w-full max-w-5xl space-y-6"
+    >
+      <PageIntro
+        title="Search Pokémon cards"
+        subtitle="Use the search bar above to find cards from the Pokémon TCG database, then add them to your portfolio."
+      />
 
-        {!query ? (
-          <section className="rounded-xl border border-border-subtle bg-card px-4 py-10 text-center text-sm text-text-muted">
-            Start by typing a card name in the search bar.
-          </section>
-        ) : total === 0 ? (
-          <section className="rounded-xl border border-border-subtle bg-card px-4 py-10 text-center text-sm text-text-muted">
-            No cards found for <span className="font-medium">{query}</span>.
-          </section>
-        ) : (
-          <section className="space-y-3">
+      {!query ? (
+        <section className="rounded-xl border border-border-subtle bg-card px-4 py-10 text-center text-sm text-text-muted">
+          Start by typing a card name in the search bar.
+        </section>
+      ) : total === 0 ? (
+        <section className="rounded-xl border border-border-subtle bg-card px-4 py-10 text-center text-sm text-text-muted">
+          No cards found for <span className="font-medium">{query}</span>.
+        </section>
+      ) : (
+        <section className="space-y-3">
             <p className="text-xs text-text-muted">
               Showing {startDisplay}–{endDisplay} of {total} result
               {total === 1 ? "" : "s"} for{" "}
@@ -133,9 +132,8 @@ export default async function MarketPage(props: MarketPageProps) {
                 )}
               </div>
             </div>
-          </section>
-        )}
-      </div>
-    </main>
+        </section>
+      )}
+    </PageShell>
   );
 }
