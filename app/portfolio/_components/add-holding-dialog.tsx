@@ -2,6 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { FiChevronDown } from "react-icons/fi";
+import {
+  HOLDING_EDITIONS,
+  HOLDING_EDITION_LABELS,
+  HOLDING_FINISHES,
+  HOLDING_FINISH_LABELS,
+  type HoldingEdition,
+  type HoldingFinish,
+} from "@/lib/holding-options";
 
 type AddHoldingDialogProps = {
   open: boolean;
@@ -14,6 +23,8 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
   const [cardName, setCardName] = useState("");
   const [setName, setSetName] = useState("");
   const [grade, setGrade] = useState("");
+  const [finish, setFinish] = useState<HoldingFinish>("NORMAL");
+  const [edition, setEdition] = useState<HoldingEdition>("UNLIMITED");
   const [purchasePrice, setPurchasePrice] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [submitting, setSubmitting] = useState(false);
@@ -26,6 +37,8 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
     setCardName("");
     setSetName("");
     setGrade("");
+    setFinish("NORMAL");
+    setEdition("UNLIMITED");
     setPurchasePrice("");
     setQuantity("1");
     setError(null);
@@ -61,6 +74,8 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
           cardName: cardName.trim(),
           setName: setName.trim(),
           grade: grade.trim(),
+            finish,
+            edition,
           purchasePrice: priceNumber,
           quantity: qtyNumber,
         }),
@@ -164,6 +179,64 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
                 className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
                 placeholder="e.g. PSA 10 (leave blank for RAW)"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-text-muted">
+                Finish
+              </label>
+              <div className="relative">
+                <select
+                  value={finish}
+                  onChange={(e) =>
+                    setFinish(e.target.value as (typeof HOLDING_FINISHES)[number])
+                  }
+                  className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none transition-colors focus:border-accent"
+                >
+                  {HOLDING_FINISHES.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {HOLDING_FINISH_LABELS[opt]}
+                    </option>
+                  ))}
+                </select>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted"
+                >
+                  <FiChevronDown className="h-4 w-4" />
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-text-muted">
+                Edition
+              </label>
+              <div className="relative">
+                <select
+                  value={edition}
+                  onChange={(e) =>
+                    setEdition(
+                      e.target.value as (typeof HOLDING_EDITIONS)[number],
+                    )
+                  }
+                  className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none transition-colors focus:border-accent"
+                >
+                  {HOLDING_EDITIONS.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {HOLDING_EDITION_LABELS[opt]}
+                    </option>
+                  ))}
+                </select>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted"
+                >
+                  <FiChevronDown className="h-4 w-4" />
+                </span>
+              </div>
             </div>
           </div>
 
