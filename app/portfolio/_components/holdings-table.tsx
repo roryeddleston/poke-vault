@@ -12,10 +12,7 @@ type HoldingsTableProps = {
   totalCount?: number;
 };
 
-/**
- * Return vs paid (%), based on current unit value vs purchase unit value.
- */
-function getMonthlyChange(holding: Holding): number | null {
+function getReturnVsPaid(holding: Holding): number | null {
   const current =
     holding.pricing?.currentGbp ?? holding.snapshots[0]?.value ?? holding.purchasePrice;
   const paid = holding.purchasePrice;
@@ -60,7 +57,13 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                   scope="col"
                   className="px-6 py-3 text-xs font-semibold uppercase tracking-wide"
                 >
-                  Condition
+                  Grade
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide"
+                >
+                  Cost
                 </th>
                 <th
                   scope="col"
@@ -72,13 +75,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                   scope="col"
                   className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide"
                 >
-                  Purchase price
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide"
-                >
-                  Return vs paid
+                  Return %
                 </th>
                 <th
                   scope="col"
@@ -92,7 +89,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
               {holdings.map((h) => {
                 const latest =
                   h.pricing?.currentGbp ?? h.snapshots[0]?.value ?? h.purchasePrice;
-                const changeMonthly = getMonthlyChange(h);
+                const returnVsPaid = getReturnVsPaid(h);
 
                 return (
                   <tr
@@ -134,15 +131,15 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                     <td className="px-6 py-5">
                       <GradePill grade={h.grade} />
                     </td>
-                    <td className="px-6 py-5 text-right font-medium tabular-nums">
-                      {formatGBP(latest)}
-                    </td>
                     <td className="px-6 py-5 text-right font-medium tabular-nums text-text-muted">
                       {formatGBP(h.purchasePrice)}
                     </td>
+                    <td className="px-6 py-5 text-right font-medium tabular-nums">
+                      {formatGBP(latest)}
+                    </td>
                     <td className="px-6 py-5 text-right">
                       <ChangePill
-                        value={changeMonthly}
+                        value={returnVsPaid}
                         periodLabel="vs paid"
                       />
                     </td>
@@ -157,7 +154,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                 <tr>
                   <td
                     className="px-4 py-8 text-center text-text-muted"
-                    colSpan={6}
+                    colSpan={7}
                   >
                     No holdings yet.
                   </td>
@@ -178,7 +175,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
           holdings.map((h) => {
             const latest =
               h.pricing?.currentGbp ?? h.snapshots[0]?.value ?? h.purchasePrice;
-            const changeMonthly = getMonthlyChange(h);
+            const returnVsPaid = getReturnVsPaid(h);
 
             return (
               <article
@@ -219,7 +216,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                     <GradePill grade={h.grade} />
                     <span className="ml-auto">
                       <ChangePill
-                        value={changeMonthly}
+                        value={returnVsPaid}
                         periodLabel="vs paid"
                       />
                     </span>
