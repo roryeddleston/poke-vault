@@ -13,11 +13,14 @@ type HoldingsTableProps = {
 };
 
 /**
- * Monthly change is not in the API yet (only latest snapshot). Pass null to show "—".
+ * Return vs paid (%), based on current unit value vs purchase unit value.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- holding used when monthly snapshots exist
 function getMonthlyChange(holding: Holding): number | null {
-  return null;
+  const current =
+    holding.pricing?.currentGbp ?? holding.snapshots[0]?.value ?? holding.purchasePrice;
+  const paid = holding.purchasePrice;
+  if (!Number.isFinite(paid) || paid <= 0) return null;
+  return ((current - paid) / paid) * 100;
 }
 
 export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
@@ -69,7 +72,13 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                   scope="col"
                   className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide"
                 >
-                  Monthly change
+                  Purchase price
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide"
+                >
+                  Return vs paid
                 </th>
                 <th
                   scope="col"
@@ -81,7 +90,8 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
             </thead>
             <tbody>
               {holdings.map((h) => {
-                const latest = h.snapshots[0]?.value ?? h.purchasePrice;
+                const latest =
+                  h.pricing?.currentGbp ?? h.snapshots[0]?.value ?? h.purchasePrice;
                 const changeMonthly = getMonthlyChange(h);
 
                 return (
@@ -127,10 +137,13 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                     <td className="px-6 py-5 text-right font-medium tabular-nums">
                       {formatGBP(latest)}
                     </td>
+                    <td className="px-6 py-5 text-right font-medium tabular-nums text-text-muted">
+                      {formatGBP(h.purchasePrice)}
+                    </td>
                     <td className="px-6 py-5 text-right">
                       <ChangePill
                         value={changeMonthly}
-                        periodLabel="this month"
+                        periodLabel="vs paid"
                       />
                     </td>
                     <td className="px-6 py-5 text-right">
@@ -163,7 +176,8 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
           </div>
         ) : (
           holdings.map((h) => {
-            const latest = h.snapshots[0]?.value ?? h.purchasePrice;
+            const latest =
+              h.pricing?.currentGbp ?? h.snapshots[0]?.value ?? h.purchasePrice;
             const changeMonthly = getMonthlyChange(h);
 
             return (
@@ -189,8 +203,13 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                         <> {h.cardNumber}</>
                       ) : null}
                     </h3>
-                    <span className="shrink-0 text-xs font-semibold tabular-nums">
-                      {formatGBP(latest)}
+                    <span className="shrink-0 text-right">
+                      <span className="block text-xs font-semibold tabular-nums">
+                        {formatGBP(latest)}
+                      </span>
+                      <span className="block text-[11px] font-medium tabular-nums text-text-muted">
+                        paid {formatGBP(h.purchasePrice)}
+                      </span>
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
@@ -201,7 +220,7 @@ export function HoldingsTable({ holdings, totalCount }: HoldingsTableProps) {
                     <span className="ml-auto">
                       <ChangePill
                         value={changeMonthly}
-                        periodLabel="this month"
+                        periodLabel="vs paid"
                       />
                     </span>
                   </div>
