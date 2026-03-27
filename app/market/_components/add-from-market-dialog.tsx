@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiChevronDown } from "react-icons/fi";
 import type { PokemonCardSummary } from "@/lib/pokemon-tcg";
@@ -58,22 +58,16 @@ export function AddFromMarketDialog({
   const [gradingCompany, setGradingCompany] =
     useState<(typeof GRADING_COMPANIES)[number]>("RAW");
   const [gradeValue, setGradeValue] = useState("");
-  const availableFinishes = getAvailableFinishes(card);
-  const availableEditions = getAvailableEditions(card);
-  const defaultFinish: HoldingFinish = availableFinishes[0];
-  const [finish, setFinish] = useState<HoldingFinish>(defaultFinish);
-  const defaultEdition: HoldingEdition = availableEditions[0];
-  const [edition, setEdition] = useState<HoldingEdition>(defaultEdition);
+  const availableFinishes = useMemo(() => getAvailableFinishes(card), [card]);
+  const availableEditions = useMemo(() => getAvailableEditions(card), [card]);
+  const defaultFinish = availableFinishes[0];
+  const defaultEdition = availableEditions[0];
+  const [finish, setFinish] = useState<HoldingFinish>(() => defaultFinish);
+  const [edition, setEdition] = useState<HoldingEdition>(() => defaultEdition);
   const [purchasePrice, setPurchasePrice] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    setFinish(defaultFinish);
-    setEdition(defaultEdition);
-  }, [open, card.id, defaultFinish, defaultEdition]);
 
   if (!open) return null;
 
