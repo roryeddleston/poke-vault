@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { HOLDING_EDITIONS, HOLDING_FINISHES } from "@/lib/holding-options";
 
 export const createHoldingSchema = z.object({
   cardId: z.string().min(1).max(100),
@@ -17,6 +18,9 @@ export const createHoldingSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => (v && v.length > 0 ? v : "RAW")),
+
+  finish: z.enum(HOLDING_FINISHES).default("NORMAL"),
+  edition: z.enum(HOLDING_EDITIONS).default("UNLIMITED"),
 
   purchasePrice: z.number().finite().min(0).max(1_000_000),
   quantity: z.number().int().min(1).max(999),
