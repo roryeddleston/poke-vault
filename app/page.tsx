@@ -304,8 +304,27 @@ export default async function DashboardPage() {
                         </span>
                       </div>
                       <p className="text-base font-semibold text-text-main">
-                        {formatGBP(data.bestPerformer.profit)} (
-                        {formatPct(data.bestPerformer.profitPct)}%)
+                        <span
+                          className={
+                            data.bestPerformer.profit >= 0
+                              ? "text-emerald-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {formatGBP(data.bestPerformer.profit)}
+                        </span>{" "}
+                        (
+                        <span
+                          className={
+                            data.bestPerformer.profitPct >= 0
+                              ? "text-emerald-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {data.bestPerformer.profitPct >= 0 ? "+" : ""}
+                          {formatPct(data.bestPerformer.profitPct)}%
+                        </span>
+                        )
                       </p>
                     </div>
                   </div>
@@ -341,8 +360,27 @@ export default async function DashboardPage() {
                         </span>
                       </div>
                       <p className="text-base font-semibold text-text-main">
-                        {formatGBP(data.worstPerformer.profit)} (
-                        {formatPct(data.worstPerformer.profitPct)}%)
+                        <span
+                          className={
+                            data.worstPerformer.profit >= 0
+                              ? "text-emerald-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {formatGBP(data.worstPerformer.profit)}
+                        </span>{" "}
+                        (
+                        <span
+                          className={
+                            data.worstPerformer.profitPct >= 0
+                              ? "text-emerald-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {data.worstPerformer.profitPct >= 0 ? "+" : ""}
+                          {formatPct(data.worstPerformer.profitPct)}%
+                        </span>
+                        )
                       </p>
                     </div>
                   </div>
