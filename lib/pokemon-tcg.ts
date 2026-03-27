@@ -113,11 +113,7 @@ export async function searchPokemonCards(
 
     // 1) If the query looks like a full card ID (e.g. "swsh3-012"), try exact id first.
     if (q.includes("-")) {
-      queries.push(
-        Query.create()
-          .equal("id", q)
-          .paginate(page, pageSize),
-      );
+      queries.push(Query.create().equal("id", q).paginate(page, pageSize));
     }
 
     // 2) If we have both a name and a trailing number, search for that combo:
@@ -238,8 +234,7 @@ export async function searchPokemonCards(
 
     // Scoring: favour matches on name, card number, and set total.
     const nameHint = namePart.toLowerCase();
-    const numberHint =
-      nameNumberPart ?? pureNumberPart ?? undefined;
+    const numberHint = nameNumberPart ?? pureNumberPart ?? undefined;
     const numberHintValue = numberHint
       ? Number.parseInt(numberHint, 10)
       : undefined;
@@ -411,7 +406,11 @@ async function getPokemonCardPricingComparable(
     const current =
       cardmarketTrend ??
       cardmarketAvg30 ??
-      extractTcgplayerValue(card.pricing?.tcgplayer, request.finish, request.edition);
+      extractTcgplayerValue(
+        card.pricing?.tcgplayer,
+        request.finish,
+        request.edition,
+      );
 
     const baseline30 = cardmarketAvg30;
 
@@ -450,7 +449,11 @@ function extractCardmarketMetric(
     }
   }
   const fallback = pricing[metric];
-  if (typeof fallback === "number" && Number.isFinite(fallback) && fallback > 0) {
+  if (
+    typeof fallback === "number" &&
+    Number.isFinite(fallback) &&
+    fallback > 0
+  ) {
     return {
       value: fallback,
       source: "cardmarket",
@@ -504,7 +507,10 @@ function getCardmarketSuffixes(finish: HoldingFinish, edition: HoldingEdition) {
   return base;
 }
 
-function getTcgplayerVariantKeys(finish: HoldingFinish, edition: HoldingEdition) {
+function getTcgplayerVariantKeys(
+  finish: HoldingFinish,
+  edition: HoldingEdition,
+) {
   const byFinish =
     finish === "HOLO"
       ? ["holofoil", "holoFoil", "holo"]
@@ -513,7 +519,11 @@ function getTcgplayerVariantKeys(finish: HoldingFinish, edition: HoldingEdition)
         : ["normal"];
 
   if (edition === "FIRST_EDITION") {
-    return byFinish.flatMap((k) => [`1stEdition${capitalize(k)}`, `firstEdition${capitalize(k)}`, k]);
+    return byFinish.flatMap((k) => [
+      `1stEdition${capitalize(k)}`,
+      `firstEdition${capitalize(k)}`,
+      k,
+    ]);
   }
   return byFinish;
 }
