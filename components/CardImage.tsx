@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type CardImageProps = {
   src?: string | null;
@@ -29,11 +29,7 @@ export function CardImage({
   const [loaded, setLoaded] = useState(false);
   const hasValidSrc = isValidImageSrc(src);
   const showImage = hasValidSrc && !failed;
-
-  useEffect(() => {
-    setFailed(false);
-    setLoaded(false);
-  }, [src]);
+  const effectiveSrc = hasValidSrc ? src : null;
 
   return (
     <div
@@ -43,7 +39,8 @@ export function CardImage({
     >
       {showImage ? (
         <Image
-          src={src as string}
+          key={effectiveSrc ?? "no-src"}
+          src={effectiveSrc as string}
           alt={alt}
           fill
           sizes={sizes}
