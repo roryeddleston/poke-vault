@@ -1,9 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiChevronDown } from "react-icons/fi";
 import type { PokemonCardSummary } from "@/lib/pokemon-tcg";
+import {
+  HOLDING_EDITION_LABELS,
+  HOLDING_FINISH_LABELS,
+  type HoldingEdition,
+  type HoldingFinish,
+} from "@/lib/holding-options";
 
 type AddFromMarketDialogProps = {
   open: boolean;
@@ -28,6 +34,21 @@ const GRADE_OPTIONS = [
   "1",
 ] as const;
 
+function getAvailableFinishes(card: PokemonCardSummary): HoldingFinish[] {
+  const variants = card.variants;
+  const finishes: HoldingFinish[] = [];
+  if (variants?.normal) finishes.push("NORMAL");
+  if (variants?.holo) finishes.push("HOLO");
+  if (variants?.reverse) finishes.push("REVERSE");
+  return finishes.length > 0 ? finishes : ["NORMAL"];
+}
+
+function getAvailableEditions(card: PokemonCardSummary): HoldingEdition[] {
+  return card.variants?.firstEdition
+    ? ["UNLIMITED", "FIRST_EDITION"]
+    : ["UNLIMITED"];
+}
+
 export function AddFromMarketDialog({
   open,
   onClose,
@@ -37,16 +58,30 @@ export function AddFromMarketDialog({
   const [gradingCompany, setGradingCompany] =
     useState<(typeof GRADING_COMPANIES)[number]>("RAW");
   const [gradeValue, setGradeValue] = useState("");
+  const availableFinishes = getAvailableFinishes(card);
+  const availableEditions = getAvailableEditions(card);
+  const defaultFinish: HoldingFinish = availableFinishes[0];
+  const [finish, setFinish] = useState<HoldingFinish>(defaultFinish);
+  const defaultEdition: HoldingEdition = availableEditions[0];
+  const [edition, setEdition] = useState<HoldingEdition>(defaultEdition);
   const [purchasePrice, setPurchasePrice] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setFinish(defaultFinish);
+    setEdition(defaultEdition);
+  }, [open, card.id, defaultFinish, defaultEdition]);
 
   if (!open) return null;
 
   const resetAndClose = () => {
     setGradingCompany("RAW");
     setGradeValue("");
+    setFinish(defaultFinish);
+    setEdition(defaultEdition);
     setPurchasePrice("");
     setQuantity("1");
     setError(null);
@@ -93,6 +128,8 @@ export function AddFromMarketDialog({
           cardNumber: card.cardNumber,
           setTotal: card.setTotal,
           grade: normalizedGrade,
+          finish,
+          edition,
           purchasePrice: priceNumber,
           quantity: qtyNumber,
         }),
@@ -201,6 +238,59 @@ export function AddFromMarketDialog({
                   {GRADE_OPTIONS.map((grade) => (
                     <option key={grade} value={grade}>
                       {grade}
+                    </option>
+                  ))}
+                </select>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted"
+                >
+                  <FiChevronDown className="h-4 w-4" />
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-text-muted">
+                Finish
+              </label>
+              <div className="relative">
+                <select
+                  value={finish}
+                  onChange={(e) => setFinish(e.target.value as HoldingFinish)}
+                  className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none focus:border-accent"
+                >
+                  {availableFinishes.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {HOLDING_FINISH_LABELS[opt]}
+                    </option>
+                  ))}
+                </select>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted"
+                >
+                  <FiChevronDown className="h-4 w-4" />
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-text-muted">
+                Edition
+              </label>
+              <div className="relative">
+                <select
+                  value={edition}
+                  onChange={(e) => setEdition(e.target.value as HoldingEdition)}
+                  disabled={availableEditions.length === 1}
+                  className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none focus:border-accent"
+                >
+                  {availableEditions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {HOLDING_EDITION_LABELS[opt]}
                     </option>
                   ))}
                 </select>
