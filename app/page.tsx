@@ -313,7 +313,6 @@ export default async function DashboardPage() {
                         >
                           {formatGBP(data.bestPerformer.profit)}
                         </span>{" "}
-                        (
                         <span
                           className={
                             data.bestPerformer.profitPct >= 0
@@ -321,10 +320,11 @@ export default async function DashboardPage() {
                               : "text-red-600"
                           }
                         >
+                          (
                           {data.bestPerformer.profitPct >= 0 ? "+" : ""}
                           {formatPct(data.bestPerformer.profitPct)}%
+                          )
                         </span>
-                        )
                       </p>
                     </div>
                   </div>
@@ -369,7 +369,6 @@ export default async function DashboardPage() {
                         >
                           {formatGBP(data.worstPerformer.profit)}
                         </span>{" "}
-                        (
                         <span
                           className={
                             data.worstPerformer.profitPct >= 0
@@ -377,10 +376,11 @@ export default async function DashboardPage() {
                               : "text-red-600"
                           }
                         >
+                          (
                           {data.worstPerformer.profitPct >= 0 ? "+" : ""}
                           {formatPct(data.worstPerformer.profitPct)}%
+                          )
                         </span>
-                        )
                       </p>
                     </div>
                   </div>
