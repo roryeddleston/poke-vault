@@ -1,5 +1,6 @@
 import "server-only";
 import TCGdex, { Query } from "@tcgdex/sdk";
+import type { HoldingEdition, HoldingFinish } from "@/lib/holding-options";
 
 export type PokemonCardSummary = {
   id: string;
@@ -11,6 +12,12 @@ export type PokemonCardSummary = {
   cardNumber?: number;
   /** Total number of cards in the set (e.g. 102 in 2/102). */
   setTotal?: number;
+  variants?: {
+    firstEdition?: boolean;
+    holo?: boolean;
+    normal?: boolean;
+    reverse?: boolean;
+  };
 };
 
 type SearchImageOptions = {
@@ -50,6 +57,23 @@ type TcgDexCardFull = {
   };
   localId?: string | number;
   getImageURL?: (quality: "high" | "low", ext: "png" | "webp") => string;
+  variants?: {
+    firstEdition?: boolean;
+    holo?: boolean;
+    normal?: boolean;
+    reverse?: boolean;
+  };
+  pricing?: {
+    cardmarket?: Record<string, number | string | undefined>;
+    tcgplayer?: Record<
+      string,
+      {
+        marketPrice?: number;
+        midPrice?: number;
+        lowPrice?: number;
+      }
+    >;
+  };
 };
 
 export async function searchPokemonCards(
@@ -206,6 +230,7 @@ export async function searchPokemonCards(
         rarity: card.rarity,
         cardNumber,
         setTotal,
+        variants: card.variants,
       };
     });
 
@@ -288,4 +313,168 @@ export async function searchPokemonCardsAll(
   }
 
   return all;
+}
+
+export async function getPokemonCardVariants(
+  cardId: string,
+): Promise<PokemonCardSummary["variants"] | null> {
+  try {
+    const tcgdex = getTcgDex();
+    const card = (await tcgdex.card.get(cardId)) as TcgDexCardFull | null;
+    return card?.variants ?? null;
+  } catch (error) {
+    console.error("[TCGdex] getPokemonCardVariants failed:", error);
+    return null;
+  }
+}
+
+export type MarketValueRequest = {
+  cardId: string;
+  finish: HoldingFinish;
+  edition: HoldingEdition;
+};
+
+export type PokemonCardMarketValue = {
+  value: number;
+  source: "cardmarket" | "tcgplayer";
+  currency: string;
+};
+
+const CARDMARKET_PRICE_FIELDS = ["trend", "avg30", "avg7", "avg", "low"] as const;
+const TCGPLAYER_PRICE_FIELDS = ["marketPrice", "midPrice", "lowPrice"] as const;
+
+export function getMarketValueRequestKey(request: MarketValueRequest) {
+  return `${request.cardId}::${request.finish}::${request.edition}`;
+}
+
+export async function getPokemonCardMarketValues(
+  requests: MarketValueRequest[],
+): Promise<Map<string, PokemonCardMarketValue>> {
+  const uniqueRequests = Array.from(
+    new Map(requests.map((r) => [getMarketValueRequestKey(r), r])).values(),
+  );
+
+  const results = await Promise.all(
+    uniqueRequests.map(async (request) => {
+      const value = await getPokemonCardMarketValue(request);
+      return [getMarketValueRequestKey(request), value] as const;
+    }),
+  );
+
+  const out = new Map<string, PokemonCardMarketValue>();
+  for (const [key, value] of results) {
+    if (value) out.set(key, value);
+  }
+  return out;
+}
+
+async function getPokemonCardMarketValue(
+  request: MarketValueRequest,
+): Promise<PokemonCardMarketValue | null> {
+  try {
+    const tcgdex = getTcgDex();
+    const card = (await tcgdex.card.get(request.cardId)) as TcgDexCardFull;
+    return (
+      extractCardmarketValue(card.pricing?.cardmarket, request.finish, request.edition) ??
+      extractTcgplayerValue(card.pricing?.tcgplayer, request.finish, request.edition)
+    );
+  } catch (error) {
+    console.error("[TCGdex] getPokemonCardMarketValue failed:", error);
+    return null;
+  }
+}
+
+function extractCardmarketValue(
+  pricing: Record<string, number | string | undefined> | undefined,
+  finish: HoldingFinish,
+  edition: HoldingEdition,
+): PokemonCardMarketValue | null {
+  if (!pricing) return null;
+  const suffixes = getCardmarketSuffixes(finish, edition);
+
+  for (const metric of CARDMARKET_PRICE_FIELDS) {
+    for (const suffix of suffixes) {
+      const key = `${metric}${suffix}`;
+      const value = pricing[key];
+      if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+        return {
+          value,
+          source: "cardmarket",
+          currency: String(pricing.unit ?? "EUR"),
+        };
+      }
+    }
+    const fallback = pricing[metric];
+    if (typeof fallback === "number" && Number.isFinite(fallback) && fallback > 0) {
+      return {
+        value: fallback,
+        source: "cardmarket",
+        currency: String(pricing.unit ?? "EUR"),
+      };
+    }
+  }
+
+  return null;
+}
+
+function extractTcgplayerValue(
+  pricing:
+    | Record<
+        string,
+        {
+          marketPrice?: number;
+          midPrice?: number;
+          lowPrice?: number;
+        }
+      >
+    | undefined,
+  finish: HoldingFinish,
+  edition: HoldingEdition,
+): PokemonCardMarketValue | null {
+  if (!pricing) return null;
+  const variantKeys = getTcgplayerVariantKeys(finish, edition);
+
+  for (const variant of variantKeys) {
+    const prices = pricing[variant];
+    if (!prices) continue;
+    for (const field of TCGPLAYER_PRICE_FIELDS) {
+      const value = prices[field];
+      if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+        return {
+          value,
+          source: "tcgplayer",
+          currency: "USD",
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+function getCardmarketSuffixes(finish: HoldingFinish, edition: HoldingEdition) {
+  const base =
+    finish === "HOLO" ? ["-holo"] : finish === "REVERSE" ? ["-reverse"] : [""];
+  if (edition === "FIRST_EDITION") {
+    return base.flatMap((s) => [`${s}-1st-edition`, `${s}-first-edition`, s]);
+  }
+  return base;
+}
+
+function getTcgplayerVariantKeys(finish: HoldingFinish, edition: HoldingEdition) {
+  const byFinish =
+    finish === "HOLO"
+      ? ["holofoil", "holoFoil", "holo"]
+      : finish === "REVERSE"
+        ? ["reverseHolofoil", "reverseHolo", "reverse-holofoil", "reverse"]
+        : ["normal"];
+
+  if (edition === "FIRST_EDITION") {
+    return byFinish.flatMap((k) => [`1stEdition${capitalize(k)}`, `firstEdition${capitalize(k)}`, k]);
+  }
+  return byFinish;
+}
+
+function capitalize(value: string) {
+  return value.length ? `${value[0].toUpperCase()}${value.slice(1)}` : value;
 }
