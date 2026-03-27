@@ -20,6 +20,20 @@ export type Holding = {
   purchasePrice: number;
   quantity: number;
   snapshots: HoldingSnapshot[];
+  pricing?: {
+    /** Market unit price in GBP, if available. */
+    currentGbp: number | null;
+    /** Cardmarket 30d baseline in GBP, only when available like-for-like. */
+    baseline30Gbp: number | null;
+    /** Like-for-like change %, typically (Cardmarket trend vs avg30). */
+    change30Pct: number | null;
+    /** Underlying source used for current price (before GBP conversion). */
+    currentSource: "cardmarket" | "tcgplayer" | null;
+    /** Underlying currency reported by the source. */
+    currentCurrency: string | null;
+    /** True when current price is not live market data. */
+    isFallback: boolean;
+  };
 };
 
 export type PortfolioSummary = {
