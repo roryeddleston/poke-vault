@@ -3,12 +3,25 @@ import { prisma } from "@/lib/prisma";
 import { DEMO_OWNER_ID } from "@/lib/constants";
 import {
   getMarketValueRequestKey,
-  getPokemonCardMarketValues,
+  getPokemonCardPricingComparables,
 } from "@/lib/pokemon-tcg";
+import { convertToGbp } from "@/lib/fx";
+import type { Prisma } from "@prisma/client";
+import type { HoldingEdition, HoldingFinish } from "@/lib/holding-options";
+
+type HoldingRow = Prisma.HoldingGetPayload<{
+  include: {
+    snapshots: { orderBy: { capturedAt: "desc" }; take: 1 };
+  };
+}> & {
+  finish: unknown;
+  edition: unknown;
+};
 
 export async function GET() {
   try {
-    const holdings = await prisma.holding.findMany({
+    // Prisma types can lag in long-lived dev sessions; at runtime these fields exist.
+    const holdings = (await prisma.holding.findMany({
       where: { ownerId: DEMO_OWNER_ID },
       orderBy: { createdAt: "desc" },
       include: {
@@ -17,48 +30,85 @@ export async function GET() {
           take: 1, // only latest snapshot for performance
         },
       },
-    });
+    })) as unknown as HoldingRow[];
 
     const marketValueRequests = holdings.map((h) => ({
       cardId: h.cardId,
-      finish: h.finish,
-      edition: h.edition,
+      finish: h.finish as unknown as HoldingFinish,
+      edition: h.edition as unknown as HoldingEdition,
     }));
-    const marketValues = await getPokemonCardMarketValues(
-      marketValueRequests as any,
+    const pricingComparables = await getPokemonCardPricingComparables(
+      marketValueRequests,
     );
 
-    // Compute summary in one pass (O(n))
-    let totalInvested = 0;
-    let totalValue = 0;
+    const pricedRows = await Promise.all(
+      holdings.map(async (holding) => {
+        const latestSnapshot = holding.snapshots[0];
+        const requestKey = getMarketValueRequestKey({
+          cardId: holding.cardId,
+          finish: holding.finish as unknown as HoldingFinish,
+          edition: holding.edition as unknown as HoldingEdition,
+        });
 
-    const holdingsWithMarketPrice = holdings.map((holding) => {
-      const latestSnapshot = holding.snapshots[0];
-      const requestKey = getMarketValueRequestKey({
-        cardId: holding.cardId,
-        finish: holding.finish,
-        edition: holding.edition,
-      });
-      const market = marketValues.get(requestKey);
-      const currentUnitValue =
-        market?.value ?? latestSnapshot?.value ?? holding.purchasePrice;
+        const comparable = pricingComparables.get(requestKey);
+        const current = comparable?.current ?? null;
+        const baseline30 = comparable?.baseline30 ?? null;
 
-      const currentValue = currentUnitValue * holding.quantity;
-      const invested = holding.purchasePrice * holding.quantity;
+        const currentGbp =
+          current ? await convertToGbp(current.value, current.currency) : null;
+        const baseline30Gbp =
+          baseline30 ? await convertToGbp(baseline30.value, baseline30.currency) : null;
 
-      totalInvested += invested;
-      totalValue += currentValue;
+        // Strict fallbacks:
+        // - Use live market price when available + convertible.
+        // - Else fall back to latest snapshot (assumed GBP) if present.
+        // - Else fall back to purchasePrice (strictly necessary to avoid showing 0 value).
+        const fallbackUnit = latestSnapshot?.value ?? holding.purchasePrice;
+        const effectiveUnitValue = currentGbp ?? fallbackUnit;
+        const isFallback = currentGbp === null;
 
-      const syntheticSnapshot = {
-        ...(latestSnapshot ?? { id: "", ownerId: holding.ownerId ?? DEMO_OWNER_ID }),
-        value: currentUnitValue,
-        capturedAt: latestSnapshot?.capturedAt ?? new Date().toISOString(),
-      };
+        const syntheticSnapshot = {
+          ...(latestSnapshot ?? { id: "", ownerId: holding.ownerId ?? DEMO_OWNER_ID }),
+          value: effectiveUnitValue,
+          capturedAt: latestSnapshot?.capturedAt ?? new Date().toISOString(),
+        };
 
-      return {
-        ...holding,
-        snapshots: [syntheticSnapshot],
-      };
+        return {
+          ...holding,
+          snapshots: [syntheticSnapshot],
+          pricing: {
+            currentGbp,
+            baseline30Gbp,
+            change30Pct:
+              current?.source === "cardmarket" &&
+              baseline30?.source === "cardmarket"
+                ? (comparable?.change30Pct ?? null)
+                : null,
+            currentSource: current?.source ?? null,
+            currentCurrency: current?.currency ?? null,
+            isFallback,
+          },
+          invested: holding.purchasePrice * holding.quantity,
+          currentValue: effectiveUnitValue * holding.quantity,
+        };
+      }),
+    );
+
+    const totals = pricedRows.reduce(
+      (acc, h) => {
+        acc.totalInvested += h.invested;
+        acc.totalValue += h.currentValue;
+        return acc;
+      },
+      { totalInvested: 0, totalValue: 0 },
+    );
+    const totalInvested = totals.totalInvested;
+    const totalValue = totals.totalValue;
+
+    const cleanedHoldings = pricedRows.map((h) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { invested, currentValue, ...rest } = h;
+      return rest;
     });
 
     const totalProfit = totalValue - totalInvested;
@@ -66,7 +116,7 @@ export async function GET() {
       totalInvested === 0 ? 0 : (totalProfit / totalInvested) * 100;
 
     return NextResponse.json({
-      holdings: holdingsWithMarketPrice,
+      holdings: cleanedHoldings,
       summary: {
         totalInvested,
         totalValue,
