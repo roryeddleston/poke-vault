@@ -106,7 +106,7 @@ function buildAllocation(
 }
 
 async function getDashboardData() {
-  const [holdings, snapshots] = await prisma.$transaction([
+  const [holdings, snapshots] = await Promise.all([
     prisma.holding.findMany({
       where: { ownerId: DEMO_OWNER_ID },
       include: {
