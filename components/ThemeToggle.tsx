@@ -12,7 +12,9 @@ export function ThemeToggle() {
     if (typeof window === "undefined") return "light";
     const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
     if (stored === "light" || stored === "dark") return stored;
-    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    const prefersDark = window.matchMedia?.(
+      "(prefers-color-scheme: dark)",
+    ).matches;
     return prefersDark ? "dark" : "light";
   });
 
@@ -59,4 +61,3 @@ function applyTheme(theme: Theme) {
   if (typeof document === "undefined") return;
   document.documentElement.dataset.theme = theme;
 }
-
