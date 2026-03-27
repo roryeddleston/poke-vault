@@ -105,9 +105,9 @@ export default async function MarketPage(props: MarketPageProps) {
               <div className="flex items-center gap-2">
                 {page > 1 ? (
                   <Link
-                    href={`/market?q=${encodeURIComponent(
-                      query,
-                    )}&page=${page - 1}`}
+                    href={`/market?q=${encodeURIComponent(query)}&page=${
+                      page - 1
+                    }`}
                     className="rounded-full px-3 py-1 font-medium cursor-pointer hover:bg-surface-soft"
                   >
                     Previous
@@ -119,9 +119,9 @@ export default async function MarketPage(props: MarketPageProps) {
                 )}
                 {startIndex + PAGE_SIZE < total ? (
                   <Link
-                    href={`/market?q=${encodeURIComponent(
-                      query,
-                    )}&page=${page + 1}`}
+                    href={`/market?q=${encodeURIComponent(query)}&page=${
+                      page + 1
+                    }`}
                     className="rounded-full px-3 py-1 font-medium cursor-pointer hover:bg-surface-soft"
                   >
                     Next
