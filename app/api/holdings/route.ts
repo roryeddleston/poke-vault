@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { DEMO_OWNER_ID } from "@/lib/constants";
 import { createHoldingSchema } from "@/lib/validators/holding";
+import { getPokemonCardVariants } from "@/lib/pokemon-tcg";
 
 export async function POST(req: Request) {
   try {
@@ -23,16 +24,42 @@ export async function POST(req: Request) {
       cardNumber,
       setTotal,
       grade,
+      finish,
+      edition,
       purchasePrice,
       quantity,
     } = parsed.data;
 
+    const variants = await getPokemonCardVariants(cardId);
+    if (variants) {
+      const finishAllowed =
+        (finish === "NORMAL" && !!variants.normal) ||
+        (finish === "HOLO" && !!variants.holo) ||
+        (finish === "REVERSE" && !!variants.reverse);
+      if (!finishAllowed) {
+        return NextResponse.json(
+          { error: `Selected finish is not available for ${cardName}.` },
+          { status: 400 },
+        );
+      }
+      if (edition === "FIRST_EDITION" && !variants.firstEdition) {
+        return NextResponse.json(
+          { error: `${cardName} does not have a 1st Edition variant.` },
+          { status: 400 },
+        );
+      }
+    }
+
+    // Note: Prisma client types can lag behind schema changes in long-lived dev sessions.
+    // Runtime behavior is correct as long as migrations + `prisma generate` are up to date.
     const holding = await prisma.holding.upsert({
       where: {
-        ownerId_cardId_grade: {
+        ownerId_cardId_grade_finish_edition: {
           ownerId: DEMO_OWNER_ID,
           cardId,
-          grade, // always a string now
+          grade,
+          finish,
+          edition,
         },
       },
       update: {
@@ -43,16 +70,16 @@ export async function POST(req: Request) {
         cardId,
         cardName,
         setName,
-        // The Prisma client typings can be slightly out of sync in some environments,
-        // so we cast here to avoid over-constraining the shape.
         ...(imageUrl ? { imageUrl } : {}),
         ...(cardNumber ? { cardNumber } : {}),
         ...(setTotal ? { setTotal } : {}),
         grade,
+        finish,
+        edition,
         purchasePrice,
         quantity,
-      } as any,
-    });
+      },
+    } as any);
 
     return NextResponse.json({ holding }, { status: 201 });
   } catch (error) {
