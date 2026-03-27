@@ -124,13 +124,13 @@ export function SearchBox() {
                   <CardImage
                     src={s.imageUrl}
                     alt={s.name}
-                    className="h-8 w-6 bg-surface-soft"
+                    className="h-8 w-6 rounded-sm bg-surface-soft"
                     sizes="24px"
                     priority={index < 3}
                     unoptimized
                   />
                 ) : (
-                  <div className="flex h-8 w-6 items-center justify-center rounded bg-surface-soft text-[10px] text-text-muted">
+                  <div className="flex h-8 w-6 items-center justify-center rounded-sm bg-surface-soft text-[10px] text-text-muted">
                     ?
                   </div>
                 )}
