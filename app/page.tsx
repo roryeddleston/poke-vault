@@ -1,14 +1,18 @@
 import { DEMO_OWNER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { valuePortfolioHoldings } from "@/lib/portfolio-valuation";
 import { CardImage } from "@/components/CardImage";
 import { formatGBP, formatPct } from "./portfolio/utils";
 import { DashboardAllocationTabs } from "./_components/dashboard-allocation-tabs";
 
 type HoldingWithSnapshots = {
   id: string;
+  cardId: string;
   cardName: string;
   setName: string;
   grade: string;
+  finish: unknown;
+  edition: unknown;
   imageUrl?: string | null;
   purchasePrice: number;
   quantity: number;
@@ -128,22 +132,19 @@ async function getDashboardData() {
     }),
   ]);
 
-  const enriched = (holdings as HoldingWithSnapshots[]).map((h) => {
-    const latest = h.snapshots[0];
+  const valued = await valuePortfolioHoldings(
+    holdings as unknown as HoldingWithSnapshots[],
+  );
+
+  const enriched = valued.map((h) => {
     const previous = h.snapshots[1];
-    const invested = h.purchasePrice * h.quantity;
-    const value = latest ? latest.value * h.quantity : invested;
-    const profit = value - invested;
-    const profitPct = invested === 0 ? 0 : (profit / invested) * 100;
-    const prevValue = previous ? previous.value * h.quantity : invested;
+    const prevValue = previous ? previous.value * h.quantity : h.invested;
+    const value = h.currentValue;
     const changeAmount = value - prevValue;
     const changePct = prevValue === 0 ? 0 : (changeAmount / prevValue) * 100;
     return {
       ...h,
-      invested,
       value,
-      profit,
-      profitPct,
       changeAmount,
       changePct,
     };
