@@ -1,5 +1,6 @@
 import { DEMO_OWNER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import type { ReactNode } from "react";
 import {
   summarizeValuedHoldings,
   valuePortfolioHoldings,
@@ -8,6 +9,12 @@ import { CardImage } from "@/components/CardImage";
 import { PageIntro } from "@/components/PageIntro";
 import { PageShell } from "@/components/PageShell";
 import { SurfaceCard } from "@/components/SurfaceCard";
+import {
+  FiBarChart2,
+  FiDollarSign,
+  FiPocket,
+  FiTrendingUp,
+} from "react-icons/fi";
 import { formatGBP, formatPct } from "./portfolio/utils";
 import { DashboardAllocationTabs } from "./_components/dashboard-allocation-tabs";
 
@@ -20,9 +27,9 @@ type AllocationRow = {
 type PerformerVariant = "best" | "worst";
 
 const PERFORMER_LABEL_STYLES: Record<PerformerVariant, string> = {
-  best: "rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-200 dark:text-emerald-900",
+  best: "rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-200 dark:text-emerald-800",
   worst:
-    "rounded-full bg-rose-100 text-rose-900 dark:bg-rose-200 dark:text-rose-900",
+    "rounded-full bg-rose-100 text-rose-800 dark:bg-rose-200 dark:text-rose-800",
 };
 
 const PERFORMER_LABEL_TEXT: Record<PerformerVariant, string> = {
@@ -33,7 +40,7 @@ const PERFORMER_LABEL_TEXT: Record<PerformerVariant, string> = {
 function PerformerLabel({ variant }: { variant: PerformerVariant }) {
   return (
     <p
-      className={`inline-flex px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.04em] ${PERFORMER_LABEL_STYLES[variant]}`}
+      className={`inline-flex px-3 py-1 text-xs font-semibold uppercase tracking-[0.04em] ${PERFORMER_LABEL_STYLES[variant]}`}
     >
       {PERFORMER_LABEL_TEXT[variant]}
     </p>
@@ -48,6 +55,39 @@ type DashboardHolding = {
   profit: number;
   profitPct: number;
 };
+
+type KpiCardProps = {
+  label: string;
+  value: string;
+  tone?: "neutral" | "positive" | "negative";
+  icon: ReactNode;
+};
+
+function KpiCard({ label, value, tone = "neutral", icon }: KpiCardProps) {
+  const valueTone =
+    tone === "positive"
+      ? "text-accent"
+      : tone === "negative"
+        ? "text-red-600"
+        : "text-text-main";
+
+  return (
+    <SurfaceCard as="article" className="relative overflow-hidden p-5">
+      <div className="absolute inset-x-0 top-0 h-1 bg-accent/70" />
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-xs font-medium uppercase tracking-[0.08em] text-text-muted">
+          {label}
+        </p>
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border-subtle bg-surface text-accent">
+          {icon}
+        </span>
+      </div>
+      <p className={`mt-3 text-2xl font-semibold tracking-tight ${valueTone}`}>
+        {value}
+      </p>
+    </SurfaceCard>
+  );
+}
 
 function PerformerCard({
   variant,
@@ -214,36 +254,30 @@ export default async function DashboardPage() {
       ) : (
         <>
             <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <SurfaceCard as="article" className="p-5">
-                <p className="text-xs text-text-muted">Total portfolio value</p>
-                <p className="mt-1 text-xl font-semibold">
-                  {formatGBP(data.summary.totalValue)}
-                </p>
-              </SurfaceCard>
-              <SurfaceCard as="article" className="p-5">
-                <p className="text-xs text-text-muted">Total cost</p>
-                <p className="mt-1 text-xl font-semibold">
-                  {formatGBP(data.summary.totalInvested)}
-                </p>
-              </SurfaceCard>
-              <SurfaceCard as="article" className="p-5">
-                <p className="text-xs text-text-muted">Profit / loss</p>
-                <p
-                  className={`mt-1 text-xl font-semibold ${
-                    data.summary.totalProfit >= 0
-                      ? "text-accent"
-                      : "text-red-600"
-                  }`}
-                >
-                  {formatGBP(data.summary.totalProfit)}
-                </p>
-              </SurfaceCard>
-              <SurfaceCard as="article" className="p-5">
-                <p className="text-xs text-text-muted">Return</p>
-                <p className="mt-1 text-xl font-semibold text-accent">
-                  {formatPct(data.summary.profitPercentage)}%
-                </p>
-              </SurfaceCard>
+              <KpiCard
+                label="Total portfolio value"
+                value={formatGBP(data.summary.totalValue)}
+                tone="neutral"
+                icon={<FiPocket size={16} aria-hidden="true" />}
+              />
+              <KpiCard
+                label="Total cost"
+                value={formatGBP(data.summary.totalInvested)}
+                tone="neutral"
+                icon={<FiDollarSign size={16} aria-hidden="true" />}
+              />
+              <KpiCard
+                label="Profit / loss"
+                value={formatGBP(data.summary.totalProfit)}
+                tone={data.summary.totalProfit >= 0 ? "positive" : "negative"}
+                icon={<FiTrendingUp size={16} aria-hidden="true" />}
+              />
+              <KpiCard
+                label="Return"
+                value={`${formatPct(data.summary.profitPercentage)}%`}
+                tone="positive"
+                icon={<FiBarChart2 size={16} aria-hidden="true" />}
+              />
             </section>
 
             <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -267,13 +301,13 @@ export default async function DashboardPage() {
                   {data.recentPriceChanges.map((h) => (
                     <li
                       key={h.id}
-                      className="flex items-start justify-between gap-3 py-3"
+                      className="flex items-start justify-between gap-3 py-4"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-text-main">
                           {h.cardName}
                         </p>
-                        <div className="mt-2 flex items-center gap-2 overflow-hidden text-xs">
+                        <div className="mt-3 flex items-center gap-2 overflow-hidden text-xs">
                           <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
                             {h.setName}
                           </span>
@@ -305,13 +339,13 @@ export default async function DashboardPage() {
                   {data.topMovers.map((h) => (
                     <li
                       key={h.id}
-                      className="flex items-start justify-between gap-3 py-3"
+                      className="flex items-start justify-between gap-3 py-4"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-text-main">
                           {h.cardName}
                         </p>
-                        <div className="mt-2 flex items-center gap-2 overflow-hidden text-xs">
+                        <div className="mt-3 flex items-center gap-2 overflow-hidden text-xs">
                           <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
                             {h.setName}
                           </span>

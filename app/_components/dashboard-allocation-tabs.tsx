@@ -31,27 +31,32 @@ export function DashboardAllocationTabs({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="space-y-3">
         <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
           {title}
         </p>
-        <div
-          role="tablist"
-          aria-label="Allocation dimension"
-          className="flex w-full max-w-[11rem] items-center rounded-full border-2 border-toggle-border bg-card p-1 transition-colors duration-300 hover:border-toggle-border-hover"
-        >
-          <TabButton
-            id="set"
-            active={tab === "set"}
-            label="Set"
-            onClick={() => setTab("set")}
-          />
-          <TabButton
-            id="grade"
-            active={tab === "grade"}
-            label="Grade"
-            onClick={() => setTab("grade")}
-          />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-text-muted">
+            Toggle between set and grade to compare allocation.
+          </p>
+          <div
+            role="tablist"
+            aria-label="Allocation dimension"
+            className="flex h-9 w-full max-w-[11rem] items-center rounded-full border-2 border-toggle-border bg-card p-0 transition-colors duration-300 hover:border-toggle-border-hover"
+          >
+            <TabButton
+              id="set"
+              active={tab === "set"}
+              label="Set"
+              onClick={() => setTab("set")}
+            />
+            <TabButton
+              id="grade"
+              active={tab === "grade"}
+              label="Grade"
+              onClick={() => setTab("grade")}
+            />
+          </div>
         </div>
       </div>
 
@@ -108,7 +113,7 @@ function TabButton({ id, active, label, onClick }: TabButtonProps) {
       onClick={onClick}
       className={`flex-1 rounded-full px-3.5 py-1.5 text-center text-sm whitespace-nowrap font-medium transition-all duration-300 ${
         active
-          ? "bg-surface text-accent shadow-sm"
+          ? "bg-accent text-white shadow-sm"
           : "text-text-muted hover:text-text-main"
       }`}
     >
