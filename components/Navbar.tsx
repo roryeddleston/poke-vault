@@ -57,35 +57,41 @@ export default function Navbar() {
       {/* Desktop sidebar */}
       <nav
         aria-label="Main navigation"
-        className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-border-subtle bg-card px-4 py-6 text-sm text-text-muted md:flex"
+        className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-border-subtle/80 bg-card/95 px-4 py-6 text-sm text-text-muted backdrop-blur md:flex"
       >
         <div className="flex items-center gap-3 px-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-muted ring-1 ring-accent/25">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-muted ring-1 ring-accent/20">
             <span className="text-lg font-semibold text-accent">PV</span>
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-text-main">
               PokeVault
             </span>
-            <span className="text-[11px] uppercase tracking-[0.16em] text-text-muted">
+            <span className="text-[11px] tracking-[0.08em] text-text-muted/90">
               Pokémon investing
             </span>
           </div>
         </div>
 
-        <ul className="mt-8 space-y-1">
+        <ul className="mt-8 space-y-1.5">
           {NAV_ITEMS.filter((item) => !item.mobileOnly).map((item) => {
             const active = isActive(item.href);
             return (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                  className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all ${
                     active
-                      ? "bg-accent-muted text-accent"
-                      : "text-text-muted hover:bg-surface-soft hover:text-text-main"
+                      ? "bg-accent-muted/80 text-accent shadow-sm ring-1 ring-accent/15"
+                      : "text-text-muted hover:bg-surface-soft/80 hover:text-text-main"
                   }`}
                 >
+                  <span
+                    aria-hidden="true"
+                    className={`absolute left-1.5 h-4 w-0.5 rounded-full transition-colors ${
+                      active ? "bg-accent/70" : "bg-transparent"
+                    }`}
+                  />
                   <item.icon
                     className={`h-5 w-5 ${
                       active
