@@ -39,7 +39,7 @@ export function ThemeToggle() {
       role="switch"
       aria-checked={isDark}
       aria-label="Toggle dark mode"
-      className="relative flex h-8 w-16 cursor-pointer items-center rounded-full border-2 border-toggle-border p-1 transition-all duration-300 hover:border-toggle-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-page"
+      className="relative flex h-8 w-16 cursor-pointer items-center rounded-full border-2 border-toggle-border-hover p-1 transition-all duration-300 hover:border-toggle-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft focus-visible:ring-offset-2 focus-visible:ring-offset-page"
     >
       <span
         aria-hidden="true"
