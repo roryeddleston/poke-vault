@@ -4,8 +4,6 @@ import { PortfolioContent } from "./_components/portfolio-content";
 import { PageShell } from "@/components/PageShell";
 
 async function getPortfolio(): Promise<PortfolioResponse> {
-  // Server-side fetch to your own API route.
-  // Use the current host so this works locally + on Vercel.
   const h = await headers();
   const host = h.get("host");
   const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
@@ -22,5 +20,9 @@ async function getPortfolio(): Promise<PortfolioResponse> {
 export default async function PortfolioPage() {
   const data = await getPortfolio();
 
-  return <PageShell><PortfolioContent data={data} /></PageShell>;
+  return (
+    <PageShell>
+      <PortfolioContent data={data} />
+    </PageShell>
+  );
 }

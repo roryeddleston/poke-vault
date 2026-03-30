@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Dialog } from "@/components/Dialog";
 import { TrashIcon } from "@/components/icons";
 
 type HoldingRowActionsProps = {
@@ -48,60 +49,50 @@ export function HoldingRowActions({ holdingId }: HoldingRowActionsProps) {
         <span className="sr-only">Remove card</span>
       </button>
 
-      {confirmOpen ? (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="remove-holding-title"
-          onClick={() => !removing && setConfirmOpen(false)}
-        >
-          <div
-          className="w-full max-w-sm rounded-2xl border border-border-subtle bg-card p-5 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
+      <Dialog
+        open={confirmOpen}
+        dismissible={!removing}
+        onClose={() => setConfirmOpen(false)}
+        labelledBy="remove-holding-title"
+        panelClassName="w-full max-w-sm rounded-2xl border border-border-subtle bg-card p-5 shadow-2xl"
+      >
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 id="remove-holding-title" className="text-xl font-semibold text-text-main">
+            Remove card
+          </h2>
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(false)}
+            className="cursor-pointer px-2 py-0.5 text-3xl leading-none text-text-muted transition-colors hover:text-text-main"
+            aria-label="Close"
+            disabled={removing}
           >
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <h2
-                id="remove-holding-title"
-                className="text-xl font-semibold text-text-main"
-              >
-                Remove card
-              </h2>
-              <button
-                type="button"
-                onClick={() => setConfirmOpen(false)}
-                className="cursor-pointer px-2 py-0.5 text-3xl leading-none text-text-muted transition-colors hover:text-text-main"
-                aria-label="Close"
-                disabled={removing}
-              >
-                ✕
-              </button>
-            </div>
-            <p className="mb-4 text-xs text-text-muted">
-              This will remove the card from your portfolio and delete its value
-              history. You can always add it again later from the market.
-            </p>
-            <div className="flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setConfirmOpen(false)}
-                className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium text-text-muted transition-colors hover:bg-surface-soft hover:text-text-main"
-                disabled={removing}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleRemove}
-                disabled={removing}
-                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-danger px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-danger/80 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {removing ? "Removing…" : "Remove card"}
-              </button>
-            </div>
-          </div>
+            ✕
+          </button>
         </div>
-      ) : null}
+        <p className="mb-4 text-xs text-text-muted">
+          This will remove the card from your portfolio and delete its value
+          history. You can always add it again later from the market.
+        </p>
+        <div className="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(false)}
+            className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium text-text-muted transition-colors hover:bg-surface-soft hover:text-text-main"
+            disabled={removing}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleRemove}
+            disabled={removing}
+            className="inline-flex cursor-pointer items-center justify-center rounded-full bg-danger px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-danger/80 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {removing ? "Removing…" : "Remove card"}
+          </button>
+        </div>
+      </Dialog>
     </>
   );
 }
