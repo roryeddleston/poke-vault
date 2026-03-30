@@ -100,7 +100,7 @@ export function SearchBox() {
           onKeyDown={(e) => {
             if (e.key === "Escape") setOpen(false);
           }}
-          placeholder="Search collection or market…"
+          placeholder="Search cards by name or number (e.g. 60/64)"
           className="w-full bg-transparent text-sm text-text-main placeholder:text-text-muted focus:outline-none"
         />
         {loading ? (
@@ -150,4 +150,3 @@ export function SearchBox() {
     </div>
   );
 }
-
