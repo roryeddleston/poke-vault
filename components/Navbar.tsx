@@ -9,6 +9,7 @@ import {
   IconProps,
   PlusIcon,
   PortfolioIcon,
+  SearchIcon,
   UserIcon,
 } from "./icons";
 
@@ -32,7 +33,12 @@ const NAV_ITEMS: NavItem[] = [
     icon: (props) => <PortfolioIcon {...props} />,
   },
   {
-    label: "Analytics",
+    label: "Search",
+    href: "/market",
+    icon: (props) => <SearchIcon {...props} />,
+  },
+  {
+    label: "About",
     href: "/analytics",
     icon: (props) => <AnalyticsIcon {...props} />,
   },
