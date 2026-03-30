@@ -21,12 +21,13 @@
 }
 
 :root[data-theme="dark"] {
+  /* Dark navy ladder: each step differs from the others (no matching stacked fills). */
   --page: #020617;
-  --card: #020819;
-  --surface: #020617;
-  /* Navy "step" used for contrasted surfaces (bg-surface-soft). */
-  --surface-soft: #0f2a5a;
-  --border-subtle: #1f2937;
+  --card: #061220;
+  --surface: #0a1b32;
+  --surface-soft: #0e2644;
+  /* Slightly brighter borders so edges read on nested navy surfaces */
+  --border-subtle: #2a3f5c;
   --accent: #14b8a6;
   --accent-soft: #22c5a8;
   --accent-muted: #0f766e;
@@ -43,11 +44,10 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --page: #020617;
-    --card: #020819;
-    --surface: #020617;
-    /* Navy "step" used for contrasted surfaces (bg-surface-soft). */
-    --surface-soft: #0f2a5a;
-    --border-subtle: #1f2937;
+    --card: #061220;
+    --surface: #0a1b32;
+    --surface-soft: #0e2644;
+    --border-subtle: #2a3f5c;
     --accent: #14b8a6;
     --accent-soft: #22c5a8;
     --accent-muted: #0f766e;

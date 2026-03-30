@@ -10,6 +10,7 @@ import { PageIntro } from "@/components/PageIntro";
 import { PageShell } from "@/components/PageShell";
 import { SurfaceCard } from "@/components/SurfaceCard";
 import {
+  FiActivity,
   FiBarChart2,
   FiDollarSign,
   FiPocket,
@@ -27,9 +28,9 @@ type AllocationRow = {
 type PerformerVariant = "best" | "worst";
 
 const PERFORMER_LABEL_STYLES: Record<PerformerVariant, string> = {
-  best: "rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-200 dark:text-emerald-800",
+  best: "rounded-full bg-emerald-100/80 text-emerald-600 dark:bg-emerald-200/80 dark:text-emerald-600",
   worst:
-    "rounded-full bg-rose-100 text-rose-800 dark:bg-rose-200 dark:text-rose-800",
+    "rounded-full bg-rose-100/80 text-rose-600 dark:bg-rose-200/80 dark:text-rose-600",
 };
 
 const PERFORMER_LABEL_TEXT: Record<PerformerVariant, string> = {
@@ -125,10 +126,16 @@ function PerformerCard({
               </span>
             </div>
             <p className="text-base font-semibold text-text-main">
-              <span className={holding.profit >= 0 ? "text-accent" : "text-red-600"}>
+              <span
+                className={holding.profit >= 0 ? "text-accent" : "text-red-600"}
+              >
                 {formatGBP(holding.profit)}
               </span>{" "}
-              <span className={holding.profitPct >= 0 ? "text-accent" : "text-red-600"}>
+              <span
+                className={
+                  holding.profitPct >= 0 ? "text-accent" : "text-red-600"
+                }
+              >
                 ({holding.profitPct >= 0 ? "+" : ""}
                 {formatPct(holding.profitPct)}%)
               </span>
@@ -244,129 +251,141 @@ export default async function DashboardPage() {
 
       {data.holdingsCount === 0 ? (
         <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card px-6 py-12 text-center">
-          <p className="text-sm font-medium text-text-main">
-            No holdings yet
-          </p>
+          <p className="text-sm font-medium text-text-main">No holdings yet</p>
           <p className="mt-2 text-sm text-text-muted">
             Add cards from Search to populate your dashboard widgets.
           </p>
         </section>
       ) : (
         <>
-            <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <KpiCard
-                label="Total portfolio value"
-                value={formatGBP(data.summary.totalValue)}
-                tone="neutral"
-                icon={<FiPocket size={16} aria-hidden="true" />}
-              />
-              <KpiCard
-                label="Total cost"
-                value={formatGBP(data.summary.totalInvested)}
-                tone="neutral"
-                icon={<FiDollarSign size={16} aria-hidden="true" />}
-              />
-              <KpiCard
-                label="Profit / loss"
-                value={formatGBP(data.summary.totalProfit)}
-                tone={data.summary.totalProfit >= 0 ? "positive" : "negative"}
-                icon={<FiTrendingUp size={16} aria-hidden="true" />}
-              />
-              <KpiCard
-                label="Return"
-                value={`${formatPct(data.summary.profitPercentage)}%`}
-                tone="positive"
-                icon={<FiBarChart2 size={16} aria-hidden="true" />}
-              />
-            </section>
+          <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <KpiCard
+              label="Total portfolio value"
+              value={formatGBP(data.summary.totalValue)}
+              tone="neutral"
+              icon={<FiPocket size={16} aria-hidden="true" />}
+            />
+            <KpiCard
+              label="Total cost"
+              value={formatGBP(data.summary.totalInvested)}
+              tone="neutral"
+              icon={<FiDollarSign size={16} aria-hidden="true" />}
+            />
+            <KpiCard
+              label="Profit / loss"
+              value={formatGBP(data.summary.totalProfit)}
+              tone={data.summary.totalProfit >= 0 ? "positive" : "negative"}
+              icon={<FiTrendingUp size={16} aria-hidden="true" />}
+            />
+            <KpiCard
+              label="Return"
+              value={`${formatPct(data.summary.profitPercentage)}%`}
+              tone="positive"
+              icon={<FiBarChart2 size={16} aria-hidden="true" />}
+            />
+          </section>
 
-            <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <PerformerCard variant="best" holding={data.bestPerformer} />
-              <PerformerCard variant="worst" holding={data.worstPerformer} />
-            </section>
+          <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <PerformerCard variant="best" holding={data.bestPerformer} />
+            <PerformerCard variant="worst" holding={data.worstPerformer} />
+          </section>
 
-            <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-              <DashboardAllocationTabs
-                bySet={data.allocationBySet}
-                byGrade={data.allocationByGrade}
-              />
-            </section>
+          <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+            <DashboardAllocationTabs
+              bySet={data.allocationBySet}
+              byGrade={data.allocationByGrade}
+            />
+          </section>
 
-            <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-                <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
-                  Recent price changes
-                </p>
-                <ul className="mt-5 divide-y divide-border-subtle/70">
-                  {data.recentPriceChanges.map((h) => (
-                    <li
-                      key={h.id}
-                      className="flex items-start justify-between gap-3 py-4"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-text-main">
-                          {h.cardName}
-                        </p>
-                        <div className="mt-3 flex items-center gap-2 overflow-hidden text-xs">
-                          <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
-                            {h.setName}
-                          </span>
-                          <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-text-muted">
-                            {h.grade}
-                          </span>
-                        </div>
-                      </div>
-                      <p
-                        className={`text-sm font-semibold ${
-                          h.changeAmount >= 0
-                            ? "text-accent"
-                            : "text-red-600"
-                        }`}
-                      >
-                        {h.changeAmount >= 0 ? "+" : ""}
-                        {formatGBP(h.changeAmount)}
+          <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+              <div className="-mx-5 border-b-2 border-accent/35 px-5 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <FiActivity
+                    className="h-5 w-5 shrink-0 text-accent"
+                    aria-hidden="true"
+                  />
+                  <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
+                    Recent price changes
+                  </p>
+                </div>
+              </div>
+              <ul className="mt-3 divide-y divide-border-subtle/70">
+                {data.recentPriceChanges.map((h) => (
+                  <li
+                    key={h.id}
+                    className="flex items-start justify-between gap-3 py-4 first:pt-2 last:pb-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-text-main">
+                        {h.cardName}
                       </p>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-
-              <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-                <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
-                  Top movers
-                </p>
-                <ul className="mt-5 divide-y divide-border-subtle/70">
-                  {data.topMovers.map((h) => (
-                    <li
-                      key={h.id}
-                      className="flex items-start justify-between gap-3 py-4"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-text-main">
-                          {h.cardName}
-                        </p>
-                        <div className="mt-3 flex items-center gap-2 overflow-hidden text-xs">
-                          <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
-                            {h.setName}
-                          </span>
-                          <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-text-muted">
-                            {h.grade}
-                          </span>
-                        </div>
+                      <div className="mt-3 flex items-center gap-2 overflow-hidden text-xs">
+                        <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
+                          {h.setName}
+                        </span>
+                        <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-text-muted">
+                          {h.grade}
+                        </span>
                       </div>
-                      <p
-                        className={`text-sm font-semibold ${
-                          h.changePct >= 0 ? "text-accent" : "text-red-600"
-                        }`}
-                      >
-                        {h.changePct >= 0 ? "+" : ""}
-                        {formatPct(h.changePct)}%
+                    </div>
+                    <p
+                      className={`text-sm font-semibold ${
+                        h.changeAmount >= 0 ? "text-accent" : "text-red-600"
+                      }`}
+                    >
+                      {h.changeAmount >= 0 ? "+" : ""}
+                      {formatGBP(h.changeAmount)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </article>
+
+            <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
+              <div className="-mx-5 border-b-2 border-accent/35 px-5 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <FiTrendingUp
+                    className="h-5 w-5 shrink-0 text-accent"
+                    aria-hidden="true"
+                  />
+                  <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
+                    Top movers
+                  </p>
+                </div>
+              </div>
+              <ul className="mt-3 divide-y divide-border-subtle/70">
+                {data.topMovers.map((h) => (
+                  <li
+                    key={h.id}
+                    className="flex items-start justify-between gap-3 py-4 first:pt-2 last:pb-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-text-main">
+                        {h.cardName}
                       </p>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            </section>
+                      <div className="mt-3 flex items-center gap-2 overflow-hidden text-xs">
+                        <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
+                          {h.setName}
+                        </span>
+                        <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-text-muted">
+                          {h.grade}
+                        </span>
+                      </div>
+                    </div>
+                    <p
+                      className={`text-sm font-semibold ${
+                        h.changePct >= 0 ? "text-accent" : "text-red-600"
+                      }`}
+                    >
+                      {h.changePct >= 0 ? "+" : ""}
+                      {formatPct(h.changePct)}%
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </section>
         </>
       )}
     </PageShell>
