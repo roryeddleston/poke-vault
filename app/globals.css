@@ -115,6 +115,11 @@ button:not(:disabled) {
 }
 
 @layer utilities {
+  /* Text inputs & selects — aligns with secondary action buttons (rounded-lg, card surface, shadow) */
+  .form-field {
+    @apply rounded-lg border border-border-subtle bg-card px-3 py-2 text-sm text-text-main shadow-sm outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent/25;
+  }
+
   .shadow-elevation-1 {
     box-shadow: var(--shadow-elevation-1);
   }

@@ -26,6 +26,16 @@ export default async function MarketPage(props: MarketPageProps) {
   const pageCards = allCards.slice(startIndex, startIndex + PAGE_SIZE);
   const startDisplay = total === 0 ? 0 : startIndex + 1;
   const endDisplay = startIndex + pageCards.length;
+  const canPrev = page > 1;
+  const canNext = page < totalPages;
+  const pageNumbers: number[] = [];
+  const showMax = 5;
+  let low = Math.max(1, page - Math.floor(showMax / 2));
+  const high = Math.min(totalPages, low + showMax - 1);
+  if (high - low + 1 < showMax) {
+    low = Math.max(1, high - showMax + 1);
+  }
+  for (let i = low; i <= high; i++) pageNumbers.push(i);
 
   return (
     <PageShell
@@ -86,7 +96,7 @@ export default async function MarketPage(props: MarketPageProps) {
                     </p>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-3">
                     {card.rarity ? (
                       <span className="shrink-0 rounded-full bg-surface-soft px-2 py-0.5 text-[11px] text-text-muted">
                         {card.rarity}
@@ -97,41 +107,61 @@ export default async function MarketPage(props: MarketPageProps) {
                 </li>
               ))}
             </ul>
-            <div className="flex items-center justify-between pt-3 text-xs text-text-muted">
-              <div>
-                Page {page} of {totalPages}
-              </div>
-              <div className="flex items-center gap-2">
-                {page > 1 ? (
+            <nav
+              aria-label="Market search pagination"
+              className="flex flex-col items-center justify-between gap-2 rounded-2xl border border-border-subtle bg-card px-4 py-3 shadow-sm sm:flex-row"
+            >
+              <p className="text-xs text-text-muted">
+                Showing {startDisplay} to {endDisplay} of {total} results
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-1">
+                {canPrev ? (
                   <Link
-                    href={`/market?q=${encodeURIComponent(query)}&page=${
-                      page - 1
-                    }`}
-                    className="rounded-full px-3 py-1 font-medium cursor-pointer hover:bg-surface-soft"
+                    href={`/market?q=${encodeURIComponent(query)}&page=${page - 1}`}
+                    className="rounded-full border border-border-subtle bg-card px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:bg-surface-soft"
                   >
                     Previous
                   </Link>
                 ) : (
-                  <span className="rounded-full px-3 py-1 font-medium cursor-not-allowed opacity-40">
+                  <span className="rounded-full border border-border-subtle bg-card px-3 py-1.5 text-xs font-medium text-text-main shadow-sm opacity-50">
                     Previous
                   </span>
                 )}
-                {startIndex + PAGE_SIZE < total ? (
+
+                {pageNumbers.map((n) =>
+                  n === page ? (
+                    <span
+                      key={n}
+                      aria-current="page"
+                      className="min-w-8 rounded-full bg-accent px-2.5 py-1.5 text-center text-xs font-medium text-slate-950"
+                    >
+                      {n}
+                    </span>
+                  ) : (
+                    <Link
+                      key={n}
+                      href={`/market?q=${encodeURIComponent(query)}&page=${n}`}
+                      className="min-w-8 rounded-full border border-border-subtle bg-card px-2.5 py-1.5 text-center text-xs font-medium text-text-main transition-colors hover:bg-surface-soft"
+                    >
+                      {n}
+                    </Link>
+                  ),
+                )}
+
+                {canNext ? (
                   <Link
-                    href={`/market?q=${encodeURIComponent(query)}&page=${
-                      page + 1
-                    }`}
-                    className="rounded-full px-3 py-1 font-medium cursor-pointer hover:bg-surface-soft"
+                    href={`/market?q=${encodeURIComponent(query)}&page=${page + 1}`}
+                    className="rounded-full border border-border-subtle bg-card px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:bg-surface-soft"
                   >
                     Next
                   </Link>
                 ) : (
-                  <span className="rounded-full px-3 py-1 font-medium cursor-not-allowed opacity-40">
+                  <span className="rounded-full border border-border-subtle bg-card px-3 py-1.5 text-xs font-medium text-text-main shadow-sm opacity-50">
                     Next
                   </span>
                 )}
               </div>
-            </div>
+            </nav>
         </section>
       )}
     </PageShell>

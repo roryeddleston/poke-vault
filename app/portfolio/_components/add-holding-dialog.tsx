@@ -131,7 +131,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
             required
             value={cardId}
             onChange={(e) => setCardId(e.target.value)}
-            className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
+            className="form-field w-full"
             placeholder="e.g. base1-4"
           />
         </div>
@@ -144,7 +144,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
             required
             value={cardName}
             onChange={(e) => setCardName(e.target.value)}
-            className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
+            className="form-field w-full"
             placeholder="Charizard Holo"
           />
         </div>
@@ -157,7 +157,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
             required
             value={setName}
             onChange={(e) => setSetName(e.target.value)}
-            className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
+            className="form-field w-full"
             placeholder="Base Set"
           />
         </div>
@@ -170,7 +170,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
             <input
               value={grade}
               onChange={(e) => setGrade(e.target.value)}
-              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
+              className="form-field w-full"
               placeholder="e.g. PSA 10 (leave blank for RAW)"
             />
           </div>
@@ -187,7 +187,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
                 onChange={(e) =>
                   setFinish(e.target.value as (typeof HOLDING_FINISHES)[number])
                 }
-                className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none transition-colors focus:border-accent"
+                className="form-field w-full cursor-pointer appearance-none pr-9"
               >
                 {HOLDING_FINISHES.map((opt) => (
                   <option key={opt} value={opt}>
@@ -214,7 +214,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
                 onChange={(e) =>
                   setEdition(e.target.value as (typeof HOLDING_EDITIONS)[number])
                 }
-                className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none transition-colors focus:border-accent"
+                className="form-field w-full cursor-pointer appearance-none pr-9"
               >
                 {HOLDING_EDITIONS.map((opt) => (
                   <option key={opt} value={opt}>
@@ -242,7 +242,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
               inputMode="decimal"
               value={purchasePrice}
               onChange={(e) => setPurchasePrice(e.target.value)}
-              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
+              className="form-field w-full"
               placeholder="0"
             />
           </div>
@@ -255,7 +255,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
               inputMode="numeric"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
-              className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none transition-colors focus:border-accent"
+              className="form-field w-full"
               placeholder="1"
             />
           </div>

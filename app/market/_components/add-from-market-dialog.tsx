@@ -200,7 +200,7 @@ export function AddFromMarketDialog({
                       e.target.value as (typeof GRADING_COMPANIES)[number],
                     )
                   }
-                  className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none focus:border-accent"
+                  className="form-field w-full cursor-pointer appearance-none pr-9"
                 >
                   {GRADING_COMPANIES.map((company) => (
                     <option key={company} value={company}>
@@ -254,7 +254,7 @@ export function AddFromMarketDialog({
                 <select
                   value={finish}
                   onChange={(e) => setFinish(e.target.value as HoldingFinish)}
-                  className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none focus:border-accent"
+                  className="form-field w-full cursor-pointer appearance-none pr-9"
                 >
                   {availableFinishes.map((opt) => (
                     <option key={opt} value={opt}>
@@ -280,7 +280,7 @@ export function AddFromMarketDialog({
                   value={edition}
                   onChange={(e) => setEdition(e.target.value as HoldingEdition)}
                   disabled={availableEditions.length === 1}
-                  className="w-full cursor-pointer appearance-none rounded-lg border border-border-subtle bg-surface px-3 py-2 pr-9 text-sm text-text-main outline-none focus:border-accent"
+                  className="form-field w-full cursor-pointer appearance-none pr-9 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {availableEditions.map((opt) => (
                     <option key={opt} value={opt}>
@@ -308,7 +308,7 @@ export function AddFromMarketDialog({
                 inputMode="decimal"
                 value={purchasePrice}
                 onChange={(e) => setPurchasePrice(e.target.value)}
-                className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none focus:border-accent"
+                className="form-field w-full"
                 placeholder="0"
               />
             </div>
@@ -321,7 +321,7 @@ export function AddFromMarketDialog({
                 inputMode="numeric"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-text-main outline-none focus:border-accent"
+                className="form-field w-full"
                 placeholder="1"
               />
             </div>

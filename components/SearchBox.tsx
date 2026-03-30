@@ -85,7 +85,7 @@ export function SearchBox() {
     <div ref={containerRef} className="relative flex-1">
       <form
         onSubmit={handleSubmit}
-        className="flex h-10 items-center gap-2 rounded-full border border-border-subtle bg-card px-3 text-sm text-text-muted shadow-sm"
+        className="flex h-10 items-center gap-2 rounded-lg border border-border-subtle bg-card px-3 text-sm text-text-muted shadow-sm"
       >
         <SearchIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
         <input

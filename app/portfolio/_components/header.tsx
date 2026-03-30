@@ -27,7 +27,7 @@ export function PortfolioHeader({
             type="button"
             onClick={onSetAsDefault}
             disabled={setAsDefaultLoading}
-            className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-border-subtle bg-card px-4 py-2 text-xs font-semibold text-text-main shadow-sm transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-lg border border-border-subtle bg-card px-4 py-2 text-sm font-semibold text-text-main shadow-sm transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-60"
           >
             {setAsDefaultLoading ? "Saving…" : "Set as default"}
           </button>
@@ -36,12 +36,12 @@ export function PortfolioHeader({
           <button
             type="button"
             onClick={onAddCard}
-            className="inline-flex cursor-pointer items-center justify-center gap-1 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft"
+            className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft"
           >
             <span className="text-base leading-none" aria-hidden="true">
               +
             </span>
-            <span>Add card</span>
+            <span>Add card manually</span>
           </button>
         ) : null}
       </div>

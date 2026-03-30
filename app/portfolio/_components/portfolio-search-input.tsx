@@ -12,7 +12,7 @@ export function PortfolioSearchInput({
   onChange,
 }: PortfolioSearchInputProps) {
   return (
-    <div className="flex flex-1 items-center gap-2 rounded-full border border-border-subtle bg-card px-3 py-2 text-sm text-text-muted ring-1 ring-surface-soft/70">
+    <div className="flex flex-1 items-center gap-2 rounded-lg border border-border-subtle bg-card px-3 py-2 text-sm text-text-muted shadow-sm">
       <SearchIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
       <input
         type="search"
