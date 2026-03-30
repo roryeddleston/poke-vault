@@ -1,5 +1,6 @@
 import type { Holding } from "../types";
 import { formatGBP } from "../utils";
+import { CardImagePlaceholder } from "./card-image-placeholder";
 import { CardImage } from "@/components/CardImage";
 import { GradePill } from "./grade-pill";
 import { ChangePill } from "./change-pill";
@@ -27,13 +28,20 @@ export function HoldingsTableMobile({
           return (
             <article
               key={h.id}
-              className="shadow-elevation-1 flex items-center gap-8 rounded-2xl border border-border-subtle bg-card px-5 py-6 text-lg"
+              className="shadow-elevation-1 flex items-center gap-8 rounded-2xl border border-border-subtle bg-card px-5 py-6 text-lg transition-shadow hover:shadow-elevation-2"
             >
-              <CardImage
-                src={h.imageUrl}
-                alt={h.cardName}
-                className="h-24 w-16 ring-1 ring-border-subtle md:h-28 md:w-20"
-              />
+              {h.imageUrl ? (
+                <CardImage
+                  src={h.imageUrl}
+                  alt={h.cardName}
+                  className="h-24 w-16 ring-1 ring-border-subtle md:h-28 md:w-20"
+                />
+              ) : (
+                <CardImagePlaceholder
+                  name={h.cardName}
+                  className="h-24 w-16 ring-1 ring-border-subtle md:h-28 md:w-20"
+                />
+              )}
 
               <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <div className="flex items-baseline justify-between gap-3">

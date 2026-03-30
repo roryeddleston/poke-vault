@@ -22,7 +22,7 @@ export function HoldingsTableDesktop({
     >
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1040px] text-base">
-          <thead className="border-b border-border-subtle/80 bg-surface-soft/80 text-left">
+          <thead className="sticky top-0 border-b border-emerald-600/40 bg-surface-soft/95 backdrop-blur text-left">
             <tr className="text-text-muted">
               <th
                 scope="col"
@@ -121,10 +121,7 @@ export function HoldingsTableDesktop({
                     {formatGBP(latest)}
                   </td>
                   <td className="px-6 py-5 text-right">
-                    <ChangePill
-                      value={returnVsPaid}
-                      periodLabel="vs paid"
-                    />
+                    <ChangePill value={returnVsPaid} periodLabel="vs paid" />
                   </td>
                   <td className="px-6 py-5 text-right">
                     <HoldingRowActions holdingId={h.id} />
@@ -139,7 +136,8 @@ export function HoldingsTableDesktop({
                   className="px-4 py-8 text-center text-text-muted"
                   colSpan={7}
                 >
-                  No holdings yet.
+                  No holdings yet. Add cards from the portfolio controls above or from
+                  the Market page.
                 </td>
               </tr>
             ) : null}
