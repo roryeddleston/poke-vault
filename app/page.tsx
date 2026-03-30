@@ -248,7 +248,7 @@ export default async function DashboardPage() {
             No holdings yet
           </p>
           <p className="mt-2 text-sm text-text-muted">
-            Add cards from Market to populate your dashboard widgets.
+            Add cards from Search to populate your dashboard widgets.
           </p>
         </section>
       ) : (
