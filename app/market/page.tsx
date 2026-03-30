@@ -42,14 +42,73 @@ export default async function MarketPage(props: MarketPageProps) {
       mainClassName="min-h-screen bg-page px-4 py-8 text-text-main"
       containerClassName="mx-auto w-full max-w-5xl space-y-6"
     >
+      {!query ? (
+        <>
+          <div className="flex flex-col items-center gap-1 text-center">
+            <p className="text-xs font-medium tracking-[0.08em] text-text-muted uppercase">
+              Use the search bar above
+            </p>
+            <div className="flex items-center gap-1 text-accent">
+              <span className="text-lg leading-none">↑</span>
+              <span className="text-xl leading-none">↑</span>
+              <span className="text-lg leading-none">↑</span>
+            </div>
+          </div>
+
+          <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5 sm:p-6">
+            <div className="grid gap-4 lg:grid-cols-3">
+              <article className="rounded-xl border border-border-subtle bg-surface px-4 py-4">
+                <p className="text-xs font-semibold tracking-[0.08em] text-text-muted uppercase">
+                  1. Search
+                </p>
+                <p className="mt-2 text-sm text-text-main">
+                  Use a card name, number, or number pair.
+                </p>
+                <p className="mt-2 text-xs text-text-muted">
+                  Examples: <span className="font-medium text-text-main">Pikachu</span>,{" "}
+                  <span className="font-medium text-text-main">Charizard 4/102</span>,{" "}
+                  <span className="font-medium text-text-main">60/64</span>
+                </p>
+              </article>
+
+              <article className="rounded-xl border border-border-subtle bg-surface px-4 py-4">
+                <p className="text-xs font-semibold tracking-[0.08em] text-text-muted uppercase">
+                  2. Check the match
+                </p>
+                <p className="mt-2 text-sm text-text-main">
+                  Confirm the set and card number shown in each result row.
+                </p>
+                <p className="mt-2 text-xs text-text-muted">
+                  This helps avoid adding the wrong print or set variant.
+                </p>
+              </article>
+
+              <article className="rounded-xl border border-accent/25 bg-accent-muted/45 px-4 py-4">
+                <p className="text-xs font-semibold tracking-[0.08em] text-accent uppercase">
+                  3. Add to portfolio
+                </p>
+                <p className="mt-2 text-sm text-text-main">
+                  Click <span className="font-semibold">Add to portfolio</span>, then set
+                  grade, finish, edition, quantity, and purchase price.
+                </p>
+                <p className="mt-2 text-xs text-text-muted">
+                  You can add the same card multiple times with different grades.
+                </p>
+              </article>
+            </div>
+          </section>
+        </>
+      ) : null}
+
       <PageIntro
         title="Search Pokémon cards"
-        subtitle="Use the search bar above to find cards from the Pokémon TCG database, then add them to your portfolio."
+        subtitle="Find cards by name or card number, review the result, then add cards directly to your portfolio."
       />
 
       {!query ? (
         <section className="rounded-xl border border-border-subtle bg-card px-4 py-10 text-center text-sm text-text-muted">
-          Start by typing a card name in the search bar.
+          Start by typing a card name or number in the search bar (for example:
+          <span className="font-medium text-text-main"> 60/64</span>).
         </section>
       ) : total === 0 ? (
         <section className="rounded-xl border border-border-subtle bg-card px-4 py-10 text-center text-sm text-text-muted">
@@ -108,7 +167,7 @@ export default async function MarketPage(props: MarketPageProps) {
               ))}
             </ul>
             <nav
-              aria-label="Market search pagination"
+              aria-label="Search pagination"
               className="flex flex-col items-center justify-between gap-2 rounded-2xl border border-border-subtle bg-card px-4 py-3 shadow-sm sm:flex-row"
             >
               <p className="text-xs text-text-muted">
