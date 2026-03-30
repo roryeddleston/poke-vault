@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { SearchIcon } from "./icons";
 import type { PokemonCardSummary } from "@/lib/pokemon-tcg";
 import { CardImage } from "./CardImage";
@@ -10,6 +10,7 @@ type Suggestion = PokemonCardSummary;
 
 export function SearchBox() {
   const router = useRouter();
+  const pathname = usePathname();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
@@ -64,6 +65,11 @@ export function SearchBox() {
     return () => document.removeEventListener("mousedown", onMouseDown);
   }, []);
 
+  useEffect(() => {
+    if (!pathname?.startsWith("/market")) return;
+    inputRef.current?.focus();
+  }, [pathname]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const q = query.trim();
@@ -85,7 +91,7 @@ export function SearchBox() {
     <div ref={containerRef} className="relative flex-1">
       <form
         onSubmit={handleSubmit}
-        className="flex h-10 items-center gap-2 rounded-lg border border-border-subtle bg-card px-3 text-sm text-text-muted shadow-sm"
+        className="flex h-10 items-center gap-2 rounded-lg border border-border-subtle bg-card px-3 text-sm text-text-muted shadow-sm transition-colors focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/30"
       >
         <SearchIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
         <input
