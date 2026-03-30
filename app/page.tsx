@@ -85,10 +85,10 @@ function PerformerCard({
               </span>
             </div>
             <p className="text-base font-semibold text-text-main">
-              <span className={holding.profit >= 0 ? "text-emerald-600" : "text-red-600"}>
+              <span className={holding.profit >= 0 ? "text-accent" : "text-red-600"}>
                 {formatGBP(holding.profit)}
               </span>{" "}
-              <span className={holding.profitPct >= 0 ? "text-emerald-600" : "text-red-600"}>
+              <span className={holding.profitPct >= 0 ? "text-accent" : "text-red-600"}>
                 ({holding.profitPct >= 0 ? "+" : ""}
                 {formatPct(holding.profitPct)}%)
               </span>
@@ -298,7 +298,7 @@ export default async function DashboardPage() {
                 <p
                   className={`mt-1 text-xl font-semibold ${
                     data.summary.totalProfit >= 0
-                      ? "text-emerald-600"
+                      ? "text-accent"
                       : "text-red-600"
                   }`}
                 >
@@ -307,7 +307,7 @@ export default async function DashboardPage() {
               </SurfaceCard>
               <SurfaceCard as="article" className="p-5">
                 <p className="text-xs text-text-muted">Return</p>
-                <p className="mt-1 text-xl font-semibold text-emerald-600">
+                <p className="mt-1 text-xl font-semibold text-accent">
                   {formatPct(data.summary.profitPercentage)}%
                 </p>
               </SurfaceCard>
@@ -357,7 +357,7 @@ export default async function DashboardPage() {
                       <p
                         className={`text-xs font-semibold ${
                           h.changeAmount >= 0
-                            ? "text-emerald-600"
+                            ? "text-accent"
                             : "text-red-600"
                         }`}
                       >
@@ -394,7 +394,7 @@ export default async function DashboardPage() {
                       </div>
                       <p
                         className={`text-xs font-semibold ${
-                          h.changePct >= 0 ? "text-emerald-600" : "text-red-600"
+                          h.changePct >= 0 ? "text-accent" : "text-red-600"
                         }`}
                       >
                         {h.changePct >= 0 ? "+" : ""}

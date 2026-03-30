@@ -15,7 +15,7 @@ export function SummaryCards({ summary, totalCards }: SummaryCardsProps) {
   return (
     <section className="grid grid-cols-1 gap-3 lg:grid-cols-3">
       <SurfaceCard as="div" className="relative min-h-36 p-5">
-        <span className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border-subtle bg-surface text-emerald-600 dark:text-emerald-300">
+        <span className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border-subtle bg-surface text-accent">
           <FiDollarSign size={16} aria-hidden="true" />
         </span>
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
@@ -33,12 +33,12 @@ export function SummaryCards({ summary, totalCards }: SummaryCardsProps) {
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
           Overall gain / loss
         </p>
-        <p className={`mt-3 text-3xl font-semibold tracking-tight ${profitPositive ? "text-emerald-600" : "text-danger"}`}>
+        <p className={`mt-3 text-3xl font-semibold tracking-tight ${profitPositive ? "text-accent" : "text-danger"}`}>
           {showData ? formatGBP(summary.totalProfit) : "—"}
         </p>
         <p
           className={`mt-1 text-sm font-semibold ${
-            profitPositive ? "text-emerald-600" : "text-danger"
+            profitPositive ? "text-accent" : "text-danger"
           }`}
         >
           {showData ? `${profitPositive ? "+" : ""}${formatPct(summary.profitPercentage)}%` : "—"}
