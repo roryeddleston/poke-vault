@@ -27,7 +27,7 @@ export function PortfolioHeader({
             type="button"
             onClick={onSetAsDefault}
             disabled={setAsDefaultLoading}
-            className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-lg border border-border-subtle bg-card px-4 py-2 text-sm font-semibold text-text-main shadow-sm transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-lg border border-border-subtle bg-card px-4 py-2 text-sm text-text-main shadow-sm transition-colors hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-60"
           >
             {setAsDefaultLoading ? "Saving…" : "Set as default"}
           </button>
