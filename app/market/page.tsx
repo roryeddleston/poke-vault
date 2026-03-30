@@ -17,7 +17,7 @@ export default async function MarketPage(props: MarketPageProps) {
   const query = q?.toString() ?? "";
   const page = Math.max(1, Number.parseInt(rawPage ?? "1", 10) || 1);
 
-  const allCards = query ? await searchPokemonCardsAll(query, 50, 10) : [];
+  const allCards = query ? await searchPokemonCardsAll(query, 50, 20) : [];
   const total = allCards.length;
   const totalPages =
     total === 0 ? 1 : Math.max(1, Math.ceil(total / PAGE_SIZE));

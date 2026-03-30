@@ -26,6 +26,12 @@ type SearchImageOptions = {
   imageExt?: "png" | "webp";
 };
 
+type ParsedStructuredQuery = {
+  number: number;
+  total?: number;
+  hasOnlyNumericShape: boolean;
+};
+
 let tcgdexClient: TCGdex | null = null;
 
 function getTcgDex(): TCGdex {
@@ -35,6 +41,61 @@ function getTcgDex(): TCGdex {
     tcgdexClient.setCacheTTL(60 * 60);
   }
   return tcgdexClient;
+}
+
+function parseCardNumberFromId(id: string): number | undefined {
+  // Typical ids look like "base1-4", "swsh3-25", etc.
+  const match = id.match(/-(\d+)$/);
+  if (!match) return undefined;
+  const parsed = Number.parseInt(match[1], 10);
+  return Number.isNaN(parsed) ? undefined : parsed;
+}
+
+function parseCardNumberFromLocalId(localId?: string | number): number | undefined {
+  if (typeof localId === "number") return localId;
+  if (typeof localId !== "string") return undefined;
+
+  // Extract the first numeric run so formats like "004", "4a", "4/102" still map to 4.
+  const match = localId.match(/(\d+)/);
+  if (!match) return undefined;
+  const parsed = Number.parseInt(match[1], 10);
+  return Number.isNaN(parsed) ? undefined : parsed;
+}
+
+function parseStructuredCardQuery(query: string): ParsedStructuredQuery | null {
+  const q = query.trim();
+  if (!q) return null;
+
+  // Pure numeric card query: "4" or "4/102"
+  const pureMatch = q.match(/^(\d+)(?:\s*\/\s*(\d+))?$/);
+  if (pureMatch) {
+    const number = Number.parseInt(pureMatch[1], 10);
+    const total =
+      pureMatch[2] !== undefined ? Number.parseInt(pureMatch[2], 10) : undefined;
+    if (!Number.isFinite(number)) return null;
+    return {
+      number,
+      total: Number.isFinite(total as number) ? total : undefined,
+      hasOnlyNumericShape: true,
+    };
+  }
+
+  // Name + trailing numeric shape: "pikachu 60/64"
+  const trailingMatch = q.match(/(\d+)(?:\s*\/\s*(\d+))?\s*$/);
+  if (!trailingMatch) return null;
+
+  const number = Number.parseInt(trailingMatch[1], 10);
+  const total =
+    trailingMatch[2] !== undefined
+      ? Number.parseInt(trailingMatch[2], 10)
+      : undefined;
+  if (!Number.isFinite(number)) return null;
+
+  return {
+    number,
+    total: Number.isFinite(total as number) ? total : undefined,
+    hasOnlyNumericShape: false,
+  };
 }
 
 type TcgDexCardResume = {
@@ -102,13 +163,16 @@ export async function searchPokemonCards(
     const nameAndNumberMatch = q.match(/^(.*?)(\d+)(?:\s*\/\s*(\d+))?$/);
     const namePart = nameAndNumberMatch?.[1]?.trim() || "";
     const nameNumberPart = nameAndNumberMatch?.[2];
-    const nameTotalPart = nameAndNumberMatch?.[3];
 
     // If the query is just a number or "12/72", capture that too.
     // "60/64" -> pureLocalId: "60/64"
     const pureNumberMatch = q.match(/^(\d+)(?:\s*\/\s*(\d+))?$/);
     const pureNumberPart = pureNumberMatch?.[1];
     const pureTotalPart = pureNumberMatch?.[2];
+    const pureFraction =
+      pureNumberPart && pureTotalPart
+        ? `${pureNumberPart}/${pureTotalPart}`
+        : undefined;
     const effectiveName = namePart || (!pureNumberPart ? q : "");
 
     // 1) If the query looks like a full card ID (e.g. "swsh3-012"), try exact id first.
@@ -125,6 +189,13 @@ export async function searchPokemonCards(
           .equal("localId", nameNumberPart)
           .paginate(page, pageSize),
       );
+      // Fallback for sets/cards whose localId may include formatting/leading zeros.
+      queries.push(
+        Query.create()
+          .contains("name", namePart)
+          .contains("localId", nameNumberPart)
+          .paginate(page, pageSize),
+      );
     }
 
     // 3) If the whole query looks like "60" or "60/64", search by exact card number within the set.
@@ -135,6 +206,36 @@ export async function searchPokemonCards(
           .sort("localId", "ASC")
           .paginate(page, pageSize),
       );
+      // Fallback for localId variants like leading zeros/suffixes.
+      queries.push(
+        Query.create()
+          .contains("localId", pureNumberPart)
+          .sort("localId", "ASC")
+          .paginate(page, pageSize),
+      );
+
+      // Fallback by id suffix (e.g. "base1-4") when localId filters are inconsistent.
+      queries.push(
+        Query.create()
+          .contains("id", `-${pureNumberPart}`)
+          .sort("id", "ASC")
+          .paginate(page, pageSize),
+      );
+
+      // If query is a fraction like "4/102", also query the full fraction form
+      // directly. Some datasets expose localId with denominator included.
+      if (pureFraction) {
+        queries.push(
+          Query.create()
+            .equal("localId", pureFraction)
+            .paginate(page, pageSize),
+        );
+        queries.push(
+          Query.create()
+            .contains("localId", pureFraction)
+            .paginate(page, pageSize),
+        );
+      }
     }
 
     // 4) Finally, search by name (if we have any non-numeric name part).
@@ -157,16 +258,25 @@ export async function searchPokemonCards(
     // Merge and de-duplicate by id, keeping a reasonable pool for scoring.
     const seen = new Set<string>();
     const merged: TcgDexCardResume[] = [];
-    const maxMerged = pageSize * 5;
-    for (const list of resumeArrays) {
-      for (const r of list) {
-        if (!seen.has(r.id)) {
-          seen.add(r.id);
-          merged.push(r);
+    const maxMerged = pageSize * 8;
+
+    // Round-robin merge so one broad query (e.g. contains localId) doesn't
+    // crowd out higher-signal query results.
+    let index = 0;
+    while (merged.length < maxMerged) {
+      let addedAny = false;
+      for (const list of resumeArrays) {
+        if (index >= list.length) continue;
+        const resume = list[index];
+        if (!seen.has(resume.id)) {
+          seen.add(resume.id);
+          merged.push(resume);
+          addedAny = true;
           if (merged.length >= maxMerged) break;
         }
       }
-      if (merged.length >= maxMerged) break;
+      if (!addedAny) break;
+      index += 1;
     }
 
     const resumes = merged;
@@ -212,13 +322,9 @@ export async function searchPokemonCards(
       const setTotal =
         typeof rawTotal === "number" && rawTotal > 0 ? rawTotal : undefined;
 
-      let cardNumber: number | undefined;
-      if (typeof card.localId === "string") {
-        const parsed = Number.parseInt(card.localId, 10);
-        cardNumber = Number.isNaN(parsed) ? undefined : parsed;
-      } else if (typeof card.localId === "number") {
-        cardNumber = card.localId;
-      }
+      const cardNumber =
+        parseCardNumberFromLocalId(card.localId) ??
+        parseCardNumberFromId(card.id);
 
       return {
         id: card.id,
@@ -233,16 +339,45 @@ export async function searchPokemonCards(
     });
 
     // Scoring: favour matches on name, card number, and set total.
+    const parsedStructured = parseStructuredCardQuery(q);
+    const numericOnlyMode = Boolean(parsedStructured?.hasOnlyNumericShape);
     const nameHint = namePart.toLowerCase();
-    const numberHint = nameNumberPart ?? pureNumberPart ?? undefined;
-    const numberHintValue = numberHint
-      ? Number.parseInt(numberHint, 10)
-      : undefined;
-    const desiredTotalRaw = nameTotalPart ?? pureTotalPart;
-    const desiredTotal =
-      desiredTotalRaw !== undefined
-        ? Number.parseInt(desiredTotalRaw, 10)
-        : undefined;
+    const numberHintValue = parsedStructured?.number;
+    const desiredTotal = parsedStructured?.total;
+
+    // For pure numeric queries like "60" or "60/64", prefer strict numeric matching.
+    // If total is provided (e.g. 60/64), prioritize exact set-total matches.
+    if (
+      numericOnlyMode &&
+      numberHintValue !== undefined &&
+      Number.isFinite(numberHintValue)
+    ) {
+      const normalizedQuery = q.replace(/\s+/g, "");
+      const exactFractionMatches = summaries.filter(
+        (s) =>
+          s.cardNumber !== undefined &&
+          s.setTotal !== undefined &&
+          `${s.cardNumber}/${s.setTotal}` === normalizedQuery,
+      );
+
+      const numberMatches = summaries.filter((s) => s.cardNumber === numberHintValue);
+
+      if (desiredTotal !== undefined && Number.isFinite(desiredTotal)) {
+        const exactTotalMatches = numberMatches.filter((s) => s.setTotal === desiredTotal);
+
+        // x/y semantics:
+        // - x is card number in set
+        // - y is total cards in set
+        // For pure numeric fraction queries, return ONLY strict (x,y) matches.
+        return [...exactFractionMatches, ...exactTotalMatches]
+          .filter((v, i, arr) => arr.findIndex((x) => x.id === v.id) === i)
+          .slice(0, pageSize);
+      }
+
+      return [...exactFractionMatches, ...numberMatches]
+        .filter((v, i, arr) => arr.findIndex((x) => x.id === v.id) === i)
+        .slice(0, pageSize);
+    }
 
     const scored = summaries.map((s) => {
       let score = 0;
@@ -270,13 +405,9 @@ export async function searchPokemonCards(
 
     scored.sort((a, b) => b.score - a.score);
 
-    // Return the best-matching slice for this page.
-    const startIndex = (page - 1) * pageSize;
-    const pageSlice = scored
-      .slice(startIndex, startIndex + pageSize)
-      .map((s) => s.summary);
-
-    return pageSlice;
+    // Queries above are already paginated by `page`/`pageSize`.
+    // At this stage we only need to take the best scored results from this page.
+    return scored.slice(0, pageSize).map((s) => s.summary);
   } catch (error) {
     console.error("[TCGdex] searchPokemonCards failed:", error);
     return [];
