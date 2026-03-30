@@ -20,9 +20,9 @@ type AllocationRow = {
 type PerformerVariant = "best" | "worst";
 
 const PERFORMER_LABEL_STYLES: Record<PerformerVariant, string> = {
-  best: "border border-border-subtle bg-surface text-[#065f46] dark:text-[#34d399]",
+  best: "rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-200 dark:text-emerald-900",
   worst:
-    "border border-border-subtle bg-surface text-[#991b1b] dark:text-[#f87171]",
+    "rounded-full bg-rose-100 text-rose-900 dark:bg-rose-200 dark:text-rose-900",
 };
 
 const PERFORMER_LABEL_TEXT: Record<PerformerVariant, string> = {
@@ -33,7 +33,7 @@ const PERFORMER_LABEL_TEXT: Record<PerformerVariant, string> = {
 function PerformerLabel({ variant }: { variant: PerformerVariant }) {
   return (
     <p
-      className={`inline-flex rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] ${PERFORMER_LABEL_STYLES[variant]}`}
+      className={`inline-flex px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.04em] ${PERFORMER_LABEL_STYLES[variant]}`}
     >
       {PERFORMER_LABEL_TEXT[variant]}
     </p>
