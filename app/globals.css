@@ -127,68 +127,101 @@ button:not(:disabled) {
 
   /* High-contrast grading pill variants */
   .grade-pill-base {
-    @apply inline-flex items-center px-0 py-0 text-xs font-semibold leading-none;
+    @apply inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-semibold leading-none tracking-[0.02em];
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      color 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.25) inset;
+  }
+
+  .grade-pill-outline {
+    border: 1px solid currentColor;
+    border-radius: 9999px;
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.08),
+      0 1px 2px rgb(2 6 23 / 0.08);
   }
 
   .grade-pill-raw {
     color: #334155;
+    background: rgb(100 116 139 / 0.12);
+    border: 1px solid rgb(100 116 139 / 0.22);
   }
 
   .grade-pill-psa {
     color: #be123c;
+    background: rgb(190 18 60 / 0.11);
   }
 
   .grade-pill-bgs {
     color: #15803d;
+    background: rgb(21 128 61 / 0.11);
   }
 
   .grade-pill-cgc {
     color: #b45309;
+    background: rgb(180 83 9 / 0.11);
   }
 
   .grade-pill-ace {
     color: #0369a1;
+    background: rgb(3 105 161 / 0.11);
   }
 
   :root[data-theme="dark"] .grade-pill-raw {
     color: #f1f5f9;
+    background: rgb(148 163 184 / 0.2);
+    border: 1px solid rgb(148 163 184 / 0.35);
   }
 
   :root[data-theme="dark"] .grade-pill-psa {
     color: #fecdd3;
+    background: rgb(251 113 133 / 0.2);
   }
 
   :root[data-theme="dark"] .grade-pill-bgs {
     color: #bbf7d0;
+    background: rgb(34 197 94 / 0.2);
   }
 
   :root[data-theme="dark"] .grade-pill-cgc {
     color: #fde68a;
+    background: rgb(245 158 11 / 0.2);
   }
 
   :root[data-theme="dark"] .grade-pill-ace {
     color: #bae6fd;
+    background: rgb(14 165 233 / 0.2);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) .grade-pill-raw {
     color: #f1f5f9;
+    background: rgb(148 163 184 / 0.2);
+    border: 1px solid rgb(148 163 184 / 0.35);
   }
 
   :root:not([data-theme]) .grade-pill-psa {
     color: #fecdd3;
+    background: rgb(251 113 133 / 0.2);
   }
 
   :root:not([data-theme]) .grade-pill-bgs {
     color: #bbf7d0;
+    background: rgb(34 197 94 / 0.2);
   }
 
   :root:not([data-theme]) .grade-pill-cgc {
     color: #fde68a;
+    background: rgb(245 158 11 / 0.2);
   }
 
   :root:not([data-theme]) .grade-pill-ace {
     color: #bae6fd;
+    background: rgb(14 165 233 / 0.2);
   }
 }

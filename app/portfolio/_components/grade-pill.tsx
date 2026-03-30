@@ -17,10 +17,11 @@ const GRADE_STYLES: Record<GradingCompany, string> = {
 export function GradePill({ grade, className = "" }: GradePillProps) {
   const company = getGradingCompany(grade);
   const style = GRADE_STYLES[company];
+  const outlined = company !== "RAW" && company !== "OTHER";
 
   return (
     <span
-      className={`grade-pill-base ${style} ${className}`}
+      className={`grade-pill-base ${style} ${outlined ? "grade-pill-outline" : ""} ${className}`}
       aria-label={`Grade: ${grade}`}
     >
       {grade}
