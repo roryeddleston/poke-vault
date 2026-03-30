@@ -72,7 +72,7 @@ export function HoldingRowActions({ holdingId }: HoldingRowActionsProps) {
         </div>
         <p className="mb-4 text-xs text-text-muted">
           This will remove the card from your portfolio and delete its value
-          history. You can always add it again later from the market.
+          history. You can always add it again later from Search.
         </p>
         <div className="flex items-center justify-end gap-2">
           <button

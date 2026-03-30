@@ -137,7 +137,7 @@ export function HoldingsTableDesktop({
                   colSpan={7}
                 >
                   No holdings yet. Add cards from the portfolio controls above or from
-                  the Market page.
+                  the Search page.
                 </td>
               </tr>
             ) : null}
