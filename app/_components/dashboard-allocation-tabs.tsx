@@ -12,6 +12,7 @@ type AllocationRow = {
 type DashboardAllocationTabsProps = {
   bySet: AllocationRow[];
   byGrade: AllocationRow[];
+  title?: string;
 };
 
 type TabKey = "set" | "grade";
@@ -19,6 +20,7 @@ type TabKey = "set" | "grade";
 export function DashboardAllocationTabs({
   bySet,
   byGrade,
+  title = "Portfolio allocation",
 }: DashboardAllocationTabsProps) {
   const [tab, setTab] = useState<TabKey>("set");
 
@@ -28,47 +30,55 @@ export function DashboardAllocationTabs({
   }, [tab, byGrade, bySet]);
 
   return (
-    <div className="space-y-3">
-      <div
-        role="tablist"
-        aria-label="Allocation dimension"
-        className="inline-flex max-w-full overflow-x-auto rounded-full border border-border-subtle bg-surface p-1 text-xs"
-      >
-        <TabButton
-          id="set"
-          active={tab === "set"}
-          label="Set"
-          onClick={() => setTab("set")}
-        />
-        <TabButton
-          id="grade"
-          active={tab === "grade"}
-          label="Grade"
-          onClick={() => setTab("grade")}
-        />
+    <div className="space-y-6">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
+          {title}
+        </p>
+        <div
+          role="tablist"
+          aria-label="Allocation dimension"
+          className="flex w-full max-w-[11rem] items-center rounded-full border-2 border-toggle-border bg-card p-1 transition-colors duration-300 hover:border-toggle-border-hover"
+        >
+          <TabButton
+            id="set"
+            active={tab === "set"}
+            label="Set"
+            onClick={() => setTab("set")}
+          />
+          <TabButton
+            id="grade"
+            active={tab === "grade"}
+            label="Grade"
+            onClick={() => setTab("grade")}
+          />
+        </div>
       </div>
 
       {rows.length === 0 ? (
         <p className="text-xs text-text-muted">No allocation data yet.</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-4">
           {rows.map((row) => {
             return (
               <li
                 key={row.label}
-                className="space-y-2 rounded-lg border border-border-subtle bg-surface-soft/40 px-3 py-3"
+                className="space-y-4 rounded-xl border border-border-subtle bg-surface px-4 py-4"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <p className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-xs font-medium text-text-main">
+                  <p className="truncate text-sm leading-7 font-medium text-text-main">
                     {row.label}
                   </p>
-                  <p className="text-[11px] text-text-muted">
-                    {formatGBP(row.value)} • {row.pct.toFixed(2)}%
+                  <p className="text-xs leading-7 font-medium text-text-muted">
+                    <span className="text-text-main">
+                      {formatGBP(row.value)}
+                    </span>{" "}
+                    • {row.pct.toFixed(2)}%
                   </p>
                 </div>
-                <div className="h-2.5 overflow-hidden rounded-full bg-surface-soft">
+                <div className="h-2 overflow-hidden rounded-full bg-surface-soft">
                   <div
-                    className="h-full rounded-full bg-accent-soft"
+                    className="h-full rounded-full bg-accent"
                     style={{ width: `${Math.min(100, row.pct)}%` }}
                   />
                 </div>
@@ -96,10 +106,10 @@ function TabButton({ id, active, label, onClick }: TabButtonProps) {
       aria-selected={active}
       type="button"
       onClick={onClick}
-      className={`rounded-full px-3 py-1.5 whitespace-nowrap transition-colors ${
+      className={`flex-1 rounded-full px-3.5 py-1.5 text-center text-sm whitespace-nowrap font-medium transition-all duration-300 ${
         active
-          ? "bg-card text-text-main shadow-sm hover:bg-surface-soft"
-          : "text-text-muted hover:bg-card hover:text-text-main"
+          ? "bg-surface text-accent shadow-sm"
+          : "text-text-muted hover:text-text-main"
       }`}
     >
       {label}

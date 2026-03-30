@@ -102,49 +102,6 @@ function PerformerCard({
   );
 }
 
-function formatDayLabel(isoDay: string) {
-  const date = new Date(`${isoDay}T00:00:00.000Z`);
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-  }).format(date);
-}
-
-function buildMiniChart(values: number[]) {
-  const width = 700;
-  const height = 180;
-  const padding = 18;
-  const chartWidth = width - padding * 2;
-  const chartHeight = height - padding * 2;
-
-  if (values.length === 0) {
-    return { width, height, linePath: "", areaPath: "" };
-  }
-
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-
-  const points = values.map((value, index) => {
-    const x = padding + (index / Math.max(1, values.length - 1)) * chartWidth;
-    const normalized = (value - min) / range;
-    const y = padding + (1 - normalized) * chartHeight;
-    return { x, y };
-  });
-
-  const linePath = points
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
-    .join(" ");
-
-  const first = points[0];
-  const last = points[points.length - 1];
-  const areaPath = `${linePath} L ${last.x.toFixed(2)} ${(
-    height - padding
-  ).toFixed(2)} L ${first.x.toFixed(2)} ${(height - padding).toFixed(2)} Z`;
-
-  return { width, height, linePath, areaPath };
-}
-
 function buildAllocation(
   rows: Array<{ label: string; value: number }>,
   totalValue: number,
@@ -164,27 +121,16 @@ function buildAllocation(
 }
 
 async function getDashboardData() {
-  const [holdings, snapshots] = await Promise.all([
-    prisma.holding.findMany({
-      where: { ownerId: DEMO_OWNER_ID },
-      include: {
-        snapshots: {
-          orderBy: { capturedAt: "desc" },
-          take: 8,
-        },
+  const holdings = await prisma.holding.findMany({
+    where: { ownerId: DEMO_OWNER_ID },
+    include: {
+      snapshots: {
+        orderBy: { capturedAt: "desc" },
+        take: 8,
       },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.priceSnapshot.findMany({
-      where: { ownerId: DEMO_OWNER_ID },
-      orderBy: { capturedAt: "asc" },
-      include: {
-        holding: {
-          select: { quantity: true },
-        },
-      },
-    }),
-  ]);
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
   const valued = await valuePortfolioHoldings(holdings);
 
@@ -233,18 +179,6 @@ async function getDashboardData() {
     enriched.map((h) => ({ label: h.grade || "RAW", value: h.value })),
     summary.totalValue,
   );
-  const seriesMap = new Map<string, number>();
-  for (const s of snapshots) {
-    const day = s.capturedAt.toISOString().slice(0, 10);
-    const qty = s.holding?.quantity ?? 1;
-    seriesMap.set(day, (seriesMap.get(day) ?? 0) + s.value * qty);
-  }
-  const portfolioSeries = Array.from(seriesMap.entries()).map(
-    ([day, value]) => ({
-      day,
-      value,
-    }),
-  );
 
   return {
     holdingsCount: enriched.length,
@@ -255,7 +189,6 @@ async function getDashboardData() {
     topMovers,
     allocationBySet,
     allocationByGrade,
-    portfolioSeries,
   };
 }
 
@@ -319,15 +252,10 @@ export default async function DashboardPage() {
             </section>
 
             <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-              <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
-                Portfolio allocation by set / grade
-              </p>
-              <div className="mt-4">
-                <DashboardAllocationTabs
-                  bySet={data.allocationBySet}
-                  byGrade={data.allocationByGrade}
-                />
-              </div>
+              <DashboardAllocationTabs
+                bySet={data.allocationBySet}
+                byGrade={data.allocationByGrade}
+              />
             </section>
 
             <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -335,17 +263,17 @@ export default async function DashboardPage() {
                 <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
                   Recent price changes
                 </p>
-                <ul className="mt-4 divide-y divide-border-subtle/70">
+                <ul className="mt-5 divide-y divide-border-subtle/70">
                   {data.recentPriceChanges.map((h) => (
                     <li
                       key={h.id}
-                      className="flex items-start justify-between gap-2 py-2"
+                      className="flex items-start justify-between gap-3 py-3"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-text-main">
                           {h.cardName}
                         </p>
-                        <div className="mt-1 flex items-center gap-1.5 overflow-hidden text-xs">
+                        <div className="mt-2 flex items-center gap-2 overflow-hidden text-xs">
                           <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
                             {h.setName}
                           </span>
@@ -355,7 +283,7 @@ export default async function DashboardPage() {
                         </div>
                       </div>
                       <p
-                        className={`text-xs font-semibold ${
+                        className={`text-sm font-semibold ${
                           h.changeAmount >= 0
                             ? "text-accent"
                             : "text-red-600"
@@ -373,17 +301,17 @@ export default async function DashboardPage() {
                 <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
                   Top movers
                 </p>
-                <ul className="mt-4 divide-y divide-border-subtle/70">
+                <ul className="mt-5 divide-y divide-border-subtle/70">
                   {data.topMovers.map((h) => (
                     <li
                       key={h.id}
-                      className="flex items-start justify-between gap-2 py-2"
+                      className="flex items-start justify-between gap-3 py-3"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-text-main">
                           {h.cardName}
                         </p>
-                        <div className="mt-1 flex items-center gap-1.5 overflow-hidden text-xs">
+                        <div className="mt-2 flex items-center gap-2 overflow-hidden text-xs">
                           <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
                             {h.setName}
                           </span>
@@ -393,7 +321,7 @@ export default async function DashboardPage() {
                         </div>
                       </div>
                       <p
-                        className={`text-xs font-semibold ${
+                        className={`text-sm font-semibold ${
                           h.changePct >= 0 ? "text-accent" : "text-red-600"
                         }`}
                       >
@@ -404,79 +332,6 @@ export default async function DashboardPage() {
                   ))}
                 </ul>
               </article>
-            </section>
-
-            <section className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-              <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
-                Mini chart of portfolio value over time
-              </p>
-              {data.portfolioSeries.length === 0 ? (
-                <p className="mt-3 text-xs text-text-muted">
-                  No historical data yet.
-                </p>
-              ) : (
-                <div className="mt-3 space-y-2">
-                  {(() => {
-                    const values = data.portfolioSeries.map((x) => x.value);
-                    const { width, height, linePath, areaPath } =
-                      buildMiniChart(values);
-                    const first = data.portfolioSeries[0];
-                    const last =
-                      data.portfolioSeries[data.portfolioSeries.length - 1];
-                    return (
-                      <>
-                        <div className="h-40 w-full rounded-lg border border-border-subtle bg-surface-soft/50 p-2">
-                          <svg
-                            viewBox={`0 0 ${width} ${height}`}
-                            className="h-full w-full"
-                            role="img"
-                            aria-label="Portfolio value trend chart"
-                          >
-                            <defs>
-                              <linearGradient
-                                id="portfolio-area"
-                                x1="0"
-                                y1="0"
-                                x2="0"
-                                y2="1"
-                              >
-                                <stop
-                                  offset="0%"
-                                  stopColor="var(--accent)"
-                                  stopOpacity="0.35"
-                                />
-                                <stop
-                                  offset="100%"
-                                  stopColor="var(--accent)"
-                                  stopOpacity="0.04"
-                                />
-                              </linearGradient>
-                            </defs>
-                            <path d={areaPath} fill="url(#portfolio-area)" />
-                            <path
-                              d={linePath}
-                              fill="none"
-                              stroke="var(--accent)"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </div>
-                        <div className="flex items-center justify-between text-[11px] text-text-muted">
-                          <span>
-                            {formatDayLabel(first.day)} ·{" "}
-                            {formatGBP(first.value)}
-                          </span>
-                          <span>
-                            {formatDayLabel(last.day)} · {formatGBP(last.value)}
-                          </span>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
-              )}
             </section>
         </>
       )}
