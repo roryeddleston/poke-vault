@@ -42,7 +42,7 @@ export function DashboardAllocationTabs({
           <div
             role="tablist"
             aria-label="Allocation dimension"
-            className="flex h-9 w-full max-w-[11rem] items-center rounded-full border-2 border-toggle-border bg-card p-0 transition-colors duration-300 hover:border-toggle-border-hover"
+            className="flex h-9 w-full max-w-44 items-center rounded-full border-2 border-toggle-border bg-card p-0 transition-colors duration-300 hover:border-toggle-border-hover"
           >
             <TabButton
               id="set"
