@@ -68,7 +68,7 @@ export function DashboardAllocationTabs({
             return (
               <li
                 key={row.label}
-                className="space-y-4 rounded-xl border border-border-subtle bg-surface px-4 py-4"
+                className="space-y-4 rounded-xl border border-accent/25 bg-surface px-4 py-4"
               >
                 <div className="flex items-center justify-between gap-3">
                   <p className="truncate text-sm leading-7 font-medium text-text-main">
