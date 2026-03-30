@@ -22,7 +22,7 @@ export function HoldingsTableDesktop({
     >
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1040px] text-base">
-          <thead className="sticky top-0 border-b border-emerald-600/40 bg-surface-soft/95 backdrop-blur text-left">
+          <thead className="sticky top-0 border-b border-emerald-600/40 bg-surface-soft/40 backdrop-blur text-left">
             <tr className="text-text-muted">
               <th
                 scope="col"
