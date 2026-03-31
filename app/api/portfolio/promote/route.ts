@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { DEMO_OWNER_ID, TEMPLATE_OWNER_ID } from "@/lib/constants";
@@ -7,8 +8,7 @@ type HoldingKeyInput = {
   grade: string | null;
 };
 
-const holdingKey = (h: HoldingKeyInput) =>
-  `${h.cardId}::${h.grade ?? ""}`;
+const holdingKey = (h: HoldingKeyInput) => `${h.cardId}::${h.grade ?? ""}`;
 
 // Applied so ~6/7 holdings show value > invested (one slot is 1 = no gain).
 const GAIN_MULTIPLIERS = [1.07, 1.12, 1.18, 1.24, 1.56, 2.32, 1] as const;
@@ -22,7 +22,7 @@ const GAIN_MULTIPLIERS = [1.07, 1.12, 1.18, 1.24, 1.56, 2.32, 1] as const;
  */
 export async function POST() {
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const demoHoldings = await tx.holding.findMany({
         where: { ownerId: DEMO_OWNER_ID },
         orderBy: { createdAt: "asc" },
@@ -55,18 +55,13 @@ export async function POST() {
 
           return {
             ...base,
-            // These optional fields exist in the DB schema; TS may lag behind
-            // in some environments, so we guard them at runtime only.
             ...(Object.prototype.hasOwnProperty.call(h, "imageUrl") && {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               imageUrl: (h as any).imageUrl,
             }),
             ...(Object.prototype.hasOwnProperty.call(h, "cardNumber") && {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               cardNumber: (h as any).cardNumber,
             }),
             ...(Object.prototype.hasOwnProperty.call(h, "setTotal") && {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               setTotal: (h as any).setTotal,
             }),
           };
@@ -112,20 +107,22 @@ export async function POST() {
         }),
       });
 
-      // Add a new "current" snapshot per holding so latest value shows profit for most
       const now = new Date();
+
       const demoGainSnapshots = demoHoldings.map((h, i) => ({
         ownerId: DEMO_OWNER_ID,
         holdingId: h.id,
         value: h.purchasePrice * GAIN_MULTIPLIERS[i % GAIN_MULTIPLIERS.length],
         capturedAt: now,
       }));
+
       const templateGainSnapshots = templateHoldings.map((h, i) => ({
         ownerId: TEMPLATE_OWNER_ID,
         holdingId: h.id,
         value: h.purchasePrice * GAIN_MULTIPLIERS[i % GAIN_MULTIPLIERS.length],
         capturedAt: now,
       }));
+
       await tx.priceSnapshot.createMany({
         data: [...demoGainSnapshots, ...templateGainSnapshots],
       });
@@ -140,4 +137,3 @@ export async function POST() {
     );
   }
 }
-
