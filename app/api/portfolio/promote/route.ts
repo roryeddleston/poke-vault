@@ -14,6 +14,10 @@ type TxClient = TransactionCallback extends (
 ) => unknown
   ? T
   : never;
+type DemoHolding = Awaited<ReturnType<TxClient["holding"]["findMany"]>>[number];
+type DemoSnapshot = Awaited<
+  ReturnType<TxClient["priceSnapshot"]["findMany"]>
+>[number];
 
 const holdingKey = (h: HoldingKeyInput) => `${h.cardId}::${h.grade ?? ""}`;
 
@@ -49,7 +53,7 @@ export async function POST() {
 
       // Create template holdings based on current demo holdings.
       await tx.holding.createMany({
-        data: demoHoldings.map((h) => {
+        data: demoHoldings.map((h: DemoHolding) => {
           return {
             ownerId: TEMPLATE_OWNER_ID,
             cardId: h.cardId,
@@ -71,12 +75,12 @@ export async function POST() {
       });
 
       const demoKeyById = new Map<string, string>();
-      for (const h of demoHoldings) {
+      for (const h of demoHoldings as DemoHolding[]) {
         demoKeyById.set(h.id, holdingKey(h));
       }
 
       const templateIdByKey = new Map<string, string>();
-      for (const h of templateHoldings) {
+      for (const h of templateHoldings as DemoHolding[]) {
         templateIdByKey.set(holdingKey(h), h.id);
       }
 
@@ -86,7 +90,7 @@ export async function POST() {
       });
 
       await tx.priceSnapshot.createMany({
-        data: demoSnapshots.flatMap((s) => {
+        data: demoSnapshots.flatMap((s: DemoSnapshot) => {
           const key = demoKeyById.get(s.holdingId);
           if (!key) return [];
 
@@ -106,14 +110,14 @@ export async function POST() {
 
       const now = new Date();
 
-      const demoGainSnapshots = demoHoldings.map((h, i) => ({
+      const demoGainSnapshots = demoHoldings.map((h: DemoHolding, i: number) => ({
         ownerId: DEMO_OWNER_ID,
         holdingId: h.id,
         value: h.purchasePrice * GAIN_MULTIPLIERS[i % GAIN_MULTIPLIERS.length],
         capturedAt: now,
       }));
 
-      const templateGainSnapshots = templateHoldings.map((h, i) => ({
+      const templateGainSnapshots = templateHoldings.map((h: DemoHolding, i: number) => ({
         ownerId: TEMPLATE_OWNER_ID,
         holdingId: h.id,
         value: h.purchasePrice * GAIN_MULTIPLIERS[i % GAIN_MULTIPLIERS.length],
