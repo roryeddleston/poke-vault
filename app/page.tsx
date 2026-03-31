@@ -19,6 +19,8 @@ import {
 import { formatGBP, formatPct } from "./portfolio/utils";
 import { DashboardAllocationTabs } from "./_components/dashboard-allocation-tabs";
 
+export const dynamic = "force-dynamic";
+
 type AllocationRow = {
   label: string;
   value: number;
