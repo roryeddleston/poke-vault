@@ -43,27 +43,17 @@ export async function POST() {
       // Create template holdings based on current demo holdings.
       await tx.holding.createMany({
         data: demoHoldings.map((h) => {
-          const base = {
+          return {
             ownerId: TEMPLATE_OWNER_ID,
             cardId: h.cardId,
             cardName: h.cardName,
             setName: h.setName,
+            imageUrl: h.imageUrl,
+            cardNumber: h.cardNumber,
+            setTotal: h.setTotal,
             grade: h.grade,
             purchasePrice: h.purchasePrice,
             quantity: h.quantity,
-          };
-
-          return {
-            ...base,
-            ...(Object.prototype.hasOwnProperty.call(h, "imageUrl") && {
-              imageUrl: (h as any).imageUrl,
-            }),
-            ...(Object.prototype.hasOwnProperty.call(h, "cardNumber") && {
-              cardNumber: (h as any).cardNumber,
-            }),
-            ...(Object.prototype.hasOwnProperty.call(h, "setTotal") && {
-              setTotal: (h as any).setTotal,
-            }),
           };
         }),
       });
