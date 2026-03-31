@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
-import type { Holding } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { DEMO_OWNER_ID, TEMPLATE_OWNER_ID } from "@/lib/constants";
 
-const holdingKey = (h: Pick<Holding, "cardId" | "grade">) =>
+type HoldingKeyInput = {
+  cardId: string;
+  grade: string | null;
+};
+
+const holdingKey = (h: HoldingKeyInput) =>
   `${h.cardId}::${h.grade ?? ""}`;
 
 // Applied so ~6/7 holdings show value > invested (one slot is 1 = no gain).
