@@ -1,4 +1,25 @@
-import { FiBarChart2, FiDatabase, FiSearch, FiSettings } from "react-icons/fi";
+import {
+  FiBarChart2,
+  FiCheckSquare,
+  FiCode,
+  FiDatabase,
+  FiGrid,
+  FiLayers,
+  FiRefreshCw,
+  FiSearch,
+  FiShare2,
+  FiSettings,
+} from "react-icons/fi";
+import {
+  SiEslint,
+  SiNextdotjs,
+  SiPrisma,
+  SiPostgresql,
+  SiReact,
+  SiSqlite,
+  SiTailwindcss,
+  SiTypescript,
+} from "react-icons/si";
 import { PageIntro } from "@/components/PageIntro";
 import { PageShell } from "@/components/PageShell";
 import { SurfaceCard } from "@/components/SurfaceCard";
@@ -33,7 +54,7 @@ export default function AnalyticsPage() {
   return (
     <PageShell>
       <PageIntro
-        title="How PokeVault works"
+        title="How it works"
         subtitle="A clear overview of what this project does, how users should use it, and the technology stack behind it."
       />
 
@@ -55,40 +76,87 @@ export default function AnalyticsPage() {
         </div>
       </SurfaceCard>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-text-main">User flow</h2>
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-          {PROCESS_STEPS.map((step) => (
-            <ProcessStepCard
-              key={step.step}
-              step={step.step}
-              title={step.title}
-              description={step.description}
-              icon={step.icon}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-3">
+      <section className="space-y-4">
         <h2 className="text-lg font-semibold text-text-main">Tech stack</h2>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <p className="text-sm text-text-muted">
+          A modular Next.js app with shared UI primitives and typed value logic,
+          powered by the TCGdex API and Prisma.
+        </p>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
           <TechStackGroup
             title="Frontend"
-            items={["Next.js (App Router)", "React", "TypeScript", "Tailwind CSS"]}
+            icon={<FiGrid className="h-4 w-4" aria-hidden="true" />}
+            items={[
+              { label: "Next.js (App Router)", icon: <SiNextdotjs className="h-4 w-4" /> },
+              { label: "React", icon: <SiReact className="h-4 w-4" /> },
+              { label: "TypeScript", icon: <SiTypescript className="h-4 w-4" /> },
+              { label: "Tailwind CSS", icon: <SiTailwindcss className="h-4 w-4" /> },
+            ]}
           />
           <TechStackGroup
             title="Backend and data"
-            items={["Next.js API Routes", "Prisma ORM", "PostgreSQL/SQLite", "TCGdex API"]}
+            icon={<FiDatabase className="h-4 w-4" aria-hidden="true" />}
+            items={[
+              { label: "Next.js API Routes", icon: <SiNextdotjs className="h-4 w-4" /> },
+              { label: "Prisma ORM", icon: <SiPrisma className="h-4 w-4" /> },
+              {
+                label: "PostgreSQL/SQLite",
+                icon: (
+                  <span className="inline-flex items-center gap-1">
+                    <SiPostgresql className="h-4 w-4" />
+                    <SiSqlite className="h-4 w-4" />
+                  </span>
+                ),
+              },
+              { label: "TCGdex API", icon: <FiDatabase className="h-4 w-4" /> },
+            ]}
           />
           <TechStackGroup
             title="Architecture"
-            items={["Reusable page primitives", "Typed DTO mapping", "Shared valuation logic", "Composable UI components"]}
+            icon={<FiLayers className="h-4 w-4" aria-hidden="true" />}
+            items={[
+              { label: "Reusable page primitives", icon: <FiLayers className="h-4 w-4" /> },
+              { label: "Typed DTO mapping", icon: <FiCode className="h-4 w-4" /> },
+              { label: "Shared valuation logic", icon: <FiShare2 className="h-4 w-4" /> },
+              { label: "Composable UI components", icon: <FiLayers className="h-4 w-4" /> },
+            ]}
           />
           <TechStackGroup
             title="Developer workflow"
-            items={["ESLint", "Modular component structure", "Progressive refactoring", "Accessible UI patterns"]}
+            icon={<FiRefreshCw className="h-4 w-4" aria-hidden="true" />}
+            items={[
+              { label: "ESLint", icon: <SiEslint className="h-4 w-4" /> },
+              { label: "Modular component structure", icon: <FiGrid className="h-4 w-4" /> },
+              { label: "Progressive refactoring", icon: <FiRefreshCw className="h-4 w-4" /> },
+              { label: "Accessible UI patterns", icon: <FiCheckSquare className="h-4 w-4" /> },
+            ]}
           />
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold text-text-main">User flow</h2>
+          </div>
+        </div>
+
+        <div className="relative">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 right-0 top-8 hidden h-px bg-accent/20 lg:block"
+          />
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-4">
+            {PROCESS_STEPS.map((step) => (
+              <ProcessStepCard
+                key={step.step}
+                step={step.step}
+                title={step.title}
+                description={step.description}
+                icon={step.icon}
+              />
+            ))}
+          </div>
         </div>
       </section>
     </PageShell>

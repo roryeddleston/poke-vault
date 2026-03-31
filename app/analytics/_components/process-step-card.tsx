@@ -17,17 +17,28 @@ export function ProcessStepCard({
   icon,
 }: ProcessStepCardProps) {
   return (
-    <SurfaceCard as="article" className="p-5">
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <span className="inline-flex rounded-full border border-border-subtle bg-surface px-2.5 py-1 text-xs font-medium text-text-muted">
-          {step}
-        </span>
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border-subtle bg-surface text-accent">
-          {icon}
-        </span>
+    <SurfaceCard as="article" className="relative overflow-hidden p-5 transition-colors hover:border-accent/30">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-12 -top-12 h-28 w-28 rounded-full bg-accent-muted/20 blur-2xl"
+      />
+
+      <div className="relative">
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-muted/20 px-3 py-1 text-xs font-semibold text-accent">
+            {step}
+          </span>
+
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/25 bg-accent-muted/30 text-accent shadow-sm">
+            {icon}
+          </span>
+        </div>
+
+        <h3 className="text-base font-semibold text-text-main">{title}</h3>
+        <p className="mt-2 text-sm leading-6 text-text-muted">{description}</p>
+
+        <div aria-hidden="true" className="mt-5 h-px w-full bg-accent/20" />
       </div>
-      <h3 className="text-base font-semibold text-text-main">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-text-muted">{description}</p>
     </SurfaceCard>
   );
 }
