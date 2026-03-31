@@ -6,6 +6,7 @@ import { QuickPresetTabs } from "./quick-preset-tabs";
 import { PortfolioSearchInput } from "./portfolio-search-input";
 import { FiltersDropdown } from "./filters-dropdown";
 import { FilterChipsRow } from "./filter-chips-row";
+import { FiDownload, FiSliders } from "react-icons/fi";
 
 type PortfolioFilterBarProps = {
   view: {
@@ -14,6 +15,7 @@ type PortfolioFilterBarProps = {
     quickPreset: QuickPreset;
     availableGrades: string[];
     availableSets: string[];
+    canExport: boolean;
   };
   actions: {
     onSearchChange: (value: string) => void;
@@ -35,6 +37,7 @@ export function PortfolioFilterBar({
     quickPreset,
     availableGrades,
     availableSets,
+    canExport,
   } = view;
 
   const {
@@ -70,7 +73,7 @@ export function PortfolioFilterBar({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <PortfolioSearchInput value={search} onChange={onSearchChange} />
 
-        <div className="relative flex items-center gap-2 self-end sm:self-auto">
+        <div className="relative flex w-full items-center justify-end gap-2 self-end sm:w-auto sm:self-auto">
           <div ref={dropdownRef}>
             <button
               type="button"
@@ -78,8 +81,13 @@ export function PortfolioFilterBar({
               aria-expanded={filtersOpen}
               aria-haspopup="listbox"
               aria-label="Open filters menu"
-              className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:border-accent-soft hover:bg-surface-soft"
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors ${
+                filtersOpen
+                  ? "border-accent/60 bg-accent-muted/20 text-text-main"
+                  : "border-border-subtle bg-surface text-text-main hover:border-accent-soft hover:bg-surface-soft"
+              }`}
             >
+              <FiSliders className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
               Filters
             </button>
             {filtersOpen && (
@@ -93,11 +101,13 @@ export function PortfolioFilterBar({
           </div>
           <button
             type="button"
-            aria-label="Export portfolio"
+            aria-label="Export CSV"
             onClick={onExport}
-            className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-xs font-medium text-text-main shadow-sm transition-colors hover:border-accent-soft hover:bg-surface-soft"
+            disabled={!canExport}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-accent/25 bg-accent-muted/20 px-3 py-1.5 text-xs font-medium text-accent shadow-sm transition-colors hover:border-accent/40 hover:bg-accent-muted/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-accent/25 disabled:hover:bg-accent-muted/20"
           >
-            Export
+            <FiDownload className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+            Export CSV
           </button>
         </div>
       </div>

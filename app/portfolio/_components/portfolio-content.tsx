@@ -24,9 +24,9 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
     filters,
     quickPreset,
     page,
+    filteredHoldings,
     availableGrades,
     availableSets,
-    filteredHoldings,
     paginatedHoldings,
     onSearchChange,
     onRemoveFilter,
@@ -85,6 +85,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
           quickPreset,
           availableGrades,
           availableSets,
+          canExport: filteredHoldings.length > 0,
         }}
         actions={{
           onSearchChange,
