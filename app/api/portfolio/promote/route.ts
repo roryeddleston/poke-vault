@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { DEMO_OWNER_ID, TEMPLATE_OWNER_ID } from "@/lib/constants";
@@ -7,6 +6,14 @@ type HoldingKeyInput = {
   cardId: string;
   grade: string | null;
 };
+
+type TransactionCallback = Parameters<typeof prisma.$transaction>[0];
+type TxClient = TransactionCallback extends (
+  tx: infer T,
+  ...rest: unknown[]
+) => unknown
+  ? T
+  : never;
 
 const holdingKey = (h: HoldingKeyInput) => `${h.cardId}::${h.grade ?? ""}`;
 
@@ -22,7 +29,7 @@ const GAIN_MULTIPLIERS = [1.07, 1.12, 1.18, 1.24, 1.56, 2.32, 1] as const;
  */
 export async function POST() {
   try {
-    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    await prisma.$transaction(async (tx: TxClient) => {
       const demoHoldings = await tx.holding.findMany({
         where: { ownerId: DEMO_OWNER_ID },
         orderBy: { createdAt: "asc" },
