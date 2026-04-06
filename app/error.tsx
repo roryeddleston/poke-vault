@@ -11,7 +11,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
       <div className="mx-auto w-full max-w-3xl">
         <section className="card-elevated px-6 py-10 text-center">
           <p className="text-sm font-semibold text-text-main">
-            Failed to load dashboard
+            Failed to load this page
           </p>
           <p className="mt-2 text-sm text-text-muted">
             {error.message || "An unexpected error occurred while loading data."}

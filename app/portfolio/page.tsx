@@ -1,24 +1,11 @@
-import { headers } from "next/headers";
-import type { PortfolioResponse } from "./types";
 import { PortfolioContent } from "./_components/portfolio-content";
 import { PageShell } from "@/components/PageShell";
+import { getPortfolioResponse } from "@/lib/get-portfolio-response";
 
-async function getPortfolio(): Promise<PortfolioResponse> {
-  const h = await headers();
-  const host = h.get("host");
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-
-  const res = await fetch(`${protocol}://${host}/api/portfolio`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) throw new Error("Failed to load portfolio");
-
-  return res.json();
-}
+export const dynamic = "force-dynamic";
 
 export default async function PortfolioPage() {
-  const data = await getPortfolio();
+  const data = await getPortfolioResponse();
 
   return (
     <PageShell>
