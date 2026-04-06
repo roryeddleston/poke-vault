@@ -59,6 +59,14 @@ type DashboardHolding = {
   profitPct: number;
 };
 
+type DashboardEnrichedHolding = DashboardHolding & {
+  id: string;
+  value: number;
+  changeAmount: number;
+  changePct: number;
+  snapshots: Array<{ value: number; capturedAt: Date }>;
+};
+
 type KpiCardProps = {
   label: string;
   value: string;
@@ -183,14 +191,22 @@ async function getDashboardData() {
 
   const valued = await valuePortfolioHoldings(holdings);
 
-  const enriched = valued.map((h) => {
-    const previous = h.snapshots[1];
-    const prevValue = previous ? previous.value * h.quantity : h.invested;
+  const enriched: DashboardEnrichedHolding[] = valued.map((h, index) => {
+    const source = holdings[index];
+    const previous = source.snapshots[1];
+    const prevValue = previous ? previous.value * source.quantity : h.invested;
     const value = h.currentValue;
     const changeAmount = value - prevValue;
     const changePct = prevValue === 0 ? 0 : (changeAmount / prevValue) * 100;
     return {
-      ...h,
+      id: source.id,
+      cardName: source.cardName,
+      setName: source.setName,
+      grade: source.grade,
+      imageUrl: source.imageUrl,
+      snapshots: source.snapshots,
+      profit: h.profit,
+      profitPct: h.profitPct,
       value,
       changeAmount,
       changePct,
@@ -212,8 +228,8 @@ async function getDashboardData() {
     .filter((h) => h.snapshots[0])
     .sort(
       (a, b) =>
-        b.snapshots[0].capturedAt.getTime() -
-        a.snapshots[0].capturedAt.getTime(),
+        (b.snapshots[0]?.capturedAt.getTime() ?? 0) -
+        (a.snapshots[0]?.capturedAt.getTime() ?? 0),
     )
     .slice(0, 5);
 
