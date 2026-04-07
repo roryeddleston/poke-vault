@@ -7,10 +7,8 @@ import {
   AnalyticsIcon,
   HomeIcon,
   IconProps,
-  PlusIcon,
   PortfolioIcon,
   SearchIcon,
-  UserIcon,
 } from "./icons";
 
 type NavItem = {
@@ -41,12 +39,6 @@ const NAV_ITEMS: NavItem[] = [
     label: "About",
     href: "/analytics",
     icon: (props) => <AnalyticsIcon {...props} />,
-  },
-  {
-    label: "Profile",
-    href: "/profile",
-    icon: (props) => <UserIcon {...props} />,
-    mobileOnly: true,
   },
 ];
 
@@ -144,14 +136,6 @@ export default function Navbar() {
           );
         })}
 
-        {/* Center add button, non-routing, for visual parity with design */}
-        <button
-          type="button"
-          aria-label="Add card"
-          className="absolute -top-5 left-1/2 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/35"
-        >
-          <PlusIcon className="h-6 w-6" aria-hidden="true" />
-        </button>
       </nav>
     </>
   );
