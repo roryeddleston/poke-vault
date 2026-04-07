@@ -76,59 +76,59 @@ export default function AnalyticsPage() {
         </div>
       </SurfaceCard>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-text-main">Tech stack</h2>
-        <p className="text-sm text-text-muted">
-          A modular Next.js app with shared UI primitives and typed value logic,
-          powered by the TCGdex API and Prisma.
-        </p>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <section className="space-y-6 sm:space-y-7">
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold tracking-tight text-text-main sm:text-2xl">
+            Tech stack
+          </h2>
+          <p className="max-w-3xl text-base leading-relaxed text-text-muted">
+            A modular Next.js app with shared UI primitives and typed value logic,
+            powered by the TCGdex API and Prisma.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-6 md:gap-7 md:grid-cols-2 xl:grid-cols-4">
           <TechStackGroup
             title="Frontend"
-            icon={<FiGrid className="h-4 w-4" aria-hidden="true" />}
             items={[
-              { label: "Next.js (App Router)", icon: <SiNextdotjs className="h-4 w-4" /> },
-              { label: "React", icon: <SiReact className="h-4 w-4" /> },
-              { label: "TypeScript", icon: <SiTypescript className="h-4 w-4" /> },
-              { label: "Tailwind CSS", icon: <SiTailwindcss className="h-4 w-4" /> },
+              { label: "Next.js (App Router)", icon: <SiNextdotjs className="h-5 w-5" /> },
+              { label: "React", icon: <SiReact className="h-5 w-5" /> },
+              { label: "TypeScript", icon: <SiTypescript className="h-5 w-5" /> },
+              { label: "Tailwind CSS", icon: <SiTailwindcss className="h-5 w-5" /> },
             ]}
           />
           <TechStackGroup
             title="Backend and data"
-            icon={<FiDatabase className="h-4 w-4" aria-hidden="true" />}
             items={[
-              { label: "Next.js API Routes", icon: <SiNextdotjs className="h-4 w-4" /> },
-              { label: "Prisma ORM", icon: <SiPrisma className="h-4 w-4" /> },
+              { label: "Next.js API Routes", icon: <SiNextdotjs className="h-5 w-5" /> },
+              { label: "Prisma ORM", icon: <SiPrisma className="h-5 w-5" /> },
               {
                 label: "PostgreSQL/SQLite",
                 icon: (
-                  <span className="inline-flex items-center gap-1">
-                    <SiPostgresql className="h-4 w-4" />
-                    <SiSqlite className="h-4 w-4" />
+                  <span className="inline-flex items-center gap-1.5">
+                    <SiPostgresql className="h-5 w-5" />
+                    <SiSqlite className="h-5 w-5" />
                   </span>
                 ),
               },
-              { label: "TCGdex API", icon: <FiDatabase className="h-4 w-4" /> },
+              { label: "TCGdex API", icon: <FiDatabase className="h-5 w-5" /> },
             ]}
           />
           <TechStackGroup
             title="Architecture"
-            icon={<FiLayers className="h-4 w-4" aria-hidden="true" />}
             items={[
-              { label: "Reusable page primitives", icon: <FiLayers className="h-4 w-4" /> },
-              { label: "Typed DTO mapping", icon: <FiCode className="h-4 w-4" /> },
-              { label: "Shared valuation logic", icon: <FiShare2 className="h-4 w-4" /> },
-              { label: "Composable UI components", icon: <FiLayers className="h-4 w-4" /> },
+              { label: "Reusable page primitives", icon: <FiLayers className="h-5 w-5" /> },
+              { label: "Typed DTO mapping", icon: <FiCode className="h-5 w-5" /> },
+              { label: "Shared valuation logic", icon: <FiShare2 className="h-5 w-5" /> },
+              { label: "Composable UI components", icon: <FiLayers className="h-5 w-5" /> },
             ]}
           />
           <TechStackGroup
             title="Developer workflow"
-            icon={<FiRefreshCw className="h-4 w-4" aria-hidden="true" />}
             items={[
-              { label: "ESLint", icon: <SiEslint className="h-4 w-4" /> },
-              { label: "Modular component structure", icon: <FiGrid className="h-4 w-4" /> },
-              { label: "Progressive refactoring", icon: <FiRefreshCw className="h-4 w-4" /> },
-              { label: "Accessible UI patterns", icon: <FiCheckSquare className="h-4 w-4" /> },
+              { label: "ESLint", icon: <SiEslint className="h-5 w-5" /> },
+              { label: "Modular component structure", icon: <FiGrid className="h-5 w-5" /> },
+              { label: "Progressive refactoring", icon: <FiRefreshCw className="h-5 w-5" /> },
+              { label: "Accessible UI patterns", icon: <FiCheckSquare className="h-5 w-5" /> },
             ]}
           />
         </div>
@@ -137,7 +137,9 @@ export default function AnalyticsPage() {
       <section className="space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold text-text-main">User flow</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-text-main sm:text-2xl">
+              User flow
+            </h2>
           </div>
         </div>
 
