@@ -30,9 +30,9 @@ type AllocationRow = {
 type PerformerVariant = "best" | "worst";
 
 const PERFORMER_LABEL_STYLES: Record<PerformerVariant, string> = {
-  best: "rounded-full bg-emerald-100/80 text-emerald-600 dark:bg-emerald-200/80 dark:text-emerald-600",
+  best: "rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
   worst:
-    "rounded-full bg-rose-100/80 text-rose-600 dark:bg-rose-200/80 dark:text-rose-600",
+    "rounded-full bg-rose-50 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
 };
 
 const PERFORMER_LABEL_TEXT: Record<PerformerVariant, string> = {
@@ -77,9 +77,9 @@ type KpiCardProps = {
 function KpiCard({ label, value, tone = "neutral", icon }: KpiCardProps) {
   const valueTone =
     tone === "positive"
-      ? "text-accent"
+      ? "text-text-positive"
       : tone === "negative"
-        ? "text-red-600"
+        ? "text-danger"
         : "text-text-main";
 
   return (
@@ -111,7 +111,7 @@ function PerformerCard({
     <SurfaceCard as="article" className="min-h-56 p-6">
       <div className="flex items-center justify-between gap-3">
         <PerformerLabel variant={variant} />
-        <span className="text-lg font-semibold text-slate-400 dark:text-slate-500">
+        <span className="text-lg font-semibold text-text-muted">
           Last 30 days
         </span>
       </div>
@@ -137,13 +137,13 @@ function PerformerCard({
             </div>
             <p className="text-base font-semibold text-text-main">
               <span
-                className={holding.profit >= 0 ? "text-accent" : "text-red-600"}
+                className={holding.profit >= 0 ? "text-text-positive" : "text-danger"}
               >
                 {formatGBP(holding.profit)}
               </span>{" "}
               <span
                 className={
-                  holding.profitPct >= 0 ? "text-accent" : "text-red-600"
+                  holding.profitPct >= 0 ? "text-text-positive" : "text-danger"
                 }
               >
                 ({holding.profitPct >= 0 ? "+" : ""}
@@ -349,7 +349,7 @@ export default async function DashboardPage() {
                     </div>
                     <p
                       className={`text-sm font-semibold ${
-                        h.changeAmount >= 0 ? "text-accent" : "text-red-600"
+                        h.changeAmount >= 0 ? "text-text-positive" : "text-danger"
                       }`}
                     >
                       {h.changeAmount >= 0 ? "+" : ""}
@@ -393,7 +393,7 @@ export default async function DashboardPage() {
                     </div>
                     <p
                       className={`text-sm font-semibold ${
-                        h.changePct >= 0 ? "text-accent" : "text-red-600"
+                        h.changePct >= 0 ? "text-text-positive" : "text-danger"
                       }`}
                     >
                       {h.changePct >= 0 ? "+" : ""}

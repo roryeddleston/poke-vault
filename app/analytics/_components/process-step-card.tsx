@@ -25,7 +25,7 @@ export function ProcessStepCard({
 
       <div className="relative">
         <div className="mb-4 flex items-start justify-between gap-3">
-          <span className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-muted/20 px-3 py-1 text-xs font-semibold text-accent">
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-muted/20 px-3 py-1 text-xs font-semibold text-text-positive">
             {step}
           </span>
 

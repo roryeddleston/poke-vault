@@ -59,13 +59,13 @@ export default function Navbar() {
       >
         <div className="flex items-center gap-3 px-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-muted ring-1 ring-accent/20">
-            <span className="text-lg font-semibold text-accent">PV</span>
+            <span className="text-lg font-semibold text-text-positive dark:text-white">PV</span>
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-text-main">
               PokeVault
             </span>
-            <span className="text-[11px] tracking-[0.08em] text-text-muted/90">
+            <span className="text-[11px] tracking-[0.08em] text-text-muted">
               Pokémon investing
             </span>
           </div>
@@ -80,7 +80,7 @@ export default function Navbar() {
                   href={item.href}
                   className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all ${
                     active
-                      ? "bg-accent-muted/80 text-accent shadow-sm ring-1 ring-accent/15"
+                      ? "bg-accent-muted/80 text-text-positive dark:text-white shadow-sm ring-1 ring-accent/15"
                       : "text-text-muted hover:bg-surface-soft/80 hover:text-text-main"
                   }`}
                 >
@@ -127,7 +127,7 @@ export default function Navbar() {
               />
               <span
                 className={`text-[11px] ${
-                  active ? "text-accent" : "text-text-muted"
+                  active ? "text-text-positive" : "text-text-muted"
                 }`}
               >
                 {item.label}

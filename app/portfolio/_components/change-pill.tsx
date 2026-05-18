@@ -24,7 +24,7 @@ export function ChangePill({
   const isPositive = value > 0;
   const isNegative = value < 0;
   const color = isPositive
-    ? "text-accent"
+    ? "text-text-positive"
     : isNegative
       ? "text-danger"
       : "text-text-muted";

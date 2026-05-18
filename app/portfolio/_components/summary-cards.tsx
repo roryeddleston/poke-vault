@@ -33,12 +33,12 @@ export function SummaryCards({ summary, totalCards }: SummaryCardsProps) {
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">
           Overall gain / loss
         </p>
-        <p className={`mt-3 text-3xl font-semibold tracking-tight ${profitPositive ? "text-accent" : "text-danger"}`}>
+        <p className={`mt-3 text-3xl font-semibold tracking-tight ${profitPositive ? "text-text-positive" : "text-danger"}`}>
           {showData ? formatGBP(summary.totalProfit) : "—"}
         </p>
         <p
           className={`mt-1 text-sm font-semibold ${
-            profitPositive ? "text-accent" : "text-danger"
+            profitPositive ? "text-text-positive" : "text-danger"
           }`}
         >
           {showData ? `${profitPositive ? "+" : ""}${formatPct(summary.profitPercentage)}%` : "—"}

@@ -104,7 +104,7 @@ export function PortfolioFilterBar({
             aria-label="Export CSV"
             onClick={onExport}
             disabled={!canExport}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-accent/25 bg-accent-muted/20 px-3 py-1.5 text-xs font-medium text-accent shadow-sm transition-colors hover:border-accent/40 hover:bg-accent-muted/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-accent/25 disabled:hover:bg-accent-muted/20"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-accent/25 bg-accent-muted/20 px-3 py-1.5 text-xs font-medium text-text-positive shadow-sm transition-colors hover:border-accent/40 hover:bg-accent-muted/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-accent/25 disabled:hover:bg-accent-muted/20"
           >
             <FiDownload className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             Export CSV

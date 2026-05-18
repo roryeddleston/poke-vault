@@ -10,9 +10,10 @@
   --accent: #34c9a6;
   --accent-soft: #45d6b4;
   --accent-muted: #d8f7ef;
-  --danger: #ef4444;
+  --danger: #b91c1c;
   --text-main: #0f172a;
-  --text-muted: #657286;
+  --text-muted: #5c6a7b;
+  --text-positive: #0e7460;
   --toggle-border: #d3dee5;
   --toggle-border-hover: #c2ccd3;
   --shadow-elevation-1: 0 8px 20px rgba(15, 23, 42, 0.05);
@@ -34,6 +35,7 @@
   --danger: #f97373;
   --text-main: #e5e7eb;
   --text-muted: #9ca3af;
+  --text-positive: #34c9a6;
   --toggle-border: #8a96a4;
   --toggle-border-hover: #b2bcc8;
   --shadow-elevation-1: 0 8px 20px rgba(2, 6, 23, 0.45);
@@ -54,6 +56,7 @@
     --danger: #f97373;
     --text-main: #e5e7eb;
     --text-muted: #9ca3af;
+    --text-positive: #34c9a6;
     --toggle-border: #8a96a4;
     --toggle-border-hover: #b2bcc8;
     --shadow-elevation-1: 0 8px 20px rgba(2, 6, 23, 0.45);
@@ -75,6 +78,7 @@
   --color-danger: var(--danger);
   --color-text-main: var(--text-main);
   --color-text-muted: var(--text-muted);
+  --color-text-positive: var(--text-positive);
   --color-toggle-border: var(--toggle-border);
   --color-toggle-border-hover: var(--toggle-border-hover);
 

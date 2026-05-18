@@ -47,7 +47,7 @@ export default async function MarketPage(props: MarketPageProps) {
           <p className="text-xs font-medium tracking-[0.08em] text-text-muted uppercase">
             Use the search bar above
           </p>
-          <div className="flex items-center gap-1 text-accent">
+          <div className="flex items-center gap-1 text-accent" aria-hidden="true">
             <span className="text-lg leading-none">↑</span>
             <span className="text-xl leading-none">↑</span>
             <span className="text-lg leading-none">↑</span>
@@ -204,8 +204,8 @@ export default async function MarketPage(props: MarketPageProps) {
               </p>
             </article>
 
-            <article className="rounded-xl border border-accent/25 bg-accent-muted/45 px-4 py-4">
-              <p className="text-xs font-semibold tracking-[0.08em] text-accent uppercase">
+            <article className="rounded-xl border border-accent/25 bg-accent-muted/45 dark:bg-accent-muted/20 px-4 py-4">
+              <p className="text-xs font-semibold tracking-[0.08em] text-text-positive uppercase">
                 3. Add to portfolio
               </p>
               <p className="mt-2 text-sm text-text-main">

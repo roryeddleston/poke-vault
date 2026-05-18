@@ -52,7 +52,7 @@ function QuickPresetButton({
       onClick={onClick}
       className={`shrink-0 cursor-pointer rounded-t-md border-b-2 px-1 pb-2 text-sm font-semibold leading-5 transition-colors ${
         active
-          ? "border-accent text-accent"
+          ? "border-accent text-text-positive"
           : "border-transparent text-text-muted hover:border-border-subtle hover:text-text-main"
       }`}
     >

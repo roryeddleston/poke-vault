@@ -344,7 +344,7 @@ export function AddFromMarketDialog({
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex cursor-pointer items-center justify-center rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex cursor-pointer items-center justify-center rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-gray-900 shadow-sm transition-colors hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-70"
             >
               {submitting ? "Adding…" : "Add card"}
             </button>
