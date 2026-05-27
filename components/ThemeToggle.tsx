@@ -1,37 +1,45 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { FiMoon, FiSun } from "react-icons/fi";
 
 type Theme = "light" | "dark";
 
 const STORAGE_KEY = "pv-theme";
 
-function getInitialTheme(): Theme {
-  const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
+function readTheme(): Theme {
+  const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
   if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia?.("(prefers-color-scheme: dark)").matches
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
 }
 
+function subscribeToTheme(callback: () => void) {
+  window.addEventListener("storage", callback);
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener("change", callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    mq.removeEventListener("change", callback);
+  };
+}
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("light");
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    readTheme,
+    () => "light" as Theme,
+  );
 
   useEffect(() => {
-    const initial = getInitialTheme();
-    setTheme(initial);
-    applyTheme(initial);
-  }, []);
-
-  useEffect(() => {
-    applyTheme(theme);
+    document.documentElement.dataset.theme = theme;
   }, [theme]);
 
   const toggle = () => {
     const next: Theme = theme === "light" ? "dark" : "light";
-    window.localStorage.setItem(STORAGE_KEY, next);
-    setTheme(next);
+    localStorage.setItem(STORAGE_KEY, next);
+    window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
   };
 
   const isDark = theme === "dark";
@@ -59,9 +67,4 @@ export function ThemeToggle() {
       </span>
     </button>
   );
-}
-
-function applyTheme(theme: Theme) {
-  if (typeof document === "undefined") return;
-  document.documentElement.dataset.theme = theme;
 }
