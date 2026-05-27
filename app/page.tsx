@@ -14,6 +14,7 @@ import {
   FiBarChart2,
   FiDollarSign,
   FiPocket,
+  FiTrendingDown,
   FiTrendingUp,
 } from "react-icons/fi";
 import { formatGBP, formatPct } from "./portfolio/utils";
@@ -29,24 +30,31 @@ type AllocationRow = {
 
 type PerformerVariant = "best" | "worst";
 
-const PERFORMER_LABEL_STYLES: Record<PerformerVariant, string> = {
-  best: "rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-  worst:
-    "rounded-full bg-rose-50 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
-};
-
-const PERFORMER_LABEL_TEXT: Record<PerformerVariant, string> = {
-  best: "Best performer",
-  worst: "Worst performer",
+const PERFORMER_CONFIG: Record<
+  PerformerVariant,
+  { label: string; icon: ReactNode; className: string }
+> = {
+  best: {
+    label: "Best performer",
+    icon: <FiTrendingUp size={11} />,
+    className: "border border-teal-500 text-teal-600 dark:border-teal-500 dark:text-teal-400",
+  },
+  worst: {
+    label: "Worst performer",
+    icon: <FiTrendingDown size={11} />,
+    className: "border border-rose-400 text-rose-600 dark:border-rose-400 dark:text-rose-400",
+  },
 };
 
 function PerformerLabel({ variant }: { variant: PerformerVariant }) {
+  const { label, icon, className } = PERFORMER_CONFIG[variant];
   return (
-    <p
-      className={`inline-flex px-3 py-1 text-xs font-semibold uppercase tracking-[0.04em] ${PERFORMER_LABEL_STYLES[variant]}`}
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${className}`}
     >
-      {PERFORMER_LABEL_TEXT[variant]}
-    </p>
+      {icon}
+      {label}
+    </span>
   );
 }
 
