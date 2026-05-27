@@ -1,31 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiMoon, FiSun } from "react-icons/fi";
 
 type Theme = "light" | "dark";
 
 const STORAGE_KEY = "pv-theme";
 
-export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") return "light";
-    const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
-    if (stored === "light" || stored === "dark") return stored;
-    const prefersDark = window.matchMedia?.(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-    return prefersDark ? "dark" : "light";
-  });
+function getInitialTheme(): Theme {
+  const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
+  if (stored === "light" || stored === "dark") return stored;
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
 
-  // Keep DOM in sync with state (no state updates here).
-  if (typeof document !== "undefined") {
+export function ThemeToggle() {
+  const [theme, setTheme] = useState<Theme>("light");
+
+  useEffect(() => {
+    const initial = getInitialTheme();
+    setTheme(initial);
+    applyTheme(initial);
+  }, []);
+
+  useEffect(() => {
     applyTheme(theme);
-  }
+  }, [theme]);
 
   const toggle = () => {
     const next: Theme = theme === "light" ? "dark" : "light";
-    applyTheme(next);
     window.localStorage.setItem(STORAGE_KEY, next);
     setTheme(next);
   };
