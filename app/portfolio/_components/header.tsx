@@ -36,7 +36,7 @@ export function PortfolioHeader({
           <button
             type="button"
             onClick={onAddCard}
-            className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-accent-soft"
+            className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft"
           >
             <span className="text-base leading-none" aria-hidden="true">
               +

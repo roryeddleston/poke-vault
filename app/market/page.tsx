@@ -142,7 +142,7 @@ export default async function MarketPage(props: MarketPageProps) {
                     <span
                       key={n}
                       aria-current="page"
-                      className="min-w-8 rounded-full bg-accent px-2.5 py-1.5 text-center text-xs font-medium text-slate-950"
+                      className="min-w-8 rounded-full bg-accent px-2.5 py-1.5 text-center text-xs font-medium text-white"
                     >
                       {n}
                     </span>
