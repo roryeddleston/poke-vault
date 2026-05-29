@@ -43,6 +43,37 @@ function getTcgDex(): TCGdex {
   return tcgdexClient;
 }
 
+const TCGDEX_TIMEOUT_MS = 3_000;
+const TCGDEX_COOLDOWN_MS = 30_000;
+let circuitOpenUntil = 0;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`TCGdex request timed out after ${ms}ms`)),
+      ms,
+    );
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (error) => { clearTimeout(timer); reject(error); },
+    );
+  });
+}
+
+async function tcgdexFetch<T>(fn: () => Promise<T>): Promise<T | null> {
+  if (Date.now() < circuitOpenUntil) return null;
+  try {
+    return await withTimeout(fn(), TCGDEX_TIMEOUT_MS);
+  } catch (error) {
+    circuitOpenUntil = Date.now() + TCGDEX_COOLDOWN_MS;
+    console.warn(
+      "[TCGdex] request failed, pausing for 30s:",
+      error instanceof Error ? error.message : error,
+    );
+    return null;
+  }
+}
+
 function parseCardNumberFromId(id: string): number | undefined {
   // Typical ids look like "base1-4", "swsh3-25", etc.
   const match = id.match(/-(\d+)$/);
@@ -250,7 +281,7 @@ export async function searchPokemonCards(
 
     const resumeArrays = await Promise.all(
       queries.map(async (qry) => {
-        const rows = await tcgdex.card.list(qry);
+        const rows = await tcgdexFetch(() => tcgdex.card.list(qry));
         return Array.isArray(rows) ? (rows as TcgDexCardResume[]) : [];
       }),
     );
@@ -282,21 +313,11 @@ export async function searchPokemonCards(
     const resumes = merged;
 
     const fullCards = await Promise.all(
-      resumes.map(async (resume) => {
-        try {
-          if (typeof resume.getCard === "function") {
-            return (await resume.getCard()) as TcgDexCardFull;
-          }
-          // Fallback: fetch full card by id if getCard is not available.
-          return (await tcgdex.card.get(resume.id)) as TcgDexCardFull;
-        } catch (err) {
-          console.error(
-            "[TCGdex] Failed to load full card for",
-            resume.id,
-            err,
-          );
-          return null;
-        }
+      resumes.map((resume) => {
+        const fn = typeof resume.getCard === "function"
+          ? () => resume.getCard!() as Promise<TcgDexCardFull>
+          : () => tcgdex.card.get(resume.id) as Promise<TcgDexCardFull>;
+        return tcgdexFetch(fn);
       }),
     );
 
@@ -428,15 +449,8 @@ export async function searchPokemonCardsAll(
   const seen = new Set<string>();
 
   for (let page = 1; page <= maxPages; page++) {
-    let pageResults: PokemonCardSummary[];
-    try {
-      pageResults = await withTimeout(
-        searchPokemonCards(query, page, perPage),
-        TCGDEX_TIMEOUT_MS,
-      );
-    } catch {
-      break;
-    }
+    const pageResults = await tcgdexFetch(() => searchPokemonCards(query, page, perPage));
+    if (!pageResults) break;
     const newOnThisPage = pageResults.filter((c) => !seen.has(c.id));
     for (const card of newOnThisPage) {
       seen.add(card.id);
@@ -454,14 +468,10 @@ export async function searchPokemonCardsAll(
 export async function getPokemonCardVariants(
   cardId: string,
 ): Promise<PokemonCardSummary["variants"] | null> {
-  try {
-    const tcgdex = getTcgDex();
-    const card = (await tcgdex.card.get(cardId)) as TcgDexCardFull | null;
-    return card?.variants ?? null;
-  } catch (error) {
-    console.error("[TCGdex] getPokemonCardVariants failed:", error);
-    return null;
-  }
+  const card = await tcgdexFetch(
+    () => getTcgDex().card.get(cardId) as Promise<TcgDexCardFull>,
+  );
+  return card?.variants ?? null;
 }
 
 export type MarketValueRequest = {
@@ -522,69 +532,46 @@ export async function getPokemonCardPricingComparables(
   return out;
 }
 
-const TCGDEX_TIMEOUT_MS = 3_000;
-const TCGDEX_COOLDOWN_MS = 30_000;
-
-let circuitOpenUntil = 0;
-
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(`TCGdex request timed out after ${ms}ms`)), ms),
-    ),
-  ]);
-}
-
 async function getPokemonCardPricingComparable(
   request: MarketValueRequest,
 ): Promise<PokemonCardPricingComparables | null> {
-  if (Date.now() < circuitOpenUntil) return null;
+  const card = await tcgdexFetch(
+    () => getTcgDex().card.get(request.cardId) as Promise<TcgDexCardFull>,
+  );
+  if (!card) return null;
 
-  try {
-    const tcgdex = getTcgDex();
-    const card = (await withTimeout(
-      tcgdex.card.get(request.cardId) as Promise<TcgDexCardFull>,
-      TCGDEX_TIMEOUT_MS,
-    )) as TcgDexCardFull;
+  const cardmarketTrend = extractCardmarketMetric(
+    card.pricing?.cardmarket,
+    request.finish,
+    request.edition,
+    "trend",
+  );
+  const cardmarketAvg30 = extractCardmarketMetric(
+    card.pricing?.cardmarket,
+    request.finish,
+    request.edition,
+    "avg30",
+  );
 
-    const cardmarketTrend = extractCardmarketMetric(
-      card.pricing?.cardmarket,
+  const current =
+    cardmarketTrend ??
+    cardmarketAvg30 ??
+    extractTcgplayerValue(
+      card.pricing?.tcgplayer,
       request.finish,
       request.edition,
-      "trend",
-    );
-    const cardmarketAvg30 = extractCardmarketMetric(
-      card.pricing?.cardmarket,
-      request.finish,
-      request.edition,
-      "avg30",
     );
 
-    const current =
-      cardmarketTrend ??
-      cardmarketAvg30 ??
-      extractTcgplayerValue(
-        card.pricing?.tcgplayer,
-        request.finish,
-        request.edition,
-      );
+  const baseline30 = cardmarketAvg30;
 
-    const baseline30 = cardmarketAvg30;
+  const change30Pct =
+    current?.source === "cardmarket" &&
+    baseline30?.source === "cardmarket" &&
+    baseline30.value > 0
+      ? ((current.value - baseline30.value) / baseline30.value) * 100
+      : null;
 
-    const change30Pct =
-      current?.source === "cardmarket" &&
-      baseline30?.source === "cardmarket" &&
-      baseline30.value > 0
-        ? ((current.value - baseline30.value) / baseline30.value) * 100
-        : null;
-
-    return { current, baseline30, change30Pct };
-  } catch (error) {
-    circuitOpenUntil = Date.now() + TCGDEX_COOLDOWN_MS;
-    console.warn("[TCGdex] pricing unavailable, pausing for 30s:", error instanceof Error ? error.message : error);
-    return null;
-  }
+  return { current, baseline30, change30Pct };
 }
 
 function extractCardmarketMetric(
