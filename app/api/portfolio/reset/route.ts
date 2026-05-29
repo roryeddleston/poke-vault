@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-import type { Holding } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { DEMO_OWNER_ID, TEMPLATE_OWNER_ID } from "@/lib/constants";
-
-const holdingKey = (h: Pick<Holding, "cardId" | "grade">) =>
-  `${h.cardId}::${h.grade ?? ""}`;
+import { holdingKey } from "../_holding-key";
 
 /**
  * POST /api/portfolio/reset

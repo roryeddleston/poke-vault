@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { DEMO_OWNER_ID, TEMPLATE_OWNER_ID } from "@/lib/constants";
-
-type HoldingKeyInput = {
-  cardId: string;
-  grade: string | null;
-};
+import { holdingKey } from "../_holding-key";
 
 type TransactionCallback = Parameters<typeof prisma.$transaction>[0];
 type TxClient = TransactionCallback extends (
@@ -18,8 +14,6 @@ type DemoHolding = Awaited<ReturnType<TxClient["holding"]["findMany"]>>[number];
 type DemoSnapshot = Awaited<
   ReturnType<TxClient["priceSnapshot"]["findMany"]>
 >[number];
-
-const holdingKey = (h: HoldingKeyInput) => `${h.cardId}::${h.grade ?? ""}`;
 
 // Applied so ~6/7 holdings show value > invested (one slot is 1 = no gain).
 const GAIN_MULTIPLIERS = [1.07, 1.12, 1.18, 1.24, 1.56, 2.32, 1] as const;
