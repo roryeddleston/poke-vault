@@ -428,7 +428,15 @@ export async function searchPokemonCardsAll(
   const seen = new Set<string>();
 
   for (let page = 1; page <= maxPages; page++) {
-    const pageResults = await searchPokemonCards(query, page, perPage);
+    let pageResults: PokemonCardSummary[];
+    try {
+      pageResults = await withTimeout(
+        searchPokemonCards(query, page, perPage),
+        TCGDEX_TIMEOUT_MS,
+      );
+    } catch {
+      break;
+    }
     const newOnThisPage = pageResults.filter((c) => !seen.has(c.id));
     for (const card of newOnThisPage) {
       seen.add(card.id);
@@ -514,12 +522,31 @@ export async function getPokemonCardPricingComparables(
   return out;
 }
 
+const TCGDEX_TIMEOUT_MS = 3_000;
+const TCGDEX_COOLDOWN_MS = 30_000;
+
+let circuitOpenUntil = 0;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`TCGdex request timed out after ${ms}ms`)), ms),
+    ),
+  ]);
+}
+
 async function getPokemonCardPricingComparable(
   request: MarketValueRequest,
 ): Promise<PokemonCardPricingComparables | null> {
+  if (Date.now() < circuitOpenUntil) return null;
+
   try {
     const tcgdex = getTcgDex();
-    const card = (await tcgdex.card.get(request.cardId)) as TcgDexCardFull;
+    const card = (await withTimeout(
+      tcgdex.card.get(request.cardId) as Promise<TcgDexCardFull>,
+      TCGDEX_TIMEOUT_MS,
+    )) as TcgDexCardFull;
 
     const cardmarketTrend = extractCardmarketMetric(
       card.pricing?.cardmarket,
@@ -554,7 +581,8 @@ async function getPokemonCardPricingComparable(
 
     return { current, baseline30, change30Pct };
   } catch (error) {
-    console.error("[TCGdex] getPokemonCardPricingComparable failed:", error);
+    circuitOpenUntil = Date.now() + TCGDEX_COOLDOWN_MS;
+    console.warn("[TCGdex] pricing unavailable, pausing for 30s:", error instanceof Error ? error.message : error);
     return null;
   }
 }
