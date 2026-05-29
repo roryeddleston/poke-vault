@@ -15,8 +15,8 @@ let cached: FxRates | null = null;
 async function fetchGbpRates(): Promise<FxRates> {
   // Frankfurter uses ECB reference rates (no API key).
   const res = await fetch(
-    "https://api.frankfurter.app/latest?from=GBP&to=EUR,USD,GBP",
-    { next: { revalidate: 60 * 60 } }, // cache for 1h at the fetch layer
+    "https://api.frankfurter.dev/v1/latest?from=GBP&to=EUR,USD",
+    { next: { revalidate: 60 * 60 }, signal: AbortSignal.timeout(5_000) },
   );
   if (!res.ok) {
     throw new Error(`FX fetch failed: ${res.status}`);
