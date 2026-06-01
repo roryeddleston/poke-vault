@@ -1,24 +1,23 @@
 import { DEMO_OWNER_ID } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import type { ReactNode } from "react";
 import {
   summarizeValuedHoldings,
   valuePortfolioHoldings,
 } from "@/lib/portfolio-valuation";
-import { CardImage } from "@/components/CardImage";
 import { PageIntro } from "@/components/PageIntro";
 import { PageShell } from "@/components/PageShell";
-import { SurfaceCard } from "@/components/SurfaceCard";
 import {
   FiActivity,
   FiBarChart2,
   FiDollarSign,
   FiPocket,
-  FiTrendingDown,
   FiTrendingUp,
 } from "react-icons/fi";
 import { formatGBP, formatPct } from "./portfolio/utils";
 import { DashboardAllocationTabs } from "./_components/dashboard-allocation-tabs";
+import { KpiCard } from "./_components/kpi-card";
+import { PerformerCard } from "./_components/performer-card";
+import { HoldingActivityList, type ActivityItem } from "./_components/holding-activity-list";
 
 export const dynamic = "force-dynamic";
 
@@ -28,144 +27,19 @@ type AllocationRow = {
   pct: number;
 };
 
-type PerformerVariant = "best" | "worst";
-
-const PERFORMER_CONFIG: Record<
-  PerformerVariant,
-  { label: string; icon: ReactNode; className: string }
-> = {
-  best: {
-    label: "Best performer",
-    icon: <FiTrendingUp size={11} />,
-    className: "border border-teal-500 text-teal-600 dark:border-teal-500 dark:text-teal-400",
-  },
-  worst: {
-    label: "Worst performer",
-    icon: <FiTrendingDown size={11} />,
-    className: "border border-rose-400 text-rose-600 dark:border-rose-400 dark:text-rose-400",
-  },
-};
-
-function PerformerLabel({ variant }: { variant: PerformerVariant }) {
-  const { label, icon, className } = PERFORMER_CONFIG[variant];
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${className}`}
-    >
-      {icon}
-      {label}
-    </span>
-  );
-}
-
-type DashboardHolding = {
+type EnrichedHolding = {
+  id: string;
   cardName: string;
   setName: string;
   grade: string;
   imageUrl?: string | null;
   profit: number;
   profitPct: number;
-};
-
-type DashboardEnrichedHolding = DashboardHolding & {
-  id: string;
-  value: number;
+  currentValue: number;
   changeAmount: number;
   changePct: number;
-  snapshots: Array<{ value: number; capturedAt: Date }>;
+  latestSnapshotAt: Date | null;
 };
-
-type KpiCardProps = {
-  label: string;
-  value: string;
-  tone?: "neutral" | "positive" | "negative";
-  icon: ReactNode;
-};
-
-function KpiCard({ label, value, tone = "neutral", icon }: KpiCardProps) {
-  const valueTone =
-    tone === "positive"
-      ? "text-text-positive"
-      : tone === "negative"
-        ? "text-danger"
-        : "text-text-main";
-
-  return (
-    <SurfaceCard as="article" className="relative overflow-hidden p-5">
-      <div className="absolute inset-x-0 top-0 h-1 bg-accent/70" />
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-medium uppercase tracking-[0.08em] text-text-muted">
-          {label}
-        </p>
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border-subtle bg-surface text-accent">
-          {icon}
-        </span>
-      </div>
-      <p className={`mt-3 text-2xl font-semibold tracking-tight ${valueTone}`}>
-        {value}
-      </p>
-    </SurfaceCard>
-  );
-}
-
-function PerformerCard({
-  variant,
-  holding,
-}: {
-  variant: PerformerVariant;
-  holding?: DashboardHolding;
-}) {
-  return (
-    <SurfaceCard as="article" className="min-h-56 p-6">
-      <div className="flex items-center justify-between gap-3">
-        <PerformerLabel variant={variant} />
-        <span className="text-lg font-semibold text-text-muted">
-          Last 30 days
-        </span>
-      </div>
-      {holding ? (
-        <div className="mt-4 flex items-start gap-4">
-          <CardImage
-            src={holding.imageUrl}
-            alt={holding.cardName}
-            className="h-28 w-20 shrink-0 ring-1 ring-border-subtle"
-            sizes="80px"
-          />
-          <div className="min-w-0 space-y-3.5">
-            <p className="truncate text-lg font-semibold text-text-main">
-              {holding.cardName}
-            </p>
-            <div className="flex flex-wrap items-center gap-2 text-sm">
-              <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 font-medium text-text-main">
-                {holding.setName}
-              </span>
-              <span className="inline-flex rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-text-muted">
-                {holding.grade}
-              </span>
-            </div>
-            <p className="text-base font-semibold text-text-main">
-              <span
-                className={holding.profit >= 0 ? "text-text-positive" : "text-danger"}
-              >
-                {formatGBP(holding.profit)}
-              </span>{" "}
-              <span
-                className={
-                  holding.profitPct >= 0 ? "text-text-positive" : "text-danger"
-                }
-              >
-                ({holding.profitPct >= 0 ? "+" : ""}
-                {formatPct(holding.profitPct)}%)
-              </span>
-            </p>
-          </div>
-        </div>
-      ) : (
-        <p className="mt-2 text-xs text-text-muted">No data.</p>
-      )}
-    </SurfaceCard>
-  );
-}
 
 function buildAllocation(
   rows: Array<{ label: string; value: number }>,
@@ -185,6 +59,25 @@ function buildAllocation(
     .slice(0, 8);
 }
 
+function toActivityItem(
+  h: EnrichedHolding,
+  mode: "change" | "movers",
+): ActivityItem {
+  const isPositive = mode === "change" ? h.changeAmount >= 0 : h.changePct >= 0;
+  const displayValue =
+    mode === "change"
+      ? `${h.changeAmount >= 0 ? "+" : ""}${formatGBP(h.changeAmount)}`
+      : `${h.changePct >= 0 ? "+" : ""}${formatPct(h.changePct)}%`;
+  return {
+    id: h.id,
+    cardName: h.cardName,
+    setName: h.setName,
+    grade: h.grade,
+    displayValue,
+    positive: isPositive,
+  };
+}
+
 async function getDashboardData() {
   const holdings = await prisma.holding.findMany({
     where: { ownerId: DEMO_OWNER_ID },
@@ -199,67 +92,53 @@ async function getDashboardData() {
 
   const valued = await valuePortfolioHoldings(holdings);
 
-  const enriched: DashboardEnrichedHolding[] = valued.map((h, index) => {
-    const source = holdings[index];
-    const previous = source.snapshots[1];
-    const prevValue = previous ? previous.value * source.quantity : h.invested;
-    const value = h.currentValue;
-    const changeAmount = value - prevValue;
+  const enriched: EnrichedHolding[] = valued.map((h) => {
+    const previous = h.snapshots[1];
+    const prevValue = previous ? previous.value * h.quantity : h.invested;
+    const changeAmount = h.currentValue - prevValue;
     const changePct = prevValue === 0 ? 0 : (changeAmount / prevValue) * 100;
     return {
-      id: source.id,
-      cardName: source.cardName,
-      setName: source.setName,
-      grade: source.grade,
-      imageUrl: source.imageUrl,
-      snapshots: source.snapshots,
+      id: h.id,
+      cardName: h.cardName,
+      setName: h.setName,
+      grade: h.grade,
+      imageUrl: h.imageUrl,
       profit: h.profit,
       profitPct: h.profitPct,
-      value,
+      currentValue: h.currentValue,
       changeAmount,
       changePct,
+      latestSnapshotAt: h.snapshots[0]?.capturedAt ?? null,
     };
   });
 
   const summary = summarizeValuedHoldings(valued);
 
-  const bestPerformer = [...enriched].sort(
-    (a, b) => b.profitPct - a.profitPct,
-  )[0];
-  const worstPerformer = [...enriched].sort(
-    (a, b) => a.profitPct - b.profitPct,
-  )[0];
+  const byProfitPct = [...enriched].sort((a, b) => b.profitPct - a.profitPct);
   const topMovers = [...enriched]
     .sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct))
     .slice(0, 5);
-  const recentPriceChanges = [...enriched]
-    .filter((h) => h.snapshots[0])
-    .sort(
-      (a, b) =>
-        (b.snapshots[0]?.capturedAt.getTime() ?? 0) -
-        (a.snapshots[0]?.capturedAt.getTime() ?? 0),
-    )
+  const recentPriceChanges = enriched
+    .filter((h) => h.latestSnapshotAt !== null)
+    .sort((a, b) => (b.latestSnapshotAt?.getTime() ?? 0) - (a.latestSnapshotAt?.getTime() ?? 0))
     .slice(0, 5);
 
   const allocationBySet = buildAllocation(
-    enriched.map((h) => ({
-      label: h.setName || "Unknown set",
-      value: h.value,
-    })),
+    enriched.map((h) => ({ label: h.setName || "Unknown set", value: h.currentValue })),
     summary.totalValue,
   );
   const allocationByGrade = buildAllocation(
-    enriched.map((h) => ({ label: h.grade || "RAW", value: h.value })),
+    enriched.map((h) => ({ label: h.grade || "RAW", value: h.currentValue })),
     summary.totalValue,
   );
 
   return {
     holdingsCount: enriched.length,
     summary,
-    bestPerformer,
-    worstPerformer,
-    recentPriceChanges,
-    topMovers,
+    bestPerformer: byProfitPct[0],
+    worstPerformer: byProfitPct[byProfitPct.length - 1],
+    recentPriceChanges: recentPriceChanges.map((h) => toActivityItem(h, "change")),
+    topMovers: topMovers.map((h) => toActivityItem(h, "movers")),
     allocationBySet,
     allocationByGrade,
   };
@@ -288,13 +167,11 @@ export default async function DashboardPage() {
             <KpiCard
               label="Total portfolio value"
               value={formatGBP(data.summary.totalValue)}
-              tone="neutral"
               icon={<FiPocket size={16} aria-hidden="true" />}
             />
             <KpiCard
               label="Total cost"
               value={formatGBP(data.summary.totalInvested)}
-              tone="neutral"
               icon={<FiDollarSign size={16} aria-hidden="true" />}
             />
             <KpiCard
@@ -324,93 +201,16 @@ export default async function DashboardPage() {
           </section>
 
           <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-              <div className="-mx-5 border-b-2 border-accent/35 px-5 pb-4">
-                <div className="flex items-center gap-2.5">
-                  <FiActivity
-                    className="h-5 w-5 shrink-0 text-accent"
-                    aria-hidden="true"
-                  />
-                  <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
-                    Recent price changes
-                  </p>
-                </div>
-              </div>
-              <ul className="mt-3 divide-y divide-border-subtle/70">
-                {data.recentPriceChanges.map((h) => (
-                  <li
-                    key={h.id}
-                    className="flex items-start justify-between gap-3 py-4 first:pt-2 last:pb-2"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-text-main">
-                        {h.cardName}
-                      </p>
-                      <div className="mt-3 flex items-center gap-2 overflow-hidden text-xs">
-                        <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
-                          {h.setName}
-                        </span>
-                        <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-text-muted">
-                          {h.grade}
-                        </span>
-                      </div>
-                    </div>
-                    <p
-                      className={`text-sm font-semibold ${
-                        h.changeAmount >= 0 ? "text-text-positive" : "text-danger"
-                      }`}
-                    >
-                      {h.changeAmount >= 0 ? "+" : ""}
-                      {formatGBP(h.changeAmount)}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </article>
-
-            <article className="shadow-elevation-1 rounded-2xl border border-border-subtle bg-card p-5">
-              <div className="-mx-5 border-b-2 border-accent/35 px-5 pb-4">
-                <div className="flex items-center gap-2.5">
-                  <FiTrendingUp
-                    className="h-5 w-5 shrink-0 text-accent"
-                    aria-hidden="true"
-                  />
-                  <p className="text-lg font-semibold tracking-tight text-text-main sm:text-xl">
-                    Top movers
-                  </p>
-                </div>
-              </div>
-              <ul className="mt-3 divide-y divide-border-subtle/70">
-                {data.topMovers.map((h) => (
-                  <li
-                    key={h.id}
-                    className="flex items-start justify-between gap-3 py-4 first:pt-2 last:pb-2"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-text-main">
-                        {h.cardName}
-                      </p>
-                      <div className="mt-3 flex items-center gap-2 overflow-hidden text-xs">
-                        <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 font-medium text-text-main">
-                          {h.setName}
-                        </span>
-                        <span className="truncate rounded-full border border-border-subtle bg-surface px-2 py-0.5 text-text-muted">
-                          {h.grade}
-                        </span>
-                      </div>
-                    </div>
-                    <p
-                      className={`text-sm font-semibold ${
-                        h.changePct >= 0 ? "text-text-positive" : "text-danger"
-                      }`}
-                    >
-                      {h.changePct >= 0 ? "+" : ""}
-                      {formatPct(h.changePct)}%
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </article>
+            <HoldingActivityList
+              title="Recent price changes"
+              icon={<FiActivity className="h-5 w-5 shrink-0 text-accent" aria-hidden="true" />}
+              items={data.recentPriceChanges}
+            />
+            <HoldingActivityList
+              title="Top movers"
+              icon={<FiTrendingUp className="h-5 w-5 shrink-0 text-accent" aria-hidden="true" />}
+              items={data.topMovers}
+            />
           </section>
         </>
       )}
