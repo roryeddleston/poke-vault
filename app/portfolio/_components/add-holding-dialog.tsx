@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Dialog } from "@/components/Dialog";
 import { FiChevronDown } from "react-icons/fi";
@@ -18,93 +18,76 @@ type AddHoldingDialogProps = {
   onClose: () => void;
 };
 
+type AddHoldingFields = {
+  cardId: string;
+  cardName: string;
+  setName: string;
+  grade: string;
+  finish: HoldingFinish;
+  edition: HoldingEdition;
+  purchasePrice: string;
+  quantity: string;
+};
+
+const DEFAULTS: AddHoldingFields = {
+  cardId: "",
+  cardName: "",
+  setName: "",
+  grade: "",
+  finish: "NORMAL",
+  edition: "UNLIMITED",
+  purchasePrice: "",
+  quantity: "1",
+};
+
 export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
   const router = useRouter();
-  const [cardId, setCardId] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [setName, setSetName] = useState("");
-  const [grade, setGrade] = useState("");
-  const [finish, setFinish] = useState<HoldingFinish>("NORMAL");
-  const [edition, setEdition] = useState<HoldingEdition>("UNLIMITED");
-  const [purchasePrice, setPurchasePrice] = useState("");
-  const [quantity, setQuantity] = useState("1");
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<AddHoldingFields>({ defaultValues: DEFAULTS });
 
   if (!open) return null;
 
-  const resetStateAndClose = () => {
-    setCardId("");
-    setCardName("");
-    setSetName("");
-    setGrade("");
-    setFinish("NORMAL");
-    setEdition("UNLIMITED");
-    setPurchasePrice("");
-    setQuantity("1");
-    setError(null);
+  const handleClose = () => {
+    reset(DEFAULTS);
     onClose();
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (submitting) return;
+  const onSubmit = async (fields: AddHoldingFields) => {
+    const res = await fetch("/api/holdings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cardId: fields.cardId.trim(),
+        cardName: fields.cardName.trim(),
+        setName: fields.setName.trim(),
+        grade: fields.grade.trim(),
+        finish: fields.finish,
+        edition: fields.edition,
+        purchasePrice: Number(fields.purchasePrice),
+        quantity: Number(fields.quantity),
+      }),
+    });
 
-    setError(null);
-
-    const priceNumber = Number(purchasePrice);
-    const qtyNumber = Number(quantity);
-
-    if (!Number.isFinite(priceNumber) || priceNumber < 0) {
-      setError("Enter a valid purchase price.");
+    if (!res.ok) {
+      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+      setError("root", { message: data?.error ?? "Failed to add card." });
       return;
     }
 
-    if (!Number.isInteger(qtyNumber) || qtyNumber <= 0) {
-      setError("Quantity must be a positive integer.");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/holdings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cardId: cardId.trim(),
-          cardName: cardName.trim(),
-          setName: setName.trim(),
-          grade: grade.trim(),
-          finish,
-          edition,
-          purchasePrice: priceNumber,
-          quantity: qtyNumber,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as {
-          error?: string;
-        } | null;
-        setError(data?.error ?? "Failed to add card.");
-        setSubmitting(false);
-        return;
-      }
-
-      router.refresh();
-      resetStateAndClose();
-    } catch (err) {
-      console.error("AddHoldingDialog submit failed:", err);
-      setError("Something went wrong. Please try again.");
-      setSubmitting(false);
-    }
+    router.refresh();
+    handleClose();
   };
 
   return (
     <Dialog
       open={open}
       dismissible={true}
-      onClose={resetStateAndClose}
+      onClose={handleClose}
       labelledBy="add-holding-title"
       panelClassName="w-full max-w-md rounded-2xl border border-border-subtle bg-card p-5 shadow-2xl"
     >
@@ -114,7 +97,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
         </h2>
         <button
           type="button"
-          onClick={resetStateAndClose}
+          onClick={handleClose}
           className="cursor-pointer px-2 py-0.5 text-3xl leading-none text-text-muted transition-colors hover:text-text-main"
           aria-label="Close"
         >
@@ -122,71 +105,49 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
         </button>
       </div>
 
-      <form className="space-y-3 text-sm" onSubmit={handleSubmit}>
+      <form className="space-y-3 text-sm" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-1">
-          <label className="block text-xs font-medium text-text-muted">
-            Card ID
-          </label>
+          <label className="block text-xs font-medium text-text-muted">Card ID</label>
           <input
-            required
-            value={cardId}
-            onChange={(e) => setCardId(e.target.value)}
+            {...register("cardId", { required: true })}
             className="form-field w-full"
             placeholder="e.g. base1-4"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="block text-xs font-medium text-text-muted">
-            Card name
-          </label>
+          <label className="block text-xs font-medium text-text-muted">Card name</label>
           <input
-            required
-            value={cardName}
-            onChange={(e) => setCardName(e.target.value)}
+            {...register("cardName", { required: true })}
             className="form-field w-full"
             placeholder="Charizard Holo"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="block text-xs font-medium text-text-muted">
-            Set name
-          </label>
+          <label className="block text-xs font-medium text-text-muted">Set name</label>
           <input
-            required
-            value={setName}
-            onChange={(e) => setSetName(e.target.value)}
+            {...register("setName", { required: true })}
             className="form-field w-full"
             placeholder="Base Set"
           />
         </div>
 
-        <div className="flex gap-3">
-          <div className="flex-1 space-y-1">
-            <label className="block text-xs font-medium text-text-muted">
-              Grade
-            </label>
-            <input
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-              className="form-field w-full"
-              placeholder="e.g. PSA 10 (leave blank for RAW)"
-            />
-          </div>
+        <div className="space-y-1">
+          <label className="block text-xs font-medium text-text-muted">Grade</label>
+          <input
+            {...register("grade")}
+            className="form-field w-full"
+            placeholder="e.g. PSA 10 (leave blank for RAW)"
+          />
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="space-y-1">
-            <label className="block text-xs font-medium text-text-muted">
-              Finish
-            </label>
+            <label className="block text-xs font-medium text-text-muted">Finish</label>
             <div className="relative">
               <select
-                value={finish}
-                onChange={(e) =>
-                  setFinish(e.target.value as (typeof HOLDING_FINISHES)[number])
-                }
+                {...register("finish")}
                 className="form-field w-full cursor-pointer appearance-none pr-9"
               >
                 {HOLDING_FINISHES.map((opt) => (
@@ -195,25 +156,17 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
                   </option>
                 ))}
               </select>
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted"
-              >
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted">
                 <FiChevronDown className="h-4 w-4" />
               </span>
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="block text-xs font-medium text-text-muted">
-              Edition
-            </label>
+            <label className="block text-xs font-medium text-text-muted">Edition</label>
             <div className="relative">
               <select
-                value={edition}
-                onChange={(e) =>
-                  setEdition(e.target.value as (typeof HOLDING_EDITIONS)[number])
-                }
+                {...register("edition")}
                 className="form-field w-full cursor-pointer appearance-none pr-9"
               >
                 {HOLDING_EDITIONS.map((opt) => (
@@ -222,10 +175,7 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
                   </option>
                 ))}
               </select>
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted"
-              >
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-muted">
                 <FiChevronDown className="h-4 w-4" />
               </span>
             </div>
@@ -234,53 +184,59 @@ export function AddHoldingDialog({ open, onClose }: AddHoldingDialogProps) {
 
         <div className="flex gap-3">
           <div className="flex-1 space-y-1">
-            <label className="block text-xs font-medium text-text-muted">
-              Purchase price
-            </label>
+            <label className="block text-xs font-medium text-text-muted">Purchase price</label>
             <input
-              required
+              {...register("purchasePrice", {
+                required: true,
+                validate: (v) =>
+                  (Number.isFinite(Number(v)) && Number(v) >= 0) ||
+                  "Enter a valid purchase price.",
+              })}
               inputMode="decimal"
-              value={purchasePrice}
-              onChange={(e) => setPurchasePrice(e.target.value)}
               className="form-field w-full"
               placeholder="0"
             />
           </div>
           <div className="w-24 space-y-1">
-            <label className="block text-xs font-medium text-text-muted">
-              Qty
-            </label>
+            <label className="block text-xs font-medium text-text-muted">Qty</label>
             <input
-              required
+              {...register("quantity", {
+                required: true,
+                validate: (v) =>
+                  (Number.isInteger(Number(v)) && Number(v) > 0) ||
+                  "Quantity must be a positive integer.",
+              })}
               inputMode="numeric"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
               className="form-field w-full"
               placeholder="1"
             />
           </div>
         </div>
 
-        {error ? (
+        {(errors.purchasePrice?.message ||
+          errors.quantity?.message ||
+          errors.root?.message) ? (
           <p className="text-xs text-danger" role="alert">
-            {error}
+            {errors.purchasePrice?.message ??
+              errors.quantity?.message ??
+              errors.root?.message}
           </p>
         ) : null}
 
         <div className="mt-4 flex items-center justify-end gap-2">
           <button
             type="button"
-            onClick={resetStateAndClose}
+            onClick={handleClose}
             className="cursor-pointer rounded-full border border-transparent px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:border-border-subtle hover:bg-surface-soft hover:text-text-main"
           >
             Cancel
           </button>
           <button
             type="submit"
-            disabled={submitting}
+            disabled={isSubmitting}
             className="inline-flex cursor-pointer items-center justify-center rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {submitting ? "Adding…" : "Add card"}
+            {isSubmitting ? "Adding…" : "Add card"}
           </button>
         </div>
       </form>
