@@ -58,7 +58,7 @@ export function Pagination({
             aria-current={n === currentPage ? "page" : undefined}
             className={`min-w-8 rounded-full px-2.5 py-1.5 text-xs font-medium transition-colors ${
               n === currentPage
-                ? "bg-accent text-slate-950"
+                ? "bg-accent text-white"
                 : "border border-border-subtle bg-card text-text-main hover:bg-surface-soft"
             }`}
           >
