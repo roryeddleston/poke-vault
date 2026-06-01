@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useClickOutside } from "@/hooks/use-click-outside";
 import { usePathname, useRouter } from "next/navigation";
 import { SearchIcon } from "./icons";
 import type { PokemonCardSummary } from "@/lib/pokemon-tcg";
@@ -55,15 +56,7 @@ export function SearchBox() {
     };
   }, [query]);
 
-  useEffect(() => {
-    const onMouseDown = (event: MouseEvent) => {
-      if (!containerRef.current) return;
-      if (containerRef.current.contains(event.target as Node)) return;
-      setOpen(false);
-    };
-    document.addEventListener("mousedown", onMouseDown);
-    return () => document.removeEventListener("mousedown", onMouseDown);
-  }, []);
+  useClickOutside(containerRef, () => setOpen(false));
 
   useEffect(() => {
     if (!pathname?.startsWith("/market")) return;

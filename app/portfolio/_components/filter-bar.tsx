@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useClickOutside } from "@/hooks/use-click-outside";
 import type { FilterEntry, QuickPreset } from "../utils";
 import { QuickPresetTabs } from "./quick-preset-tabs";
 import { PortfolioSearchInput } from "./portfolio-search-input";
@@ -52,15 +53,7 @@ export function PortfolioFilterBar({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!filtersOpen) return;
-    const handle = (e: MouseEvent) => {
-      if (dropdownRef.current?.contains(e.target as Node)) return;
-      setFiltersOpen(false);
-    };
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, [filtersOpen]);
+  useClickOutside(dropdownRef, () => setFiltersOpen(false), filtersOpen);
 
   return (
     <section
