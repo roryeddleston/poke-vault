@@ -169,6 +169,49 @@ type TcgDexCardFull = {
   };
 };
 
+function buildCardSearchQueries(q: string, page: number, pageSize: number): Query[] {
+  const queries: Query[] = [];
+
+  const nameAndNumberMatch = q.match(/^(.*?)(\d+)(?:\s*\/\s*(\d+))?$/);
+  const namePart = nameAndNumberMatch?.[1]?.trim() || "";
+  const nameNumberPart = nameAndNumberMatch?.[2];
+
+  const pureNumberMatch = q.match(/^(\d+)(?:\s*\/\s*(\d+))?$/);
+  const pureNumberPart = pureNumberMatch?.[1];
+  const pureTotalPart = pureNumberMatch?.[2];
+  const pureFraction = pureNumberPart && pureTotalPart ? `${pureNumberPart}/${pureTotalPart}` : undefined;
+  const effectiveName = namePart || (!pureNumberPart ? q : "");
+
+  // 1) Exact card ID, e.g. "swsh3-012"
+  if (q.includes("-")) {
+    queries.push(Query.create().equal("id", q).paginate(page, pageSize));
+  }
+
+  // 2) Name + number combo, e.g. "Pikachu 60/64"
+  if (namePart && nameNumberPart) {
+    queries.push(Query.create().contains("name", namePart).equal("localId", nameNumberPart).paginate(page, pageSize));
+    queries.push(Query.create().contains("name", namePart).contains("localId", nameNumberPart).paginate(page, pageSize));
+  }
+
+  // 3) Pure number or fraction, e.g. "60" or "60/64"
+  if (pureNumberPart) {
+    queries.push(Query.create().equal("localId", pureNumberPart).sort("localId", "ASC").paginate(page, pageSize));
+    queries.push(Query.create().contains("localId", pureNumberPart).sort("localId", "ASC").paginate(page, pageSize));
+    queries.push(Query.create().contains("id", `-${pureNumberPart}`).sort("id", "ASC").paginate(page, pageSize));
+    if (pureFraction) {
+      queries.push(Query.create().equal("localId", pureFraction).paginate(page, pageSize));
+      queries.push(Query.create().contains("localId", pureFraction).paginate(page, pageSize));
+    }
+  }
+
+  // 4) Name substring
+  if (effectiveName) {
+    queries.push(Query.create().contains("name", effectiveName).sort("localId", "ASC").paginate(page, pageSize));
+  }
+
+  return queries;
+}
+
 export async function searchPokemonCards(
   query: string,
   page = 1,
@@ -180,104 +223,7 @@ export async function searchPokemonCards(
 
   try {
     const tcgdex = getTcgDex();
-
-    // Build up one or more queries so we can match by:
-    // - exact ID when the user pastes a full code like "swsh3-012"
-    // - combined "Pikachu 60/64" (name + number)
-    // - card number within the set (localId), e.g. "60" or "60/64"
-    // - name (substring)
-    // We will execute all of them, but merge results in the above priority order.
-    const queries: Query[] = [];
-
-    // Try to extract a trailing number or number/total, e.g.:
-    // "Pikachu 60/64" -> namePart: "Pikachu", nameNumberPart: "60", nameTotalPart: "64"
-    const nameAndNumberMatch = q.match(/^(.*?)(\d+)(?:\s*\/\s*(\d+))?$/);
-    const namePart = nameAndNumberMatch?.[1]?.trim() || "";
-    const nameNumberPart = nameAndNumberMatch?.[2];
-
-    // If the query is just a number or "12/72", capture that too.
-    // "60/64" -> pureLocalId: "60/64"
-    const pureNumberMatch = q.match(/^(\d+)(?:\s*\/\s*(\d+))?$/);
-    const pureNumberPart = pureNumberMatch?.[1];
-    const pureTotalPart = pureNumberMatch?.[2];
-    const pureFraction =
-      pureNumberPart && pureTotalPart
-        ? `${pureNumberPart}/${pureTotalPart}`
-        : undefined;
-    const effectiveName = namePart || (!pureNumberPart ? q : "");
-
-    // 1) If the query looks like a full card ID (e.g. "swsh3-012"), try exact id first.
-    if (q.includes("-")) {
-      queries.push(Query.create().equal("id", q).paginate(page, pageSize));
-    }
-
-    // 2) If we have both a name and a trailing number, search for that combo:
-    //    name contains "Pikachu" AND localId == "60".
-    if (namePart && nameNumberPart) {
-      queries.push(
-        Query.create()
-          .contains("name", namePart)
-          .equal("localId", nameNumberPart)
-          .paginate(page, pageSize),
-      );
-      // Fallback for sets/cards whose localId may include formatting/leading zeros.
-      queries.push(
-        Query.create()
-          .contains("name", namePart)
-          .contains("localId", nameNumberPart)
-          .paginate(page, pageSize),
-      );
-    }
-
-    // 3) If the whole query looks like "60" or "60/64", search by exact card number within the set.
-    if (pureNumberPart) {
-      queries.push(
-        Query.create()
-          .equal("localId", pureNumberPart)
-          .sort("localId", "ASC")
-          .paginate(page, pageSize),
-      );
-      // Fallback for localId variants like leading zeros/suffixes.
-      queries.push(
-        Query.create()
-          .contains("localId", pureNumberPart)
-          .sort("localId", "ASC")
-          .paginate(page, pageSize),
-      );
-
-      // Fallback by id suffix (e.g. "base1-4") when localId filters are inconsistent.
-      queries.push(
-        Query.create()
-          .contains("id", `-${pureNumberPart}`)
-          .sort("id", "ASC")
-          .paginate(page, pageSize),
-      );
-
-      // If query is a fraction like "4/102", also query the full fraction form
-      // directly. Some datasets expose localId with denominator included.
-      if (pureFraction) {
-        queries.push(
-          Query.create()
-            .equal("localId", pureFraction)
-            .paginate(page, pageSize),
-        );
-        queries.push(
-          Query.create()
-            .contains("localId", pureFraction)
-            .paginate(page, pageSize),
-        );
-      }
-    }
-
-    // 4) Finally, search by name (if we have any non-numeric name part).
-    if (effectiveName) {
-      queries.push(
-        Query.create()
-          .contains("name", effectiveName)
-          .sort("localId", "ASC")
-          .paginate(page, pageSize),
-      );
-    }
+    const queries = buildCardSearchQueries(q, page, pageSize);
 
     const resumeArrays = await Promise.all(
       queries.map(async (qry) => {
@@ -362,7 +308,7 @@ export async function searchPokemonCards(
     // Scoring: favour matches on name, card number, and set total.
     const parsedStructured = parseStructuredCardQuery(q);
     const numericOnlyMode = Boolean(parsedStructured?.hasOnlyNumericShape);
-    const nameHint = namePart.toLowerCase();
+    const nameHint = q.match(/^(.*?)(\d+)(?:\s*\/\s*(\d+))?$/)?.[1]?.trim().toLowerCase() ?? "";
     const numberHintValue = parsedStructured?.number;
     const desiredTotal = parsedStructured?.total;
 
