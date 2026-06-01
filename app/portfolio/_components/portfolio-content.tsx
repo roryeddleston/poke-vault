@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PortfolioResponse } from "../types";
-import { buildHoldingsCsv } from "../utils";
+import { buildHoldingsCsv } from "../csv";
 import { PortfolioFilterBar } from "./filter-bar";
 import { HoldingsTable } from "./holdings-table";
 import { Pagination } from "./pagination";
