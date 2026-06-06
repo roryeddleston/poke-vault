@@ -4,6 +4,14 @@ A full-stack Pokemon card portfolio tracker built with Next.js App Router.
 
 Track holdings, review profit/loss, explore card search results, and view a clear "How it works" breakdown of the project architecture and user flow.
 
+**App Router** was chosen for collocated server components and streaming — data fetching lives next to the UI that needs it, with no separate API calls for initial renders.
+
+**Neon** fits the Vercel deployment model cleanly: serverless Postgres with connection pooling built in, so there are no idle connections to manage.
+
+\*AVOIDED using supabase with vercel due to poopling issues.
+
+**demo/template pattern** (`demo` + `demo-template` owner scopes) lets anyone interact with a live, resettable dataset without auth — practical for a portfolio context where you want visitors to explore freely.
+
 ---
 
 ## Current Pages
