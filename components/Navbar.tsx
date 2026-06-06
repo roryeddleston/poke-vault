@@ -37,7 +37,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     label: "About",
-    href: "/analytics",
+    href: "/about",
     icon: (props) => <AnalyticsIcon {...props} />,
   },
 ];
@@ -135,7 +135,6 @@ export default function Navbar() {
             </Link>
           );
         })}
-
       </nav>
     </>
   );
