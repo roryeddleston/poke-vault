@@ -17,7 +17,10 @@ import { formatGBP, formatPct } from "./portfolio/utils";
 import { DashboardAllocationTabs } from "./_components/dashboard-allocation-tabs";
 import { KpiCard } from "./_components/kpi-card";
 import { PerformerCard } from "./_components/performer-card";
-import { HoldingActivityList, type ActivityItem } from "./_components/holding-activity-list";
+import {
+  HoldingActivityList,
+  type ActivityItem,
+} from "./_components/holding-activity-list";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +46,7 @@ type EnrichedHolding = {
 
 function buildAllocation(
   rows: Array<{ label: string; value: number }>,
-  totalValue: number,
+  totalValue: number
 ): AllocationRow[] {
   const grouped = new Map<string, number>();
   for (const row of rows) {
@@ -61,7 +64,7 @@ function buildAllocation(
 
 function toActivityItem(
   h: EnrichedHolding,
-  mode: "change" | "movers",
+  mode: "change" | "movers"
 ): ActivityItem {
   const isPositive = mode === "change" ? h.changeAmount >= 0 : h.changePct >= 0;
   const displayValue =
@@ -120,16 +123,23 @@ async function getDashboardData() {
     .slice(0, 5);
   const recentPriceChanges = enriched
     .filter((h) => h.latestSnapshotAt !== null)
-    .sort((a, b) => (b.latestSnapshotAt?.getTime() ?? 0) - (a.latestSnapshotAt?.getTime() ?? 0))
+    .sort(
+      (a, b) =>
+        (b.latestSnapshotAt?.getTime() ?? 0) -
+        (a.latestSnapshotAt?.getTime() ?? 0)
+    )
     .slice(0, 5);
 
   const allocationBySet = buildAllocation(
-    enriched.map((h) => ({ label: h.setName || "Unknown set", value: h.currentValue })),
-    summary.totalValue,
+    enriched.map((h) => ({
+      label: h.setName || "Unknown set",
+      value: h.currentValue,
+    })),
+    summary.totalValue
   );
   const allocationByGrade = buildAllocation(
     enriched.map((h) => ({ label: h.grade || "RAW", value: h.currentValue })),
-    summary.totalValue,
+    summary.totalValue
   );
 
   return {
@@ -137,7 +147,9 @@ async function getDashboardData() {
     summary,
     bestPerformer: byProfitPct[0],
     worstPerformer: byProfitPct[byProfitPct.length - 1],
-    recentPriceChanges: recentPriceChanges.map((h) => toActivityItem(h, "change")),
+    recentPriceChanges: recentPriceChanges.map((h) =>
+      toActivityItem(h, "change")
+    ),
     topMovers: topMovers.map((h) => toActivityItem(h, "movers")),
     allocationBySet,
     allocationByGrade,
@@ -203,12 +215,22 @@ export default async function DashboardPage() {
           <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <HoldingActivityList
               title="Recent price changes"
-              icon={<FiActivity className="h-5 w-5 shrink-0 text-accent" aria-hidden="true" />}
+              icon={
+                <FiActivity
+                  className="h-5 w-5 shrink-0 text-accent"
+                  aria-hidden="true"
+                />
+              }
               items={data.recentPriceChanges}
             />
             <HoldingActivityList
               title="Top movers"
-              icon={<FiTrendingUp className="h-5 w-5 shrink-0 text-accent" aria-hidden="true" />}
+              icon={
+                <FiTrendingUp
+                  className="h-5 w-5 shrink-0 text-accent"
+                  aria-hidden="true"
+                />
+              }
               items={data.topMovers}
             />
           </section>
