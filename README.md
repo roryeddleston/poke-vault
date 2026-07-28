@@ -93,6 +93,8 @@ Open [http://localhost:3000](http://localhost:3000)
 
 Live link: https://pokevault.roryeddleston.co.uk/
 
+Live connection to vercel to update repo changes
+
 ---
 
 ## Scripts
